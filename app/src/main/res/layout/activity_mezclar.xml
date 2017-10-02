@@ -20,7 +20,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_mezclar" />
+    <include layout="@layout/content_mezclar_linearlayout" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
