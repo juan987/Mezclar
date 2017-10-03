@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
 
-        android:src="@drawable/avion1"
+        android:src="@drawable/imagen11"
         android:scaleType="centerInside"
          />
 
@@ -39,10 +39,17 @@
         android:id="@+id/imageView2"
 
 
-        android:src="@drawable/transparente3"
-        android:scaleType="centerInside"
+        android:src="@drawable/imagen2"
+        android:scaleType="centerInside"/>
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView3"
         />
+
+
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,12 +57,8 @@
         android:id="@+id/combineimage"
       />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView3"
 
-         />
+
 
 
     </LinearLayout>
