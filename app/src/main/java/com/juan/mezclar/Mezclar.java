@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 //Para gestionar imagenes
@@ -23,6 +24,8 @@ import android.widget.ImageView;
 public class Mezclar extends AppCompatActivity {
     private ImageView collageImage;
     private ImageView finalImage;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +42,9 @@ public class Mezclar extends AppCompatActivity {
             }
         });
 
+
+        String xxx = this.getClass().getSimpleName();
+        Log.d(xxx, "Hola " );
         collageImage = (ImageView)findViewById(R.id.imageView3);
 
 
@@ -49,17 +55,13 @@ public class Mezclar extends AppCompatActivity {
             public void onClick(View v) {
                 Bitmap bigImage = BitmapFactory.decodeResource(getResources(), R.drawable.imagen11);
                 Bitmap smallImage = BitmapFactory.decodeResource(getResources(), R.drawable.imagen2);
-
                 smallImage = changeSomePixelsToTransparent(smallImage);
-
-
                 Bitmap mergedImages = createSingleImageFromMultipleImages(bigImage, smallImage);
-
                 collageImage.setImageBitmap(mergedImages);
+                GuardarImagen guardarImagen = new GuardarImagen(Mezclar.this, mergedImages);
+                guardarImagen.guardarImagenMethod();
             }
         });
-
-
 
     }
 
@@ -76,9 +78,7 @@ public class Mezclar extends AppCompatActivity {
     private Bitmap changeSomePixelsToTransparent(Bitmap originalImage){
 
         Bitmap bitmap2 = originalImage.copy(Bitmap.Config.ARGB_8888,true);
-
         bitmap2.setHasAlpha(true);
-
         for(int x=0;x<bitmap2.getWidth();x++){
             for(int y=0;y<bitmap2.getHeight();y++){
                 //if(bitmap2.getPixel(x, y)==Color.rgb(0xff, 0xff, 0xff))
@@ -90,8 +90,6 @@ public class Mezclar extends AppCompatActivity {
                 }
             }
         }
-
-
         return bitmap2;
     }
 
