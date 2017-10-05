@@ -15,6 +15,20 @@ import java.io.OutputStream;
  * Created by Juan on 04/10/2017.
  */
 
+/*
+
+Comentarios importantes
+
+If you want to use a image file from your drawable folder you can get it with this line of code:
+Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.my_image);
+
+If you want to save a thumbnail of an image you can easily change the size of the image with this line of code:
+Bitmap thumbnail = Bitmap.createScaledBitmap(originalBitmap, width, height, false);
+
+
+ */
+
+
 public class GuardarImagen {
     String xxx = this.getClass().getSimpleName();
     Context context;
@@ -38,8 +52,8 @@ public class GuardarImagen {
                 Log.d(xxx, "Imagen guardada");
             }else{
                 Toast.makeText(context,
-                        "Imagen NO guardada", Toast.LENGTH_SHORT).show();
-                Log.d(xxx, "Imagen NO guardada" );
+                        "ERROR Imagen NO guardada", Toast.LENGTH_SHORT).show();
+                Log.d(xxx, "ERROR: Imagen NO guardada" );
             }
 
 
@@ -89,6 +103,8 @@ public class GuardarImagen {
 
         } catch (Exception e) {
             Log.e("saveToExternalStorage()", e.getMessage());
+            Toast.makeText(context,
+                    e.getMessage(), Toast.LENGTH_SHORT).show();
             return false;
         }
     }
