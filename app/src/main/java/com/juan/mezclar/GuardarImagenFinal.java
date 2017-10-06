@@ -3,7 +3,6 @@ package com.juan.mezclar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,8 +12,6 @@ import java.io.OutputStream;
 
 /**
  * Created by Juan on 04/10/2017.
- *
- * Clase deprecada el 6 oct 17.  Usar la clase GuardarImagenFinal
  */
 
 /*
@@ -31,30 +28,35 @@ Bitmap thumbnail = Bitmap.createScaledBitmap(originalBitmap, width, height, fals
  */
 
 
-public class GuardarImagen {
+public class GuardarImagenFinal {
     String xxx = this.getClass().getSimpleName();
     Context context;
     Bitmap bitmap;
 
-    public GuardarImagen(Context context, Bitmap bitmap){
+    public GuardarImagenFinal(Context context, Bitmap bitmap){
         this.context = context;
         this.bitmap = bitmap;
     }
 
-    public boolean guardarImagenMethod(){
+    // los path para guardar la imagen generada son:
+    //   /pictures/predict y /DCIM/predict
+    public boolean guardarImagenMethod(String environmentDir, String subDir, String imageName){
+        //NOTA 1: environmentDir es string del tipo Environment.DIRECTORY_PICTURES o Environment.DIRECTORY_DCIM
+        //Nota 2: subDir es un string con barras: /predict/
+        //NOTA 3: imageName es el nombre de la imagen a guardar como predict.jpg
         if(isExternalStorageWritable()) {
-            File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File picturesDir = Environment.getExternalStoragePublicDirectory(environmentDir);
             String directorio = picturesDir.getAbsolutePath() ;
             Log.d(xxx, "El directorio es: " + directorio);
             Toast.makeText(context,
                     directorio, Toast.LENGTH_SHORT).show();
-            if(saveImageToExternalPublicStorage(directorio)){
+            if(saveImageToExternalPublicStorage(directorio, subDir, imageName)){
                 Toast.makeText(context,
                         "Imagen guardada", Toast.LENGTH_SHORT).show();
                 Log.d(xxx, "Imagen guardada");
             }else{
                 Toast.makeText(context,
-                        "ERROR Imagen NO guardada", Toast.LENGTH_SHORT).show();
+                        "ERROR Imagen NO guardada", Toast.LENGTH_LONG).show();
                 Log.d(xxx, "ERROR: Imagen NO guardada" );
                 return false;
             }
@@ -80,12 +82,12 @@ public class GuardarImagen {
         return false;
     }
 
-    public boolean saveImageToExternalPublicStorage(String fullPath) {
+    public boolean saveImageToExternalPublicStorage(String directorio, String subDir, String imageName) {
     //Como en:
     //https://www.101apps.co.za/articles/using-android-s-file-system-for-saving-application-data-part-1-saving-files.html
     //http://www.e-nature.ch/tech/saving-loading-bitmaps-to-the-android-device-storage-internal-external/
         try {
-            File dir = new File(fullPath + "/predict/");
+            File dir = new File(directorio + subDir);
             if (!dir.exists()) {
                 dir.mkdirs();
                 Log.d(xxx, "Directorio predict creado ");
@@ -93,7 +95,7 @@ public class GuardarImagen {
 
             OutputStream fOut = null;
             //Siempre sobreescribe el fichero si ya existe
-            File file = new File(fullPath + "/predict/", "predict.jpg");
+            File file = new File(directorio + subDir + imageName);
             //file.createNewFile();
             fOut = new FileOutputStream(file);
 
@@ -110,7 +112,7 @@ public class GuardarImagen {
         } catch (Exception e) {
             Log.e("saveToExternalStorage()", e.getMessage());
             Toast.makeText(context,
-                    e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.getMessage(), Toast.LENGTH_LONG).show();
             return false;
         }
     }

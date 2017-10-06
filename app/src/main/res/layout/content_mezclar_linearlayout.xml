@@ -23,13 +23,18 @@
         android:orientation="vertical">
 
 
+        <!--
+                android:src="@drawable/imagen11"
+                android:src="@drawable/imagen2"
+
+
+
+        -->
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
-
-        android:src="@drawable/imagen11"
         android:scaleType="centerInside"
          />
 
@@ -37,9 +42,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView2"
-
-
-        android:src="@drawable/imagen2"
         android:scaleType="centerInside"/>
 
     <ImageView

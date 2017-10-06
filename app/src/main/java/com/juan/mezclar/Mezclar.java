@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -25,9 +26,32 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+//*************************************************************************
+//Notas del 6 oct 2017
+//Cosas que me faltan:
+
+//leer el fichero config y guardar las coordenadas x e y en dos arrays String
+//Almacenar la foto en internet
+//Decidir como manejar la app Mezclar: la ejecuto sin interfaz grafica o pongo un servicio.
+//Ver como poner mas de una linea en las notificaciones
+//Adecentar un poco la UI de LaunchMezclar y ver como posicionar los controles en un ConstraintLayout y que
+//   no se puedan escribir mas de 16 digitos
+//Este es el commit 4321
+
 public class Mezclar extends AppCompatActivity {
+    //String para usar en log.d con el nombre de la clase
+    String xxx = this.getClass().getSimpleName();
+
     private ImageView collageImage;
     private ImageView finalImage;
+    //Array para almacenar la secuencia de imagenes a superponer
+    char[] arrayImagesSequence;
+    //String de secuencia de imagenes inicializada con la imagen 0.
+    String stringImagesSecuence; //Para prueba con el array vacio
+    //String stringImagesSecuence = "0";
+    //Path a agregar al dir raiz del telefono
+    String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
+    String imagenPrincipal = "origin.jpg";
 
 
     @Override
@@ -44,47 +68,78 @@ public class Mezclar extends AppCompatActivity {
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //        .setAction("Action", null).show();
-                metodoPrincipal();
+                boolean booleanContinuarApp = metodoPrincipal_2();
+                if(booleanContinuarApp){
+                    //Mantener la app abierta
+                    Snackbar.make(view, "Resultado correcto", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Aplicacion cerrada");
+                }else{
+                    //Forzar el cierre de la app por que ha habido un error
+                    Snackbar.make(view, "Cerrando app debido a un ERROR", Snackbar.LENGTH_LONG)
+                           .setAction("Action", null).show();
+                    //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
+                    //enviarNotification("Aplicacion cerrada debido a un error de ejecucion");
+                    finish();
+                }
             }
         });
 
 
-        String xxx = this.getClass().getSimpleName();
         Log.d(xxx, "Hola " );
         collageImage = (ImageView)findViewById(R.id.imageView3);
 
 
         //Recibir datos de la app Launh Mezclar
+        String myString;
         Bundle data = getIntent().getExtras();
         if(data!=null){
-            String myString = data.getString("KeyName");
+            myString = data.getString("KeyName");
             //Hay que chequear myString para que no lanze el toast with null cuando lanzo la app desde el movil
-            if(myString!=null) {
+            if(myString!=null && !myString.isEmpty()) {
+                //Copiamos la secuencia de imagenes recibidas
+                stringImagesSecuence = null;
+                stringImagesSecuence = myString;
                 Toast.makeText(this,
                         myString, Toast.LENGTH_SHORT).show();
-                Log.d(xxx, "Datos de Launch Mezclar: " + myString);
+                Log.d(xxx, "Datos de Launch Mezclar: " + stringImagesSecuence);
                 //Muestro el string character a character
-                for(int i = 0; i < myString.length(); i++) {
-                    Log.d(xxx, "Caracter " +i +":" + myString.charAt(i));
+                for(int i = 0; i < stringImagesSecuence.length(); i++) {
+                    Log.d(xxx, "Caracter " +i +":" + stringImagesSecuence.charAt(i));
                 }
-            }else{
+
+                //Convertir el string de secuencia de imagenes en un array de secuencia de imagenes, character a character
+                arrayImagesSequence = stringImagesSecuence.toCharArray();
+                //Lo muestro con
+                for (char temp : arrayImagesSequence) {
+                    Log.d(xxx, "Caracter " +temp);
+                }//OK
+            }else{//Salta aqui si no hay datos en el intent
                 Log.d(xxx, "Datos de Launch Mezclar: No hay datos");
+                //Datos fake para probar
+                //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
+                this.finish();
+
             }
 
-        }else{
+        }else{//Salta aqui si recibe nulo en el intent
             Log.d(xxx, "Datos de Launch Mezclar: NULL 2 del else");
+            //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
+            this.finish();
         }
 
-        Button combineImage = (Button)findViewById(R.id.combineimage);
+        //Boton anulado. Uso el fab
+        /*Button combineImage = (Button)findViewById(R.id.combineimage);
         combineImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 metodoPrincipal();
             }
         });
+        */
 
     }
-    //ESte metodo mezcla dos imagenes que estan en la carpeta drawable.
+    //ESte metodo mezcla dos imagenes que estan en la carpeta drawable. Es solo para probar
     private void metodoPrincipal(){
 
                 Bitmap bigImage = BitmapFactory.decodeResource(getResources(), R.drawable.imagen11);
@@ -99,17 +154,196 @@ public class Mezclar extends AppCompatActivity {
                 guardarImagen.guardarImagenMethod();
     }
 
-    private void metodoPrincipal_2(){
-        //Obtener el path de DCIM/
+    //Metodo final y OK
+    private boolean metodoPrincipal_2(){
+        ObtenerImagen obtenerImagen = new ObtenerImagen(Mezclar.this);
+
+        //Chequeo el array de secuencia de imagenes: si es null o esta vacio, termina el programa
+        if (arrayImagesSequence != null) {
+            if (arrayImagesSequence.length == 0) {
+                //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                enviarNotification("Error: el array de imagenes esta vacio, saliendo de la aplicacion");
+                return false;
+            }//El array de sequencia existe, continuamos
+        }else
+        {
+            enviarNotification("Error: el array de imagenes es null, saliendo de la aplicacion");
+            return false;
+        }
+
+        //Obtener la imagen origin.jpg como un bitmap
+        Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
+        if(originJpg == null){
+            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Error al recuperar origin.jpg, saliendo de la aplicacion");
+            return false;
+        }
+        //Se muestra origin.jpg en la UI
+        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        imageView.setImageBitmap(originJpg);
+        //Instruccion para cargar directamente de la memoria una imagen
+        //imageView.setImageBitmap(BitmapFactory.decodeFile(pathToPicture));
+
+        //Loop principal de la aplicacion
+        Bitmap imagenParaSuperponerConOrigin;
+        Bitmap mergedImages = null;
+        for(int i = 0; i < arrayImagesSequence.length; i++) {
+            Log.d(xxx, "mezclando imagen: " +i);
+            enviarNotification("mezclando imagen: " +i);
+            //Obtener la imagen a superponer como un bitmap
+            imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                    +arrayImagesSequence[i]+".jpg");
+            if(imagenParaSuperponerConOrigin == null){
+                //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                enviarNotification("Error al recuperar imagen pequeña numero: " +i +" ,saliendo de la aplicacion");
+                //Acabamos la ejecucion
+                return false;
+            }else{
+                //Continuamos con el procesamiento
+                //Se muestra la imagen pequeña en la UI,
+                ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
+                imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
+
+                //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
+                imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
+                leerCoordenadasDeSuperposicion(i);
+                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+                mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
+                                        xFloat, yFloat);
+                //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
+                originJpg = mergedImages;
+                if(mergedImages != null) {
+                    //Comando de prueba. Comentar esta linea en la version final
+                    collageImage.setImageBitmap(mergedImages);
+                }else{
+                    //Ha habido un error al mezclar las imagenes
+                    enviarNotification("Error mezclando imagen: " +i  +" ,saliendo de la aplicacion");
+                    return false;
+
+                }
+                //
+            }
+
+        }//Fin del loop principal
+
+        //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
+        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(Mezclar.this, mergedImages);
+        //Guardar imagen el directorio pictures/predict
+        //No hace falta, guardo directamente en DCIM/predict
+        /*
+        if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_PICTURES, "/predict/", "predict.jpg")){
+            //Ha habido un error al guardar la imagen, devolver false
+            enviarNotification("Error guardando imagen predict" +" ,saliendo de la aplicacion");
+            return false;
+        } */
+
+        //Guardar imagen en el directorio DCIM/predict
+        if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg")){
+            //Ha habido un error al guardar la imagen, devolver false
+            enviarNotification("Error guardando imagen predict" +" ,saliendo de la aplicacion");
+            return false;
+        }
+
+        //Return true al final del metodo. es un fake return, este valor no se recoje en ningun sitio
+        return true;
+    }//Fin de metodoPrincipal_2
+
+    //Coordenadas globales para colocar la imagen transparente sobre origin.jpg
+    private float xFloat;
+    private float yFloat;
+    private void leerCoordenadasDeSuperposicion(int i){
+        //TODO: extraer las coordenadas del fichero CONFIG.text en CesaralMagic/ImageC
+
+
+        //Este es manual, con las coordenadas de CONFIG:
+        switch (i){
+            case 0://N1
+                xFloat = 94;
+                yFloat = 1;
+                break;
+            case 1://N2
+                xFloat = 115;
+                yFloat = 1;
+                break;
+            case 2://N3
+                xFloat = 94;
+                yFloat = 27;
+                break;
+            case 3://N4
+                xFloat = 115;
+                yFloat = 27;
+                break;
+            case 4://N5
+                xFloat = 94;
+                yFloat = 53;
+                break;
+            case 5://N6
+                xFloat = 115;
+                yFloat = 53;
+                break;
+            case 6://N7
+                xFloat = 94;
+                yFloat = 79;
+                break;
+            case 7://N8
+                xFloat = 115;
+                yFloat = 79;
+                break;
+            case 8://N9
+                xFloat = 94;
+                yFloat = 105;
+                break;
+            case 9://N10
+                xFloat = 115;
+                yFloat = 105;
+                break;
+            case 10://N11
+                xFloat = 94;
+                yFloat = 173;
+                break;
+            case 11://N12
+                xFloat = 115;
+                yFloat = 173;
+                break;
+            case 12://N13
+                xFloat = 94;
+                yFloat = 199;
+                break;
+            case 13://N14
+                xFloat = 115;
+                yFloat = 199;
+                break;
+            case 14://N15
+                xFloat = 0;
+                yFloat = 0;
+                break;
+            case 15://N16
+                xFloat = 0;
+                yFloat = 50;
+                break;
+
+        }
 
     }
 
+
+    //Metodo de prueba
     private Bitmap createSingleImageFromMultipleImages(Bitmap firstImage, Bitmap secondImage){
 
         Bitmap result = Bitmap.createBitmap(firstImage.getWidth(), firstImage.getHeight(), firstImage.getConfig());
         Canvas canvas = new Canvas(result);
         canvas.drawBitmap(firstImage, 0f, 0f, null);
         canvas.drawBitmap(secondImage, 10, 10, null);
+        return result;
+    }
+
+    //Metodo final para la mezcla
+    private Bitmap createSingleImageFromMultipleImagesWithCoord(Bitmap firstImage, Bitmap secondImage, float x, float y ){
+
+        Bitmap result = Bitmap.createBitmap(firstImage.getWidth(), firstImage.getHeight(), firstImage.getConfig());
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(firstImage, 0f, 0f, null);
+        canvas.drawBitmap(secondImage, x, y, null);
         return result;
     }
 
