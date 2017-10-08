@@ -26,6 +26,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.List;
+
 //*************************************************************************
 //Notas del 6 oct 2017
 //Cosas que me faltan:
@@ -52,6 +54,7 @@ public class Mezclar extends AppCompatActivity {
     //Path a agregar al dir raiz del telefono
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
     String imagenPrincipal = "origin.jpg";
+    String ficheroConfigTxt = "CONFIG.txt";
 
 
     @Override
@@ -156,7 +159,7 @@ public class Mezclar extends AppCompatActivity {
 
     //Metodo final y OK
     private boolean metodoPrincipal_2(){
-        ObtenerImagen obtenerImagen = new ObtenerImagen(Mezclar.this);
+        //ObtenerImagen obtenerImagen = new ObtenerImagen(Mezclar.this);
 
         //Chequeo el array de secuencia de imagenes: si es null o esta vacio, termina el programa
         if (arrayImagesSequence != null) {
@@ -164,14 +167,38 @@ public class Mezclar extends AppCompatActivity {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error: el array de imagenes esta vacio, saliendo de la aplicacion");
                 return false;
-            }//El array de sequencia existe, continuamos
+            }else{
+                //El array de sequencia existe, continuamos
+            }
         }else
         {
             enviarNotification("Error: el array de imagenes es null, saliendo de la aplicacion");
             return false;
         }
 
+        //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
+        LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(Mezclar.this);
+        List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
+        if(arrayLineasTexto.isEmpty()){
+            Log.d(xxx, "arrayLineasTexto esta vacio");
+            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            return false;
+        }
+        if(arrayLineasTexto.size() == 0){
+            Log.d(xxx, "arrayLineasTexto tiene size = 0");
+            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Error 2 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            return false;
+        }
+
+        //Recorro y muestro la lista de List con el contenido de CONFIG.txt
+        for (int i=0; i < arrayLineasTexto.size(); i++){
+            Log.d(xxx, "Linea "  +(i+1) +"contiene: " +arrayLineasTexto.get(i));
+        }
+
         //Obtener la imagen origin.jpg como un bitmap
+        ObtenerImagen obtenerImagen = new ObtenerImagen(Mezclar.this);
         Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
         if(originJpg == null){
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
