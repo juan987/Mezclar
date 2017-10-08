@@ -29,16 +29,16 @@ import android.widget.Toast;
 import java.util.List;
 
 //*************************************************************************
-//Notas del 6 oct 2017
+//Notas del 8 oct 2017
 //Cosas que me faltan:
 
-//leer el fichero config y guardar las coordenadas x e y en dos arrays String
+//leer el fichero config y guardar las coordenadas x e y en dos arrays String, lo he hecho en parte
 //Almacenar la foto en internet
 //Decidir como manejar la app Mezclar: la ejecuto sin interfaz grafica o pongo un servicio.
 //Ver como poner mas de una linea en las notificaciones
 //Adecentar un poco la UI de LaunchMezclar y ver como posicionar los controles en un ConstraintLayout y que
 //   no se puedan escribir mas de 16 digitos
-//Este es el commit 4321
+//Este es el commit 4322
 
 public class Mezclar extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
@@ -179,22 +179,36 @@ public class Mezclar extends AppCompatActivity {
         //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
         LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(Mezclar.this);
         List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
+        if(arrayLineasTexto == null){
+            Log.d(xxx, "arrayLineasTexto es null");
+            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            return false;
+        }
+
         if(arrayLineasTexto.isEmpty()){
             Log.d(xxx, "arrayLineasTexto esta vacio");
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
             return false;
         }
-        if(arrayLineasTexto.size() == 0){
-            Log.d(xxx, "arrayLineasTexto tiene size = 0");
-            //Hay un error, terminamos la ejecucion he informamos con una notificacion
-            enviarNotification("Error 2 al recuperar CONFIG.txt, saliendo de la aplicacion");
-            return false;
-        }
 
-        //Recorro y muestro la lista de List con el contenido de CONFIG.txt
+        //Recorro y muestro la lista con el contenido de CONFIG.txt, solo para pruebas
+        String[] coordenates;
+        String linea;
         for (int i=0; i < arrayLineasTexto.size(); i++){
-            Log.d(xxx, "Linea "  +(i+1) +"contiene: " +arrayLineasTexto.get(i));
+            Log.d(xxx, "Linea "  +(i+1) +" contiene: " +arrayLineasTexto.get(i));
+            linea = arrayLineasTexto.get(i);
+            //Hacemos split de linea
+            coordenates = linea.split("\\s+");
+            int index = 1;
+            for(String dato : coordenates){
+                //Dato tiene cada string de una linea de CONFIG.txt: N12,
+                Log.d(xxx, "Dato " +index +" es: " +dato);
+                index++;
+
+            }
+            leerCoordenadasDeConfigTxt(arrayLineasTexto.get(i));
         }
 
         //Obtener la imagen origin.jpg como un bitmap
@@ -274,6 +288,25 @@ public class Mezclar extends AppCompatActivity {
         //Return true al final del metodo. es un fake return, este valor no se recoje en ningun sitio
         return true;
     }//Fin de metodoPrincipal_2
+
+
+    //ESte metodo separa los numeros de cada linea de config.txt en el array str:
+    //str[1] muestra el indice N, el str[2] el valor de la coordenada X, str[3] la coordenada Y
+    //str[0] siempre muestra un char vacio.
+    private void leerCoordenadasDeConfigTxt(String linea){
+        String line = "This order was32354 placed 343434for 43411 QT ! OK?";
+        String regex = "[^\\d]+";
+        //String[] str = line.split(regex);
+        String[] str = linea.split(regex);
+        //String required = "";
+        int i = 0;
+        for(String st: str){
+            Log.d(xxx, "xxx Dato " +i +" es: " +st);
+            i++;
+        }
+    }
+
+
 
     //Coordenadas globales para colocar la imagen transparente sobre origin.jpg
     private float xFloat;

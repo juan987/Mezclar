@@ -32,61 +32,34 @@ public class LeerFicheroTxt {
         ArrayList<String> arrayLineasTexto = new ArrayList<>();
         if(isExternalStorageWritable()) {
 
-            //File directorioMain = Environment.getExternalStorageDirectory() + pathToFileTxt;
-
-            File directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt );
-
+            File directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt);
             String directorio = directorioMain.getAbsolutePath();
-            //directorio += pathToFileTxt;
             Log.d(xxx, "El directorio es: " + directorioMain);
-            //Leer el fichero txt
-            //BufferedReader br = new BufferedReader(new FileReader(directorioMain));
-            BufferedReader br = null;
-
             try {
-                br = new BufferedReader(new FileReader(directorioMain));
-                //BufferedReader br = new BufferedReader(new FileReader(directorioMain));
+                //Como en https://alvinalexander.com/blog/post/java/how-open-read-file-java-string-array-list
+                BufferedReader br = new BufferedReader(new FileReader(directorioMain));
                 String line;
                 int lineCount = 0;
                 while ((line = br.readLine()) != null) {
                     arrayLineasTexto.add(line);
-                    // process the line.
+                    // process the line 7  o multiplos, creo.
                     /* if(lineCount % 7 == 0) {
                         arrayLineasTexto.add(line);
                     } */
                     lineCount ++;
                 }
-                //br.close();
+                br.close();
+                return arrayLineasTexto;
             }
-
-            /*
-            catch (FileNotFoundException e) {
-                e.printStackTrace();
+            catch (Exception e) {
+                Log.d(xxx, e.getMessage());
                 return null;
-            } */
-            catch (IOException ioEx) {
-                //ioEx.printStackTrace();
-                Log.d(xxx, ioEx.getMessage());
-
-            }
-            finally {
-                try {
-
-                    if (br != null) {
-                        br.close();
-                    }
-                } catch (IOException ex) {
-                    //ex.printStackTrace();
-                    Log.d(xxx, ex.getMessage());
-
-                }
             }
 
         }else{
             Log.d(xxx, "El external public storage no esta montado ");
-
+            return null;
         }
-        return arrayLineasTexto;
     }
 
 
