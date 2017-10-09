@@ -48,15 +48,15 @@ public class GuardarImagenFinal {
             File picturesDir = Environment.getExternalStoragePublicDirectory(environmentDir);
             String directorio = picturesDir.getAbsolutePath() ;
             Log.d(xxx, "El directorio es: " + directorio);
-            Toast.makeText(context,
-                    directorio, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context,
+                    //directorio, Toast.LENGTH_SHORT).show();
             if(saveImageToExternalPublicStorage(directorio, subDir, imageName)){
-                Toast.makeText(context,
-                        "Imagen guardada", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,
+                        //"Imagen guardada", Toast.LENGTH_SHORT).show();
                 Log.d(xxx, "Imagen guardada");
             }else{
-                Toast.makeText(context,
-                        "ERROR Imagen NO guardada", Toast.LENGTH_LONG).show();
+                //Toast.makeText(context,
+                        //"ERROR Imagen NO guardada", Toast.LENGTH_LONG).show();
                 Log.d(xxx, "ERROR: Imagen NO guardada" );
                 return false;
             }
@@ -111,8 +111,8 @@ public class GuardarImagenFinal {
 
         } catch (Exception e) {
             Log.e("saveToExternalStorage()", e.getMessage());
-            Toast.makeText(context,
-                    e.getMessage(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(context,
+                    //e.getMessage(), Toast.LENGTH_LONG).show();
             return false;
         }
     }

@@ -1,6 +1,7 @@
 package com.juan.mezclar;
 
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,21 +13,32 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.content.Intent;
 
 //Para gestionar imagenes
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
+import android.webkit.URLUtil;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.juan.mezclar.retrofit.ServicioRetrofit2;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 //*************************************************************************
 //Notas del 8 oct 2017
@@ -56,10 +68,19 @@ public class Mezclar extends AppCompatActivity {
     String imagenPrincipal = "origin.jpg";
     String ficheroConfigTxt = "CONFIG.txt";
 
+    //Fichero de prueba para probar fallo de ArrayIndexOutOfBoundsException
+    //String ficheroConfigTxt = "CONFIG[1].txt";
+
+    //Fichero de prueba para probar fallo de URL no valida
+    //String ficheroConfigTxt = "CONFIG[1][1].txt";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Obtener datos iniciales. Si no hay datos, cerrar la app
+        recuperarIntentConDatosIniciales();
+        //Si hay datos, se carga la UI
         setContentView(R.layout.activity_mezclar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -76,7 +97,7 @@ public class Mezclar extends AppCompatActivity {
                     //Mantener la app abierta
                     Snackbar.make(view, "Resultado correcto", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                    enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Aplicacion cerrada");
+                    enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando a retrofit");
                 }else{
                     //Forzar el cierre de la app por que ha habido un error
                     Snackbar.make(view, "Cerrando app debido a un ERROR", Snackbar.LENGTH_LONG)
@@ -92,12 +113,27 @@ public class Mezclar extends AppCompatActivity {
         Log.d(xxx, "Hola " );
         collageImage = (ImageView)findViewById(R.id.imageView3);
 
+        //Boton anulado. Uso el fab
+        /*Button combineImage = (Button)findViewById(R.id.combineimage);
+        combineImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                metodoPrincipal();
+            }
+        });
+        */
 
+    }//Fin del onCreate
+
+    //Metodo que recupera los datos recibidos en un intent lanzado por otra aplicacion,
+    //por ejemplo, Launch Mezclar.
+    //Si el intent es nulo, o no hay datos, la app se cierra automaticamente
+    private void recuperarIntentConDatosIniciales(){
         //Recibir datos de la app Launh Mezclar
-        String myString;
+        //String myString;
         Bundle data = getIntent().getExtras();
         if(data!=null){
-            myString = data.getString("KeyName");
+            String myString = data.getString("KeyName");
             //Hay que chequear myString para que no lanze el toast with null cuando lanzo la app desde el movil
             if(myString!=null && !myString.isEmpty()) {
                 //Copiamos la secuencia de imagenes recibidas
@@ -130,18 +166,8 @@ public class Mezclar extends AppCompatActivity {
             //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
             this.finish();
         }
-
-        //Boton anulado. Uso el fab
-        /*Button combineImage = (Button)findViewById(R.id.combineimage);
-        combineImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                metodoPrincipal();
-            }
-        });
-        */
-
     }
+
     //ESte metodo mezcla dos imagenes que estan en la carpeta drawable. Es solo para probar
     private void metodoPrincipal(){
 
@@ -159,8 +185,6 @@ public class Mezclar extends AppCompatActivity {
 
     //Metodo final y OK
     private boolean metodoPrincipal_2(){
-        //ObtenerImagen obtenerImagen = new ObtenerImagen(Mezclar.this);
-
         //Chequeo el array de secuencia de imagenes: si es null o esta vacio, termina el programa
         if (arrayImagesSequence != null) {
             if (arrayImagesSequence.length == 0) {
@@ -194,22 +218,56 @@ public class Mezclar extends AppCompatActivity {
         }
 
         //Recorro y muestro la lista con el contenido de CONFIG.txt, solo para pruebas
+        /*
         String[] coordenates;
         String linea;
         for (int i=0; i < arrayLineasTexto.size(); i++){
             Log.d(xxx, "Linea "  +(i+1) +" contiene: " +arrayLineasTexto.get(i));
             linea = arrayLineasTexto.get(i);
-            //Hacemos split de linea
+            //Hacemos split de linea, el token es espeacio en blanco como regex: \\s+
             coordenates = linea.split("\\s+");
             int index = 1;
             for(String dato : coordenates){
-                //Dato tiene cada string de una linea de CONFIG.txt: N12,
+                //Dato tiene cada string de una linea de CONFIG.txt: N*, coordX y CoordY.
                 Log.d(xxx, "Dato " +index +" es: " +dato);
                 index++;
 
             }
             leerCoordenadasDeConfigTxt(arrayLineasTexto.get(i));
+        } */
+
+        //Leer coordenadas y URL del array de lineas obtenido del fichero CONFIG.txt
+        List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
+
+        //Caso de try/ctach para ArrayIndexOutOfBoundsException
+        if(listaCoordenadas == null){
+            //Este error indica que alguna coordenada x, y no es un numero valido, alomejor es
+            //un error tipografico, como poner una letra en vez de un digito.
+            enviarNotification("Error ArrayIndexOutOfBoundsException, saliendo de la aplicacion");
+            return false;
         }
+
+        if(listaCoordenadas.isEmpty()){
+            //Hay un fallo en CONFIG text y no se han leido las coordenadas
+            //Enviar notificacion de error y cerrar programa
+            enviarNotification("Error al recuperar coordenadas, saliendo de la aplicacion");
+            return false;
+        }
+
+        //Chequear si la url de CONFIG.txt es valida
+        if( URLUtil.isValidUrl(urlServidor)){
+            //La URL del servidor es valida
+            Log.d(xxx, "URL del servidor valida: " +urlServidor);
+
+
+        }else{
+            //La URL del servidor NO es valida
+            enviarNotification("Error URL invalida, saliendo de la aplicacion");
+            Log.d(xxx, "URL del servidor NO valida: " +urlServidor);
+            return false;
+        }
+        //FIN de Leer coordenadas y URL del array de lineas obtenido del fichero CONFIG.txt
+
 
         //Obtener la imagen origin.jpg como un bitmap
         ObtenerImagen obtenerImagen = new ObtenerImagen(Mezclar.this);
@@ -241,13 +299,34 @@ public class Mezclar extends AppCompatActivity {
                 return false;
             }else{
                 //Continuamos con el procesamiento
-                //Se muestra la imagen pequeña en la UI,
-                ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
-                imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
+                //Se muestra la imagen pequeña en la UI, solo para pruebas
+                //ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
+                //imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
 
                 //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
                 imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
-                leerCoordenadasDeSuperposicion(i);
+                //Leer las coordenadas de prueba
+                //leerCoordenadasDeSuperposicion(i);
+
+
+                //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
+                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
+                //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
+                if(i >= listaCoordenadas.size()){
+                    enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
+                    return false;//Cerrar aplicacion y evitar un null pointer
+                }
+                xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
+                yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+
+                //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
+                //Float.isNaN retorna true si no es un numero
+                if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
+                    enviarNotification("Error, coordenadas no son un numero valido, saliendo de la aplicacion");
+                    return false;//Cerrar aplicacion y evitar fallo en el procesamiento
+                }
+
+
                 //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
                 mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
                                         xFloat, yFloat);
@@ -285,7 +364,12 @@ public class Mezclar extends AppCompatActivity {
             return false;
         }
 
-        //Return true al final del metodo. es un fake return, este valor no se recoje en ningun sitio
+        //Enviar predict.jpg al server con POST
+        //java.lang.IllegalArgumentException: baseUrl must end in /: http://www.cesaral.com/test
+        subirImagenConRetrofit2(obtenerImagen, urlServidor +"/");
+
+
+        //Return true al final del metodo. La app se queda abierta, esperando el resultado de retrofit
         return true;
     }//Fin de metodoPrincipal_2
 
@@ -293,6 +377,7 @@ public class Mezclar extends AppCompatActivity {
     //ESte metodo separa los numeros de cada linea de config.txt en el array str:
     //str[1] muestra el indice N, el str[2] el valor de la coordenada X, str[3] la coordenada Y
     //str[0] siempre muestra un char vacio.
+    //Este metodo es solo para pruebas
     private void leerCoordenadasDeConfigTxt(String linea){
         String line = "This order was32354 placed 343434for 43411 QT ! OK?";
         String regex = "[^\\d]+";
@@ -306,11 +391,74 @@ public class Mezclar extends AppCompatActivity {
         }
     }
 
+    //Metodo para:
+    //Generar array de pojos con las coordenadas x e Y de posicionamiento de imagenes
+    //Generar la URL para subir y almacenar la imagen generada a un servidor
+    String urlServidor;
+    private List<PojoCoordenadas> generarPojoGenerarUrl(List<String> arrayLineasTextoLocal){
+        ArrayList<PojoCoordenadas> arrayPojoCoordenadas = new ArrayList<>();
+        String regex = "[^\\d]+";
+        for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
+            //Extrae las coordenadas x e y de cada linea con regex y genera pojo de
+            //coordenadas por cada linea y lo guarda en el array de coordenadas
+            String[] str = arrayLineasTextoLocal.get(i).split(regex);
+            //Si la linea no tiene digitos, hago un break y continua el loop
+            if(str.length == 0) break;
+            PojoCoordenadas pojoCoordenadas = new PojoCoordenadas();
+            try {
+                pojoCoordenadas.setCoordX(str[2]);
+                pojoCoordenadas.setCoordY(str[3]);
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+                Log.d(xxx, "ArrayIndexOutOfBoundsException:  " +e.getMessage());
+                return null;
+            }
+            arrayPojoCoordenadas.add(pojoCoordenadas);
+        }
+
+        //Este for extrae la URL del servidor
+        String[] stringURLFinal = null;
+        for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
+            //Obtener URL del Servidor para almacenar imagen generada
+            String regexUrl = "web=";
+            stringURLFinal = arrayLineasTextoLocal.get(i).split(regexUrl);
+        }
+
+        if(stringURLFinal != null) {
+            int i = 0;
+            for (String st : stringURLFinal) {
+                Log.d(xxx, "xxx Dato en stringURLFinal " + i + " es: " + st);
+                urlServidor = stringURLFinal[i];
+                i++;
+            }
+        }
+
+        //Imprime las coordenadas
+        for (int i = 0; i < arrayPojoCoordenadas.size(); i++ ){
+            Log.d(xxx, "Coordenada X en arraPojo " + i + " es: " + arrayPojoCoordenadas.get(i).getCoordX()
+                            +"\n"
+                             +"Coordenada y en arraPojo " + i + " es: " + arrayPojoCoordenadas.get(i).getCoordY());
+        }
+
+        //Imprime la url
+        if(stringURLFinal != null) {
+            int i = 0;
+            for (String st : stringURLFinal) {
+                Log.d(xxx, "xxx Dato en stringURLFinal " + i + " es: " + st);
+                urlServidor = stringURLFinal[i];
+                i++;
+            }
+        }
+
+
+        return arrayPojoCoordenadas;
+    }//Fin de generarPojoGenerarUrl
 
 
     //Coordenadas globales para colocar la imagen transparente sobre origin.jpg
     private float xFloat;
     private float yFloat;
+    //Este metodo es solo para hacer pruebas
     private void leerCoordenadasDeSuperposicion(int i){
         //TODO: extraer las coordenadas del fichero CONFIG.text en CesaralMagic/ImageC
 
@@ -430,8 +578,9 @@ public class Mezclar extends AppCompatActivity {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("My notification")
-                        .setContentText(mensaje);
+                        .setContentTitle("Mezclar")
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(mensaje));
+                        //.setContentText(mensaje);
         // Gets an instance of the NotificationManager service//
 
         NotificationManager mNotificationManager =
@@ -445,6 +594,64 @@ public class Mezclar extends AppCompatActivity {
         // rather than create a new one. In this example, the notification’s ID is 001//
 
         mNotificationManager.notify(001, mBuilder.build());
+    }
+
+
+    //Uso de retrofit para subir la imagen generada al servidor
+    //Recibe la instancia de ObtenerImagen usada en el metodo metodoPrincipal_2
+    ServicioRetrofit2 servicioRetrofit2;
+    private boolean subirImagenConRetrofit2(ObtenerImagen obtenerImagen, String Url){
+        File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/",
+                "predict.jpg");
+
+        if(filePathDePredictJpg == null){
+            enviarNotification("Error al obtener el file de predict.jpg para retrofit2" +" ,saliendo de la aplicacion");
+            return false;
+
+        }else{//Hemos obtenido el file de la imagen a subir, seguimos
+
+            //Chequeamos que el path a predict.jpg es correcto:
+            Log.d(xxx, "Path a predict.jpg: " + filePathDePredictJpg.getName());
+
+            //Usamos interceptor para loggear retrofit
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+            //Creamos una instancia de ServicioRetrofit2
+            servicioRetrofit2 = new Retrofit.Builder().baseUrl(Url).client(client).build().create(ServicioRetrofit2.class);
+
+            //Definimos los parametros necesarios para retrofit2
+            RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), filePathDePredictJpg);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("upload", filePathDePredictJpg.getName(), reqFile);
+            RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "prueba_de_subida");
+
+            retrofit2.Call<okhttp3.ResponseBody> req = servicioRetrofit2.postImage(body, name);
+            req.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Toast.makeText(Mezclar.this, "Success " + response.message(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(Mezclar.this, "Success " + response.body().toString(), Toast.LENGTH_LONG).show();
+                    Log.d(xxx, "Imagen subida correctamente con retrofit2: " +response.message());
+                    Log.d(xxx, "response.message: " +response.message());
+                    Log.d(xxx, "response.body().toString(): " +response.body().toString());
+                    enviarNotification("Imagen subida correctamente al servidor: " +response.message());
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    //t.printStackTrace();
+                    Log.d(xxx, "Error de retrofit2: " +t.getMessage());
+                    enviarNotification("Error al obtener el file de predict.jpg para retrofit2" +" ,saliendo de la aplicacion");
+                }
+            });
+
+
+
+
+            //**********************************************************************************
+            return true;
+        }
     }
 
 
