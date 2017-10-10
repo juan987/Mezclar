@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -23,9 +24,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.juan.mezclar.ftpClases.FtpClient;
 import com.juan.mezclar.retrofit.ServicioRetrofit2;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,10 +84,24 @@ public class Mezclar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //Obtener datos iniciales. Si no hay datos, cerrar la app
         recuperarIntentConDatosIniciales();
+
+
+        //Si no pongo esto, entonces se cuelga la app cuando subo el fichero al servidor ftp. Tendria que usar un asynctask!!!!!
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+
+
         //Si hay datos, se carga la UI
         setContentView(R.layout.activity_mezclar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //Muestr snakbar con lo que ha mandado la app Launch Mezclar
+        Snackbar.make(findViewById(R.id.coordinatorlayout_1), stringImagesSecuence, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
 
         //Llamo al metodo desde el Floating button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -97,7 +115,7 @@ public class Mezclar extends AppCompatActivity {
                     //Mantener la app abierta
                     Snackbar.make(view, "Resultado correcto", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                    enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando a retrofit");
+                    //enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp");
                 }else{
                     //Forzar el cierre de la app por que ha habido un error
                     Snackbar.make(view, "Cerrando app debido a un ERROR", Snackbar.LENGTH_LONG)
@@ -128,6 +146,7 @@ public class Mezclar extends AppCompatActivity {
     //Metodo que recupera los datos recibidos en un intent lanzado por otra aplicacion,
     //por ejemplo, Launch Mezclar.
     //Si el intent es nulo, o no hay datos, la app se cierra automaticamente
+    public String textoSnackBarInicial;
     private void recuperarIntentConDatosIniciales(){
         //Recibir datos de la app Launh Mezclar
         //String myString;
@@ -139,8 +158,8 @@ public class Mezclar extends AppCompatActivity {
                 //Copiamos la secuencia de imagenes recibidas
                 stringImagesSecuence = null;
                 stringImagesSecuence = myString;
-                Toast.makeText(this,
-                        myString, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, myString, Toast.LENGTH_SHORT).show();
+
                 Log.d(xxx, "Datos de Launch Mezclar: " + stringImagesSecuence);
                 //Muestro el string character a character
                 for(int i = 0; i < stringImagesSecuence.length(); i++) {
@@ -364,13 +383,27 @@ public class Mezclar extends AppCompatActivity {
             return false;
         }
 
+        //Return true al final del metodo. La app se queda abierta, esperando el resultado de la subida de predict.jpg con ftp
+        enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp...");
+
         //Enviar predict.jpg al server con POST
         //java.lang.IllegalArgumentException: baseUrl must end in /: http://www.cesaral.com/test
-        subirImagenConRetrofit2(obtenerImagen, urlServidor +"/");
+        //subirImagenConRetrofit2(obtenerImagen, urlServidor +"/");
 
 
-        //Return true al final del metodo. La app se queda abierta, esperando el resultado de retrofit
+        //Provisionalmente devuelve tru aqui
         return true;
+
+        //Dejo este codigo comentado hasta que Cesar arregle lo del acceso al ftp server
+        /*
+        if(metodoSubirImagenConFtp(obtenerImagen)){
+            return true;
+        }else{
+            return false;
+        }*/
+
+
+
     }//Fin de metodoPrincipal_2
 
 
@@ -597,8 +630,134 @@ public class Mezclar extends AppCompatActivity {
     }
 
 
+
+
+    //Metodo para operar con ftp y subir el la imagen predict.jpg al servidor:
+    //http://ftp.cesaral.com/test/
+    //Como en: http://tutoandroidblog.blogspot.com.es/2013/01/servidor-ftp-de-subida-de-archivo.html
+
+
+    private boolean metodoSubirImagenConFtp(ObtenerImagen obtenerImagen) {
+
+        //Campos----------------------------------------------------
+
+        //EditText nombreArhivo;        // Almacena el id del componente donde está localizado el nombre del archivo a subir
+        //Button subir;                // Almacena el id del componente donde está localizado el botón para subir el archivo
+
+        //Credenciales
+        String ip;                    //Almacena la direción ip del servidor
+        String usuario;                //Almacena el usuario
+        String contrasena;            //Almacena la contraseña
+
+        FtpClient ftp;                    //Instancia manejador ftp
+
+        //-----------------------------------------------------------
+        //Inicializa las credenciales
+        //ip = "192.168.0.1";
+        //usuario = "admin";
+        //contrasena = "admin";
+
+        //ip = "ftp.cesaral.com/test";
+        ip = "ftp://ftp.cesaral.com/test";
+        //ip = "http://ftp.cesaral.com/test";
+        usuario = "textx";
+        contrasena = "test.2017";
+
+        //**********************************************
+        //Mi codigo:
+        //File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
+        File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
+
+        if(filePathDePredictJpg == null){
+            enviarNotification("Error al obtener el file de predict.jpg para upload ftp" +" ,saliendo de la aplicacion");
+            return false;
+
+        }else {//Hemos obtenido el file de la imagen a subir, seguimos
+
+            //Chequeamos que el path a predict.jpg es correcto:
+            Log.d(xxx, "Path a predict.jpg para enviar al servidor con ftp: " + filePathDePredictJpg.getName());
+            Log.d(xxx, "Absolute Path a predict.jpg para enviar al servidor con ftp: " + filePathDePredictJpg.getAbsolutePath());
+
+
+
+        //**********************************************
+
+
+        //Establece los ids de la vista
+        //nombreArhivo = (EditText) findViewById(R.id.edtxtNombreArchivo);
+        //subir = (Button) findViewById(R.id.btnSubir);
+
+        //Evento OnClick (btnSubir)
+        //subir.setOnClickListener(new OnClickListener() {
+
+            //public void onClick(View v) {
+
+                //Establece un servidor
+                ftp = new FtpClient(ip, usuario, contrasena, getApplicationContext());
+
+                //Realiza login en el servidor
+
+                try {
+                    if(ftp.login(usuario, contrasena)){
+                        //Login correcto, enviamos el fichero con el try catch de abajo
+                    }else{
+                        enviarNotification("Error: El login o la conexion al servidor ftp ha fallado");
+                        Log.d(xxx, "Error: El login o la conexion al servidor ftp ha fallado" +" ,saliendo de la aplicacion");
+                        return false;
+                    }
+                } catch (SocketException e) {
+                    //e.printStackTrace();
+                    enviarNotification("Error Socket Exception en ftp login: " +e.getMessage() +" ,saliendo de la aplicacion");
+                    Log.d(xxx, "Error Socket Exception en ftp login: " +e.getMessage());
+                    return false;
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                    enviarNotification("Error IOException en ftp login: " +e.getMessage() +" ,saliendo de la aplicacion");
+                    Log.d(xxx, "Error IOException en ftp login: " +e.getMessage());
+                    return false;
+                }
+
+                //Sube el archivo al servidor
+                try {
+                    //if(ftp.enviarFile(nombreArhivo)){
+                    //if(ftp.enviarFile("predict.jpg")){
+                    if(ftp.enviarFileFinalFinal(filePathDePredictJpg, "predict.jpg")){
+                        enviarNotification("Fichero predict.jpg enviado al servidor");
+                        Log.d(xxx, "Archivo predict.jpg enviado al servidor");
+                        return true;
+                    }else{
+                        enviarNotification("Error: Fallo al enviar el fichero predict.jpg al servidor");
+                        Log.d(xxx, "Error: Fallo al enviar el fichero predict.jpg al servidor");
+                        return false;
+                    }
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                    enviarNotification("Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage() +" ,saliendo de la aplicacion");
+                    Log.d(xxx, "Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage());
+                    return false;
+                }
+            //}
+        //});
+
+
+
+            //return true;
+
+        }//Fin del else de if(filePathDePredictJpg == null)
+
+    }//Fin de metodo metodoSubirImagenConFtp
+
+
+
+    //**********************************************************************************************************
+    //NOTA 10 oct 2017: ESte codigo no lo uso, ni las clases en la carpeta retrofit, ya que para funcionar requiere
+    //un servidor node.js o php que tenga implementado web services.
+    //Me queda como ejercicio para hacer el servidor en node.js, como en la web de donde extraje este codigo.
+    //Servidor node.js para subir imagenes:  http://hidrodixtion.github.io/2016/06/02/create-simple-image-upload-server-in-node-js/
+
     //Uso de retrofit para subir la imagen generada al servidor
     //Recibe la instancia de ObtenerImagen usada en el metodo metodoPrincipal_2
+    //Como en https://medium.com/@adinugroho/upload-image-from-android-app-using-retrofit-2-ae6f922b184c
     ServicioRetrofit2 servicioRetrofit2;
     private boolean subirImagenConRetrofit2(ObtenerImagen obtenerImagen, String Url){
         File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/",
