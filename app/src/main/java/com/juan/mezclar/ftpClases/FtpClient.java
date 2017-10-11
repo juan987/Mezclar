@@ -145,6 +145,7 @@ public class FtpClient {
      * @throws IOException
      */
     public boolean login (String usuario, String contrasena) throws SocketException, IOException {
+        Log.d(xxx, "Estoy en el metodo login");
 
         //Almacena los valores en la clase
         this.usuario = usuario;
@@ -156,10 +157,12 @@ public class FtpClient {
             ftpClient = new FTPClient();
 
             //Para ver los traceos en el monitor
-            ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));//No funciona?????
+            //ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));//No funciona?????
 
             //Establece conexión con el servidor
-            ftpClient.connect("ftp.cesaral.com");//OK, pero anulando el strict mode, si no, me da fallo
+            //ftpClient.connect("ftp.cesaral.com");
+            Log.d(xxx, "URL para el ftp que esta en el fichero CONTEXT.txt: " +ip);
+            ftpClient.connect(ip);
             Log.d(xxx, "Codigo de respuesta del connect:   " +ftpClient.getReplyCode());
 
 
@@ -202,7 +205,6 @@ public class FtpClient {
          Log.d(xxx, "Fallo 3 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
          return false;	//En caso de que no sea posible la conexion
 
-
      }
 
 
@@ -224,7 +226,7 @@ public class FtpClient {
             return false;	//En caso de login incorrecto
         }  */
 
-    }
+    }//Fin del metodo login
 
     /**
      * Sube un archivo al servidor FTP si previamente se ha hecho login correctamente
@@ -367,6 +369,7 @@ public class FtpClient {
                 //Cambio de directorio hecho
                 Log.d(xxx, "Cambio de directorio hecho");
                 //Continuamos
+                Log.d(xxx, "Cambio de directorio hecho, codigo de respuesta:  " +ftpClient.getReplyCode());
                 Log.d(xxx, "Cambio de directorio hecho:  " +ftpClient.printWorkingDirectory());
 
 

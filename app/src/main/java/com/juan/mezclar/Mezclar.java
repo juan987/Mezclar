@@ -4,9 +4,11 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.support.annotation.BoolRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -71,6 +73,7 @@ public class Mezclar extends AppCompatActivity {
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
     String imagenPrincipal = "origin.jpg";
     String ficheroConfigTxt = "CONFIG.txt";
+    ProgressBar progressBar;
 
     //Fichero de prueba para probar fallo de ArrayIndexOutOfBoundsException
     //String ficheroConfigTxt = "CONFIG[1].txt";
@@ -87,10 +90,12 @@ public class Mezclar extends AppCompatActivity {
 
 
         //Si no pongo esto, entonces se cuelga la app cuando subo el fichero al servidor ftp. Tendria que usar un asynctask!!!!!
+        //Ya estoy usando FtpAsyncTask, comento las lineas del thread policy
+        /*
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
-        }
+        }*/
 
 
 
@@ -100,7 +105,7 @@ public class Mezclar extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Muestr snakbar con lo que ha mandado la app Launch Mezclar
-        Snackbar.make(findViewById(R.id.coordinatorlayout_1), stringImagesSecuence, Snackbar.LENGTH_LONG)
+        Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Secuencia de imágenes recibidas: " +stringImagesSecuence, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
 
         //Llamo al metodo desde el Floating button
@@ -113,13 +118,12 @@ public class Mezclar extends AppCompatActivity {
                 boolean booleanContinuarApp = metodoPrincipal_2();
                 if(booleanContinuarApp){
                     //Mantener la app abierta
-                    Snackbar.make(view, "Resultado correcto", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, "Imagen predict.jpg guardada en DCIM/predict", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                    //enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp");
                 }else{
-                    //Forzar el cierre de la app por que ha habido un error
-                    Snackbar.make(view, "Cerrando app debido a un ERROR", Snackbar.LENGTH_LONG)
-                           .setAction("Action", null).show();
+                    //Forzar el cierre de la app por que ha habido un error durante el procesamiento de la imagen
+                    //Y antes de ejecutar el FtpAsyncTask
+                    //Snackbar.make(view, "Cerrando app debido a un ERROR", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
                     //enviarNotification("Aplicacion cerrada debido a un error de ejecucion");
                     finish();
@@ -130,6 +134,7 @@ public class Mezclar extends AppCompatActivity {
 
         Log.d(xxx, "Hola " );
         collageImage = (ImageView)findViewById(R.id.imageView3);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
         //Boton anulado. Uso el fab
         /*Button combineImage = (Button)findViewById(R.id.combineimage);
@@ -203,7 +208,10 @@ public class Mezclar extends AppCompatActivity {
     }
 
     //Metodo final y OK
+    ObtenerImagen obtenerImagen;
     private boolean metodoPrincipal_2(){
+        progressBar.setVisibility(View.VISIBLE); //To Hide ProgressBar
+
         //Chequeo el array de secuencia de imagenes: si es null o esta vacio, termina el programa
         if (arrayImagesSequence != null) {
             if (arrayImagesSequence.length == 0) {
@@ -274,6 +282,11 @@ public class Mezclar extends AppCompatActivity {
         }
 
         //Chequear si la url de CONFIG.txt es valida
+        /*
+        11 octubre 2017: No hago ningun chequeo de URL. Si el ftp es incorrecto,
+        se recibira un fallo de no se pudo resolver el host: UnknownHostException
+         */
+        /* Lo dejo comentado
         if( URLUtil.isValidUrl(urlServidor)){
             //La URL del servidor es valida
             Log.d(xxx, "URL del servidor valida: " +urlServidor);
@@ -284,12 +297,12 @@ public class Mezclar extends AppCompatActivity {
             enviarNotification("Error URL invalida, saliendo de la aplicacion");
             Log.d(xxx, "URL del servidor NO valida: " +urlServidor);
             return false;
-        }
+        } */
         //FIN de Leer coordenadas y URL del array de lineas obtenido del fichero CONFIG.txt
 
 
         //Obtener la imagen origin.jpg como un bitmap
-        ObtenerImagen obtenerImagen = new ObtenerImagen(Mezclar.this);
+        obtenerImagen = new ObtenerImagen(Mezclar.this);
         Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
         if(originJpg == null){
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
@@ -313,7 +326,7 @@ public class Mezclar extends AppCompatActivity {
                     +arrayImagesSequence[i]+".jpg");
             if(imagenParaSuperponerConOrigin == null){
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
-                enviarNotification("Error al recuperar imagen pequeña numero: " +i +" ,saliendo de la aplicacion");
+                enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
                 //Acabamos la ejecucion
                 return false;
             }else{
@@ -356,7 +369,7 @@ public class Mezclar extends AppCompatActivity {
                     collageImage.setImageBitmap(mergedImages);
                 }else{
                     //Ha habido un error al mezclar las imagenes
-                    enviarNotification("Error mezclando imagen: " +i  +" ,saliendo de la aplicacion");
+                    enviarNotification("Error mezclando imagen: " +i  +", saliendo de la aplicacion");
                     return false;
 
                 }
@@ -379,7 +392,7 @@ public class Mezclar extends AppCompatActivity {
         //Guardar imagen en el directorio DCIM/predict
         if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg")){
             //Ha habido un error al guardar la imagen, devolver false
-            enviarNotification("Error guardando imagen predict" +" ,saliendo de la aplicacion");
+            enviarNotification("Error guardando imagen predict" +", saliendo de la aplicacion");
             return false;
         }
 
@@ -390,8 +403,14 @@ public class Mezclar extends AppCompatActivity {
         //java.lang.IllegalArgumentException: baseUrl must end in /: http://www.cesaral.com/test
         //subirImagenConRetrofit2(obtenerImagen, urlServidor +"/");
 
+        //**************************************
+        //Solo falta activar un progress bar y ejecutar el asynctask para enviar la imagen al servidor con ftp
+        new FtpAsyncTask().execute("string1", "string2", "string3");
+        //**************************************
 
-        //Provisionalmente devuelve tru aqui
+
+
+        //Provisionalmente devuelve true aqui
         return true;
 
         //Dejo este codigo comentado hasta que Cesar arregle lo del acceso al ftp server
@@ -405,6 +424,7 @@ public class Mezclar extends AppCompatActivity {
 
 
     }//Fin de metodoPrincipal_2
+
 
 
     //ESte metodo separa los numeros de cada linea de config.txt en el array str:
@@ -425,7 +445,7 @@ public class Mezclar extends AppCompatActivity {
     }
 
     //Metodo para:
-    //Generar array de pojos con las coordenadas x e Y de posicionamiento de imagenes
+    //Generar array de PojoCoordenadas con las coordenadas x e Y de posicionamiento de imagenes
     //Generar la URL para subir y almacenar la imagen generada a un servidor
     String urlServidor;
     private List<PojoCoordenadas> generarPojoGenerarUrl(List<String> arrayLineasTextoLocal){
@@ -629,6 +649,28 @@ public class Mezclar extends AppCompatActivity {
         mNotificationManager.notify(001, mBuilder.build());
     }
 
+    private void enviarNotificationFtp(String mensaje){
+        //Get an instance of NotificationManager//
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Mezclar: ftp process")
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(mensaje));
+        //.setContentText(mensaje);
+        // Gets an instance of the NotificationManager service//
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //When you issue multiple notifications about the same type of event, it’s best practice for your app to try
+        // to update an existing notification with this new information, rather than immediately creating a
+        // new notification. If you want to update this notification at a later date, you need to assign it an ID.
+        // You can then use this ID whenever you issue a subsequent notification.
+        // If the previous notification is still visible, the system will update this existing notification,
+        // rather than create a new one. In this example, the notification’s ID is 001//
+
+        mNotificationManager.notify(002, mBuilder.build());
+    }
 
 
 
@@ -658,8 +700,7 @@ public class Mezclar extends AppCompatActivity {
         //contrasena = "admin";
 
         //ip = "ftp.cesaral.com/test";
-        ip = "ftp://ftp.cesaral.com/test";
-        //ip = "http://ftp.cesaral.com/test";
+        ip = urlServidor;
         usuario = "textx";
         contrasena = "test.2017";
 
@@ -669,7 +710,7 @@ public class Mezclar extends AppCompatActivity {
         File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
 
         if(filePathDePredictJpg == null){
-            enviarNotification("Error al obtener el file de predict.jpg para upload ftp" +" ,saliendo de la aplicacion");
+            enviarNotificationFtp("Error al obtener el file de predict.jpg para upload ftp" +", saliendo de la aplicacion");
             return false;
 
         }else {//Hemos obtenido el file de la imagen a subir, seguimos
@@ -701,19 +742,21 @@ public class Mezclar extends AppCompatActivity {
                     if(ftp.login(usuario, contrasena)){
                         //Login correcto, enviamos el fichero con el try catch de abajo
                     }else{
-                        enviarNotification("Error: El login o la conexion al servidor ftp ha fallado");
-                        Log.d(xxx, "Error: El login o la conexion al servidor ftp ha fallado" +" ,saliendo de la aplicacion");
+                        enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
+                        Log.d(xxx, "Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                         return false;
                     }
                 } catch (SocketException e) {
                     //e.printStackTrace();
-                    enviarNotification("Error Socket Exception en ftp login: " +e.getMessage() +" ,saliendo de la aplicacion");
+                    enviarNotificationFtp("Error Socket Exception en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
                     Log.d(xxx, "Error Socket Exception en ftp login: " +e.getMessage());
+
                     return false;
                 } catch (IOException e) {
                     //e.printStackTrace();
-                    enviarNotification("Error IOException en ftp login: " +e.getMessage() +" ,saliendo de la aplicacion");
+                    enviarNotificationFtp("Error IOException en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
                     Log.d(xxx, "Error IOException en ftp login: " +e.getMessage());
+
                     return false;
                 }
 
@@ -722,20 +765,23 @@ public class Mezclar extends AppCompatActivity {
                     //if(ftp.enviarFile(nombreArhivo)){
                     //if(ftp.enviarFile("predict.jpg")){
                     if(ftp.enviarFileFinalFinal(filePathDePredictJpg, "predict.jpg")){
-                        enviarNotification("Fichero predict.jpg enviado al servidor");
+                        enviarNotificationFtp("Fichero predict.jpg enviado al servidor");
                         Log.d(xxx, "Archivo predict.jpg enviado al servidor");
+
                         return true;
                     }else{
-                        enviarNotification("Error: Fallo al enviar el fichero predict.jpg al servidor");
+                        enviarNotificationFtp("Error: Fallo al enviar el fichero predict.jpg al servidor" +", saliendo de la aplicacion");
                         Log.d(xxx, "Error: Fallo al enviar el fichero predict.jpg al servidor");
                         return false;
                     }
                 } catch (IOException e) {
                     //e.printStackTrace();
-                    enviarNotification("Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage() +" ,saliendo de la aplicacion");
+                    enviarNotificationFtp("Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage() +", saliendo de la aplicacion");
                     Log.d(xxx, "Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage());
+
                     return false;
                 }
+
             //}
         //});
 
@@ -813,5 +859,54 @@ public class Mezclar extends AppCompatActivity {
         }
     }
 
+    //Clase para subir la imagen al servidor en un thread distinto de la UI
+    private class FtpAsyncTask extends AsyncTask<String, Integer, Boolean> {
+        public FtpAsyncTask() {
+            super();
+        }
 
-}
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            Log.d(xxx, "estoy en doInBackground");
+
+            if (metodoSubirImagenConFtp(obtenerImagen)) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected void onPostExecute(Boolean boolResultado) {
+            Log.d(xxx, "onPostExecute, el resultado de doInBackground es: " +boolResultado);
+
+            if(boolResultado) {
+                Log.d(xxx, "En onPostExecute: Success, Imagen enviada al servidor ftp");
+                //Mantener la app abierta
+                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Imagen predict.jpg guardada en DCIM/predict y enviada al servidor", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+            }else{
+                Log.d(xxx, "En onPostExecute: FAIL, Imagen NO enviada al servidor ftp");
+                progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
+                //Cerrar aplicacion, ha habido un fallo
+                finish();
+
+            }
+
+        }
+
+        protected void onProgressUpdate(Integer[] values) {
+        }
+
+
+
+        protected void onCancelled() {
+        }
+    }
+}//Fin del activity
