@@ -1,14 +1,14 @@
 package com.juan.mezclar;
 
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
-import android.support.annotation.BoolRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -16,12 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-
-//Para gestionar imagenes
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.webkit.URLUtil;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -46,19 +40,30 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-//*************************************************************************
-//Notas del 8 oct 2017
-//Cosas que me faltan:
 
-//leer el fichero config y guardar las coordenadas x e y en dos arrays String, lo he hecho en parte
-//Almacenar la foto en internet
-//Decidir como manejar la app Mezclar: la ejecuto sin interfaz grafica o pongo un servicio.
-//Ver como poner mas de una linea en las notificaciones
-//Adecentar un poco la UI de LaunchMezclar y ver como posicionar los controles en un ConstraintLayout y que
-//   no se puedan escribir mas de 16 digitos
-//Este es el commit 4322
+//Gestio de errores
+/*
+La App no necesita un interfaz de usuario, pero sería bueno que informara, a través de un icono en la barra superior del teléfono, del proceso que está realizando:
+1)    Un icono cuadrado con un “1” dentro significaría que la App está componiendo la imagen
+2)    Un icono cuadrado con un “2” dentro significaría que a imagen ha sido generada
+3)    Un icono cuadrado con un “3” dentro significaría que la imagen ha sido generada y se está subiendo al directorio web indicado en el fichero de configuración (en caso de existir).
+4)    Un icono cuadrado con un “OK” dentro, significaría que el proceso ha terminado correctamente
+5)    Un icono cuadrado con un “E1” dentro significaría que ha habido un error en la generación del JPG
+6)    Un icono cuadrado con un “E2” dentro significaría que ha habido un error en la subida del JPG al directorio web
 
-public class Mezclar extends AppCompatActivity {
+Si la App encuentra un error, pondría el icono E1 o E2 y terminaría.
+
+ */
+
+//Para gestionar imagenes
+
+//11 oct 17, Cesar me pidio que hiciera estos cambios, documento que esta probado y OK
+//Prueba boton fab invisible, OK
+//Prueba de inicio automatico, OK
+//Prueba de NO mostrar la imagen original en la UI, OK
+//Prueba de notificaciones con numero, EJECUTADA PARCIALMENTE, CONTINUAR
+
+public class MezclarFinal extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
     String xxx = this.getClass().getSimpleName();
 
@@ -81,6 +86,9 @@ public class Mezclar extends AppCompatActivity {
 
     //Fichero de prueba para probar fallo de URL no valida
     //String ficheroConfigTxt = "CONFIG[1][1].txt";
+
+    //Fichero de prueba para probar fallo reportado por Cesar, cuando hay lineas en blanco en las coordenadas
+    //String ficheroConfigTxt = "CONFIG_genera_fallos.txt";
 
 
     @Override
@@ -110,7 +118,10 @@ public class Mezclar extends AppCompatActivity {
                 .setAction("Action", null).show();
 
         //Llamo al metodo desde el Floating button
+        //En la ultima version, funciona automaticamente
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //Lo hago invisible, la app funciona de manera automatica, sin boton.
+        fab.setVisibility(View.INVISIBLE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -136,6 +147,21 @@ public class Mezclar extends AppCompatActivity {
         Log.d(xxx, "Hola " );
         collageImage = (ImageView)findViewById(R.id.imageView3);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
+
+        //Inicio automatico
+        boolean booleanContinuarApp = metodoPrincipal_2();
+        if(booleanContinuarApp){
+            //Mantener la app abierta
+            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Imagen predict.jpg guardada en DCIM/predict", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }else{
+            //Forzar el cierre de la app por que ha habido un error durante el procesamiento de la imagen
+            //Y antes de ejecutar el FtpAsyncTask
+            //Snackbar.make(view, "Cerrando app debido a un ERROR", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
+            //enviarNotification("Aplicacion cerrada debido a un error de ejecucion");
+            finish();
+        }
 
         //Boton anulado. Uso el fab
         /*Button combineImage = (Button)findViewById(R.id.combineimage);
@@ -178,6 +204,7 @@ public class Mezclar extends AppCompatActivity {
                 for (char temp : arrayImagesSequence) {
                     Log.d(xxx, "Caracter " +temp);
                 }//OK
+
             }else{//Salta aqui si no hay datos en el intent
                 Log.d(xxx, "Datos de Launch Mezclar: No hay datos");
                 //Datos fake para probar
@@ -191,7 +218,9 @@ public class Mezclar extends AppCompatActivity {
             //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
             this.finish();
         }
-    }
+
+
+    }//Fin de recuperarIntentConDatosIniciales
 
     //ESte metodo mezcla dos imagenes que estan en la carpeta drawable. Es solo para probar
     private void metodoPrincipal(){
@@ -204,7 +233,7 @@ public class Mezclar extends AppCompatActivity {
                 Bitmap mergedImages = createSingleImageFromMultipleImages(bigImage, smallImage);
                 collageImage.setImageBitmap(mergedImages);
                 enviarNotification("3");
-                GuardarImagen guardarImagen = new GuardarImagen(Mezclar.this, mergedImages);
+                GuardarImagen guardarImagen = new GuardarImagen(MezclarFinal.this, mergedImages);
                 guardarImagen.guardarImagenMethod();
     }
 
@@ -214,10 +243,12 @@ public class Mezclar extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE); //To Hide ProgressBar
 
         //Chequeo el array de secuencia de imagenes: si es null o esta vacio, termina el programa
+
         if (arrayImagesSequence != null) {
             if (arrayImagesSequence.length == 0) {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error: el array de imagenes esta vacio, saliendo de la aplicacion");
+                enviarNotificationConNumero("E1");
                 return false;
             }else{
                 //El array de sequencia existe, continuamos
@@ -225,16 +256,18 @@ public class Mezclar extends AppCompatActivity {
         }else
         {
             enviarNotification("Error: el array de imagenes es null, saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
             return false;
         }
 
         //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
-        LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(Mezclar.this);
+        LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(MezclarFinal.this);
         List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
         if(arrayLineasTexto == null){
             Log.d(xxx, "arrayLineasTexto es null");
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
             return false;
         }
 
@@ -242,6 +275,7 @@ public class Mezclar extends AppCompatActivity {
             Log.d(xxx, "arrayLineasTexto esta vacio");
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
             return false;
         }
 
@@ -272,6 +306,7 @@ public class Mezclar extends AppCompatActivity {
             //Este error indica que alguna coordenada x, y no es un numero valido, alomejor es
             //un error tipografico, como poner una letra en vez de un digito.
             enviarNotification("Error ArrayIndexOutOfBoundsException, saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
             return false;
         }
 
@@ -279,6 +314,7 @@ public class Mezclar extends AppCompatActivity {
             //Hay un fallo en CONFIG text y no se han leido las coordenadas
             //Enviar notificacion de error y cerrar programa
             enviarNotification("Error al recuperar coordenadas, saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
             return false;
         }
 
@@ -303,16 +339,19 @@ public class Mezclar extends AppCompatActivity {
 
 
         //Obtener la imagen origin.jpg como un bitmap
-        obtenerImagen = new ObtenerImagen(Mezclar.this);
+        obtenerImagen = new ObtenerImagen(MezclarFinal.this);
         Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
         if(originJpg == null){
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error al recuperar origin.jpg, saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
             return false;
         }
-        //Se muestra origin.jpg en la UI
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
-        imageView.setImageBitmap(originJpg);
+        //NO se muestra origin.jpg en la UI, requerimiento de Cesar
+        //ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        //imageView.setImageBitmap(originJpg);
+
+
         //Instruccion para cargar directamente de la memoria una imagen
         //imageView.setImageBitmap(BitmapFactory.decodeFile(pathToPicture));
 
@@ -322,12 +361,14 @@ public class Mezclar extends AppCompatActivity {
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "mezclando imagen: " +i);
             enviarNotification("mezclando imagen: " +i);
+            enviarNotificationConNumero("1");
             //Obtener la imagen a superponer como un bitmap
             imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
                     +arrayImagesSequence[i]+".jpg");
             if(imagenParaSuperponerConOrigin == null){
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
+                enviarNotificationConNumero("E1");
                 //Acabamos la ejecucion
                 return false;
             }else{
@@ -347,6 +388,7 @@ public class Mezclar extends AppCompatActivity {
                 //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
                 if(i >= listaCoordenadas.size()){
                     enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
                     return false;//Cerrar aplicacion y evitar un null pointer
                 }
                 xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
@@ -356,6 +398,7 @@ public class Mezclar extends AppCompatActivity {
                 //Float.isNaN retorna true si no es un numero
                 if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
                     enviarNotification("Error, coordenadas no son un numero valido, saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
                     return false;//Cerrar aplicacion y evitar fallo en el procesamiento
                 }
 
@@ -371,6 +414,7 @@ public class Mezclar extends AppCompatActivity {
                 }else{
                     //Ha habido un error al mezclar las imagenes
                     enviarNotification("Error mezclando imagen: " +i  +", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
                     return false;
 
                 }
@@ -380,7 +424,7 @@ public class Mezclar extends AppCompatActivity {
         }//Fin del loop principal
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
-        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(Mezclar.this, mergedImages);
+        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(MezclarFinal.this, mergedImages);
         //Guardar imagen el directorio pictures/predict
         //No hace falta, guardo directamente en DCIM/predict
         /*
@@ -394,11 +438,13 @@ public class Mezclar extends AppCompatActivity {
         if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg")){
             //Ha habido un error al guardar la imagen, devolver false
             enviarNotification("Error guardando imagen predict" +", saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
             return false;
         }
 
         //Return true al final del metodo. La app se queda abierta, esperando el resultado de la subida de predict.jpg con ftp
         enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp...");
+        enviarNotificationConNumero("2");
 
         //Enviar predict.jpg al server con POST
         //java.lang.IllegalArgumentException: baseUrl must end in /: http://www.cesaral.com/test
@@ -406,25 +452,67 @@ public class Mezclar extends AppCompatActivity {
 
         //**************************************
         //Solo falta activar un progress bar y ejecutar el asynctask para enviar la imagen al servidor con ftp
-        new FtpAsyncTask().execute("string1", "string2", "string3");
+        //new FtpAsyncTask().execute("string1", "string2", "string3");
         //**************************************
 
-
-
-        //Provisionalmente devuelve true aqui
         return true;
 
-        //Dejo este codigo comentado hasta que Cesar arregle lo del acceso al ftp server
-        /*
-        if(metodoSubirImagenConFtp(obtenerImagen)){
-            return true;
-        }else{
-            return false;
-        }*/
-
-
-
     }//Fin de metodoPrincipal_2
+
+    //Metodo que envia distintos iconos a la barra de notificaciones, segun el estado de la app
+    private void enviarNotificationConNumero(String stringConCodigoDeError){
+        //Este switch para seleccionar la imagen correcta de la notificacion a enviar
+        Log.d(xxx, "enviarNotificationConNumero, el error es: " + stringConCodigoDeError);
+        int intIdentificadorDelIcon = R.drawable.ic_number_1;
+        switch (stringConCodigoDeError){
+            case "1"://N1
+                intIdentificadorDelIcon = R.drawable.ic_number_1;
+
+                break;
+            case "2"://N2
+                intIdentificadorDelIcon = R.drawable.ic_number_2;
+
+                break;
+            case "3"://N3
+                intIdentificadorDelIcon = R.drawable.ic_number_3;
+
+                break;
+            case "OK"://N4
+                intIdentificadorDelIcon = R.drawable.ic_icono_ok;
+
+                break;
+            case "E1"://N5
+                intIdentificadorDelIcon = R.drawable.ic_error_jpg;
+
+                break;
+            case "E2"://N6
+                intIdentificadorDelIcon = R.drawable.ic_error_ftp;
+
+                break;
+        }
+
+        //Get an instance of NotificationManager//
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(intIdentificadorDelIcon)
+                        .setContentTitle("Mezclar");
+                        //.setStyle(new NotificationCompat.BigTextStyle().bigText(mensaje));
+        //.setContentText(mensaje);
+        // Gets an instance of the NotificationManager service//
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //When you issue multiple notifications about the same type of event, it’s best practice for your app to try
+        // to update an existing notification with this new information, rather than immediately creating a
+        // new notification. If you want to update this notification at a later date, you need to assign it an ID.
+        // You can then use this ID whenever you issue a subsequent notification.
+        // If the previous notification is still visible, the system will update this existing notification,
+        // rather than create a new one. In this example, the notification’s ID is 001//
+
+        mNotificationManager.notify(003, mBuilder.build());
+    }//Fin de enviarNotificationConNumero
+
 
 
 
@@ -832,12 +920,12 @@ public class Mezclar extends AppCompatActivity {
             MultipartBody.Part body = MultipartBody.Part.createFormData("upload", filePathDePredictJpg.getName(), reqFile);
             RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "prueba_de_subida");
 
-            retrofit2.Call<okhttp3.ResponseBody> req = servicioRetrofit2.postImage(body, name);
+            Call<ResponseBody> req = servicioRetrofit2.postImage(body, name);
             req.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Toast.makeText(Mezclar.this, "Success " + response.message(), Toast.LENGTH_LONG).show();
-                    Toast.makeText(Mezclar.this, "Success " + response.body().toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MezclarFinal.this, "Success " + response.message(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MezclarFinal.this, "Success " + response.body().toString(), Toast.LENGTH_LONG).show();
                     Log.d(xxx, "Imagen subida correctamente con retrofit2: " +response.message());
                     Log.d(xxx, "response.message: " +response.message());
                     Log.d(xxx, "response.body().toString(): " +response.body().toString());
