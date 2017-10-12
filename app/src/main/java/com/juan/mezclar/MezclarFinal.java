@@ -61,7 +61,10 @@ Si la App encuentra un error, pondría el icono E1 o E2 y terminaría.
 //Prueba boton fab invisible, OK
 //Prueba de inicio automatico, OK
 //Prueba de NO mostrar la imagen original en la UI, OK
-//Prueba de notificaciones con numero, EJECUTADA PARCIALMENTE, CONTINUAR con ftp
+//Prueba de notificaciones con imagenes, sin texto,  OK
+//Prueba CONFIG.txt con lineas blancas de por medio o con comentarios, OK
+//OJO: si una coordenada es una letra, la aplicacion falla por null pointer
+//Prueba quitar todas las notificaciones, lo hago modificando los metodos de notificaciones, no las llamadas
 
 public class MezclarFinal extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
@@ -78,7 +81,9 @@ public class MezclarFinal extends AppCompatActivity {
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
     String imagenPrincipal = "origin.jpg";
     //String ficheroConfigTxt = "CONFIG.txt";
-    ProgressBar progressBar;
+
+    //No se usa la progress bar
+    //ProgressBar progressBar;
 
     //FloatingActionButton fabOnPostExecute;//Para deshabilitar el boton FAB si la ejecucion es completa
 
@@ -89,7 +94,10 @@ public class MezclarFinal extends AppCompatActivity {
     //String ficheroConfigTxt = "CONFIG[1][1].txt";
 
     //Fichero de prueba para probar fallo reportado por Cesar, cuando hay lineas en blanco en las coordenadas
-    String ficheroConfigTxt = "CONFIG_genera_fallos.txt";
+    //String ficheroConfigTxt = "CONFIG_genera_fallos.txt";
+
+    //Fichero de prueba para probar fallo por lineas de comentarios
+    String ficheroConfigTxt = "CONFIG_genera_fallos_comments.txt";
 
 
     @Override
@@ -151,10 +159,10 @@ public class MezclarFinal extends AppCompatActivity {
 
 
         collageImage = (ImageView)findViewById(R.id.imageView3);
-        progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        //progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
         //No mostramos la progress bar
-        progressBar.setVisibility(View.INVISIBLE);
+        //progressBar.setVisibility(View.INVISIBLE);
 
 
 
@@ -225,7 +233,7 @@ public class MezclarFinal extends AppCompatActivity {
     private boolean metodoPrincipal_2(){
         Log.d(xxx, "En metodoPrincipal_2");
 
-        progressBar.setVisibility(View.VISIBLE); //To Hide ProgressBar
+        //progressBar.setVisibility(View.VISIBLE); //To Hide ProgressBar
 
         //Lanzar notificacon de inicio de lageneracion de la imagen
         enviarNotificationConNumero("1");
@@ -573,6 +581,12 @@ public class MezclarFinal extends AppCompatActivity {
             //Extrae las coordenadas x e y de cada linea con regex y genera pojo de
             //coordenadas por cada linea y lo guarda en el array de coordenadas
             String[] str = arrayLineasTextoLocal.get(i).split(regex);
+            //Recorro y muestro con Log.d el array str
+            for(int i2 = 0; i2 < str.length; i2++) {
+                Log.d(xxx, "En metodo generarPojoGenerarUrl, despues del split con regex" + "\n"
+                                    +"Linea " +i +"\n"
+                                    +"posicion " +i2 +" tiene: " +str[i2]);
+            }
             //Si la linea no tiene digitos, hago un break y continua el loop
             //if(str.length == 0) break;
             PojoCoordenadas pojoCoordenadas = new PojoCoordenadas();
@@ -662,7 +676,10 @@ public class MezclarFinal extends AppCompatActivity {
         return bitmap2;
     }
 
+    //Metodo anulado para que no envie las notificaciones con texto
     private void enviarNotification(String mensaje){
+        /*
+
         //Get an instance of NotificationManager//
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -683,9 +700,14 @@ public class MezclarFinal extends AppCompatActivity {
         // rather than create a new one. In this example, the notification’s ID is 001//
 
         mNotificationManager.notify(001, mBuilder.build());
+
+        */
     }
 
+    //Metodo anulado para que no envie las notificaciones con texto
     private void enviarNotificationFtp(String mensaje){
+        /*
+
         //Get an instance of NotificationManager//
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -706,6 +728,9 @@ public class MezclarFinal extends AppCompatActivity {
         // rather than create a new one. In this example, the notification’s ID is 001//
 
         mNotificationManager.notify(002, mBuilder.build());
+
+
+        */
     }
 
 
@@ -860,9 +885,9 @@ public class MezclarFinal extends AppCompatActivity {
 
             }else{
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen NO enviada al servidor ftp, saliendo de la app");
-                progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
+                //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
-                finish();
+                //finish();
             }
         }
 
@@ -911,9 +936,9 @@ public class MezclarFinal extends AppCompatActivity {
 
             }else{
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen jpg NO generada, saliendo de la app");
-                progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
+                //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
-                finish();
+                //finish();
             }
         }
 
