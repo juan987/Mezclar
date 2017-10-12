@@ -41,7 +41,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 
-//Gestio de errores
+//NOTA FINAL: ESTA CLASE ES LA ACTIVIDAD PRINCIPAL DE LA ACTIVIDAD
+
+//Gestion de errores
 /*
 La App no necesita un interfaz de usuario, pero sería bueno que informara, a través de un icono en la barra superior del teléfono, del proceso que está realizando:
 1)    Un icono cuadrado con un “1” dentro significaría que la App está componiendo la imagen

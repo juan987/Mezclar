@@ -4,6 +4,7 @@ package com.juan.mezclar;
  * Created by Juan on 09/10/2017.
  */
 
+
 public class PojoCoordenadas {
     String coordX;
     String coordY;

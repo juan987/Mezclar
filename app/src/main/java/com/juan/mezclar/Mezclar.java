@@ -46,6 +46,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+
+
+//NOTA FINAL: CLASE DEPRECADA, LA MANTENGO PARA FUTURAS REFERENCIAS (TIENE EL CODIGO DE RETROFIT)
+//USAR LA CLASE MezclarFinal
+
+
 //*************************************************************************
 //Notas del 8 oct 2017
 //Cosas que me faltan:

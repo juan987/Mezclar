@@ -22,6 +22,8 @@ import java.net.UnknownHostException;
  *
  */
 
+//NOTA FINAL: CLASE CON LAS FUNCIONES NECESARIAS PARA SUBIR PREDICT.JPG AL SERVER
+
 //Como en: http://tutoandroidblog.blogspot.com.es/2013/01/servidor-ftp-de-subida-de-archivo.html
 
 //ESTO ES MUY IMPORTANTE: COMO FUNCIONA commons.net
@@ -288,7 +290,7 @@ public class FtpClient {
 
     }//Fin de enviarFile, no uso este metodo
 
-    //Metodo modificado por mi, este es el que uso
+    //Metodo deprecated
     public boolean enviarFileFinal (File ruta, String nombreArchivo) throws IOException{
         Log.d(xxx, "Estoy en el metodo enviarFileFinal");
 
@@ -438,7 +440,7 @@ public class FtpClient {
 
 
 
-
+    //Metodo deprecated
     public boolean login_original (String usuario, String contrasena) throws SocketException, IOException {
 
         //Almacena los valores en la clase

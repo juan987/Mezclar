@@ -13,6 +13,8 @@ import retrofit2.http.Part;
  */
 
 public interface ServicioRetrofit2 {
+    //En este proyecto no se usa retrofit por que no hay web services.
+    //Mantengo esta clase para el futuro.
 
     @Multipart
     @POST("/")
