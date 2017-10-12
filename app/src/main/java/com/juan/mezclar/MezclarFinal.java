@@ -61,7 +61,7 @@ Si la App encuentra un error, pondría el icono E1 o E2 y terminaría.
 //Prueba boton fab invisible, OK
 //Prueba de inicio automatico, OK
 //Prueba de NO mostrar la imagen original en la UI, OK
-//Prueba de notificaciones con numero, EJECUTADA PARCIALMENTE, CONTINUAR
+//Prueba de notificaciones con numero, EJECUTADA PARCIALMENTE, CONTINUAR con ftp
 
 public class MezclarFinal extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
@@ -77,9 +77,10 @@ public class MezclarFinal extends AppCompatActivity {
     //Path a agregar al dir raiz del telefono
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
     String imagenPrincipal = "origin.jpg";
-    String ficheroConfigTxt = "CONFIG.txt";
+    //String ficheroConfigTxt = "CONFIG.txt";
     ProgressBar progressBar;
-    FloatingActionButton fabOnPostExecute;//Para deshabilitar el boton FAB si la ejecucion es completa
+
+    //FloatingActionButton fabOnPostExecute;//Para deshabilitar el boton FAB si la ejecucion es completa
 
     //Fichero de prueba para probar fallo de ArrayIndexOutOfBoundsException
     //String ficheroConfigTxt = "CONFIG[1].txt";
@@ -88,11 +89,13 @@ public class MezclarFinal extends AppCompatActivity {
     //String ficheroConfigTxt = "CONFIG[1][1].txt";
 
     //Fichero de prueba para probar fallo reportado por Cesar, cuando hay lineas en blanco en las coordenadas
-    //String ficheroConfigTxt = "CONFIG_genera_fallos.txt";
+    String ficheroConfigTxt = "CONFIG_genera_fallos.txt";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(xxx, "En el onCreate, Hola " );
+
         super.onCreate(savedInstanceState);
         //Obtener datos iniciales. Si no hay datos, cerrar la app
         recuperarIntentConDatosIniciales();
@@ -122,6 +125,9 @@ public class MezclarFinal extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         //Lo hago invisible, la app funciona de manera automatica, sin boton.
         fab.setVisibility(View.INVISIBLE);
+
+        //No hago nada con el fab, No lo muestro, es invisible
+        /*
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,37 +147,19 @@ public class MezclarFinal extends AppCompatActivity {
                     finish();
                 }
             }
-        });
+        });  */
 
 
-        Log.d(xxx, "Hola " );
         collageImage = (ImageView)findViewById(R.id.imageView3);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
-        //Inicio automatico
-        boolean booleanContinuarApp = metodoPrincipal_2();
-        if(booleanContinuarApp){
-            //Mantener la app abierta
-            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Imagen predict.jpg guardada en DCIM/predict", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        }else{
-            //Forzar el cierre de la app por que ha habido un error durante el procesamiento de la imagen
-            //Y antes de ejecutar el FtpAsyncTask
-            //Snackbar.make(view, "Cerrando app debido a un ERROR", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
-            //enviarNotification("Aplicacion cerrada debido a un error de ejecucion");
-            finish();
-        }
+        //No mostramos la progress bar
+        progressBar.setVisibility(View.INVISIBLE);
 
-        //Boton anulado. Uso el fab
-        /*Button combineImage = (Button)findViewById(R.id.combineimage);
-        combineImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                metodoPrincipal();
-            }
-        });
-        */
+
+
+        //Lanzamos el asynctask de componer imagen
+        new ComponerImagenAsyncTask().execute("string1", "string2", "string3");
 
     }//Fin del onCreate
 
@@ -192,55 +180,56 @@ public class MezclarFinal extends AppCompatActivity {
                 stringImagesSecuence = myString;
                 //Toast.makeText(this, myString, Toast.LENGTH_SHORT).show();
 
-                Log.d(xxx, "Datos de Launch Mezclar: " + stringImagesSecuence);
+                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: " + stringImagesSecuence);
                 //Muestro el string character a character
                 for(int i = 0; i < stringImagesSecuence.length(); i++) {
-                    Log.d(xxx, "Caracter " +i +":" + stringImagesSecuence.charAt(i));
+                    Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Caracter " +i +":" + stringImagesSecuence.charAt(i));
                 }
 
                 //Convertir el string de secuencia de imagenes en un array de secuencia de imagenes, character a character
                 arrayImagesSequence = stringImagesSecuence.toCharArray();
                 //Lo muestro con
                 for (char temp : arrayImagesSequence) {
-                    Log.d(xxx, "Caracter " +temp);
-                }//OK
+                    Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Caracter " +temp);
+                }//OK, la app continua
 
             }else{//Salta aqui si no hay datos en el intent
-                Log.d(xxx, "Datos de Launch Mezclar: No hay datos");
+                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: No hay datos");
                 //Datos fake para probar
                 //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
-                this.finish();
+                //this.finish();
+                finish();
 
             }
 
         }else{//Salta aqui si recibe nulo en el intent
-            Log.d(xxx, "Datos de Launch Mezclar: NULL 2 del else");
+            Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: NULL 2 del else");
             //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
-            this.finish();
-        }
+            //this.finish();
+            finish();
 
+        }
 
     }//Fin de recuperarIntentConDatosIniciales
 
-    //ESte metodo mezcla dos imagenes que estan en la carpeta drawable. Es solo para probar
-    private void metodoPrincipal(){
+    //Coordenadas globales para colocar la imagen transparente sobre origin.jpg
+    private float xFloat;
+    private float yFloat;
 
-                Bitmap bigImage = BitmapFactory.decodeResource(getResources(), R.drawable.imagen11);
-                Bitmap smallImage = BitmapFactory.decodeResource(getResources(), R.drawable.imagen2);
-                enviarNotification("1");
-                smallImage = changeSomePixelsToTransparent(smallImage);
-                enviarNotification("2");
-                Bitmap mergedImages = createSingleImageFromMultipleImages(bigImage, smallImage);
-                collageImage.setImageBitmap(mergedImages);
-                enviarNotification("3");
-                GuardarImagen guardarImagen = new GuardarImagen(MezclarFinal.this, mergedImages);
-                guardarImagen.guardarImagenMethod();
-    }
+    //Tiene que ser un campo de la clase para poder usarla en el OnPOst de un asynctask
+    //Esta variable tiene el resultado final de componer la imagen
+    Bitmap mergedImages = null;
 
     //Metodo final y OK
     ObtenerImagen obtenerImagen;
     private boolean metodoPrincipal_2(){
+        Log.d(xxx, "En metodoPrincipal_2");
+
         progressBar.setVisibility(View.VISIBLE); //To Hide ProgressBar
+
+        //Lanzar notificacon de inicio de lageneracion de la imagen
+        enviarNotificationConNumero("1");
+
 
         //Chequeo el array de secuencia de imagenes: si es null o esta vacio, termina el programa
 
@@ -249,6 +238,8 @@ public class MezclarFinal extends AppCompatActivity {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error: el array de imagenes esta vacio, saliendo de la aplicacion");
                 enviarNotificationConNumero("E1");
+                Log.d(xxx, "En metodoPrincipal_2, arrayImagesSequence.length == 0, salimos de la app");
+
                 return false;
             }else{
                 //El array de sequencia existe, continuamos
@@ -257,6 +248,8 @@ public class MezclarFinal extends AppCompatActivity {
         {
             enviarNotification("Error: el array de imagenes es null, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, arrayImagesSequence es null, salimos de la app");
+
             return false;
         }
 
@@ -264,23 +257,25 @@ public class MezclarFinal extends AppCompatActivity {
         LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(MezclarFinal.this);
         List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
         if(arrayLineasTexto == null){
-            Log.d(xxx, "arrayLineasTexto es null");
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto es null, salimos de la app");
+
             return false;
         }
 
         if(arrayLineasTexto.isEmpty()){
-            Log.d(xxx, "arrayLineasTexto esta vacio");
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto esta vacio, salimos de la app");
+
             return false;
         }
 
         //Recorro y muestro la lista con el contenido de CONFIG.txt, solo para pruebas
-        /*
+
         String[] coordenates;
         String linea;
         for (int i=0; i < arrayLineasTexto.size(); i++){
@@ -296,10 +291,16 @@ public class MezclarFinal extends AppCompatActivity {
 
             }
             leerCoordenadasDeConfigTxt(arrayLineasTexto.get(i));
-        } */
+        }
 
         //Leer coordenadas y URL del array de lineas obtenido del fichero CONFIG.txt
         List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
+
+        //Recorro he imprimo los datos de listaCoordenadas
+        for(int i = 0; i < listaCoordenadas.size(); i++){
+            Log.d(xxx, "en metodoPrincipal_2, lista de coordenadas, posicion: " +i + ", CoordX= " +listaCoordenadas.get(i).getCoordX());
+            Log.d(xxx, "en metodoPrincipal_2, lista de coordenadas, posicion: " +i + ", CoordY= " +listaCoordenadas.get(i).getCoordY());
+        }
 
         //Caso de try/ctach para ArrayIndexOutOfBoundsException
         if(listaCoordenadas == null){
@@ -307,6 +308,7 @@ public class MezclarFinal extends AppCompatActivity {
             //un error tipografico, como poner una letra en vez de un digito.
             enviarNotification("Error ArrayIndexOutOfBoundsException, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, listaCoordenadas == null, salimos de la app");
             return false;
         }
 
@@ -315,6 +317,7 @@ public class MezclarFinal extends AppCompatActivity {
             //Enviar notificacion de error y cerrar programa
             enviarNotification("Error al recuperar coordenadas, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, listaCoordenadas es Empty, salimos de la app");
             return false;
         }
 
@@ -345,6 +348,7 @@ public class MezclarFinal extends AppCompatActivity {
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error al recuperar origin.jpg, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, originJpg == null, salimos de la app");
             return false;
         }
         //NO se muestra origin.jpg en la UI, requerimiento de Cesar
@@ -357,7 +361,8 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Loop principal de la aplicacion
         Bitmap imagenParaSuperponerConOrigin;
-        Bitmap mergedImages = null;
+
+
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "mezclando imagen: " +i);
             enviarNotification("mezclando imagen: " +i);
@@ -369,6 +374,8 @@ public class MezclarFinal extends AppCompatActivity {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
                 enviarNotificationConNumero("E1");
+                Log.d(xxx, "En metodoPrincipal_2, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
+
                 //Acabamos la ejecucion
                 return false;
             }else{
@@ -389,8 +396,19 @@ public class MezclarFinal extends AppCompatActivity {
                 if(i >= listaCoordenadas.size()){
                     enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    Log.d(xxx, "En metodoPrincipal_2, Error en indice de coordenadas, salimos de la app");
                     return false;//Cerrar aplicacion y evitar un null pointer
                 }
+
+
+                //Para corregir fallos de null, OJO OJO OJO
+                /*
+                if(listaCoordenadas.get(i).getCoordX() == null || listaCoordenadas.get(i).getCoordY() == null){
+                    //No lee los valores null
+                }else{
+                    xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
+                    yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+                } */
                 xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
                 yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
 
@@ -399,6 +417,8 @@ public class MezclarFinal extends AppCompatActivity {
                 if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
                     enviarNotification("Error, coordenadas no son un numero valido, saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    Log.d(xxx, "En metodoPrincipal_2, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
+
                     return false;//Cerrar aplicacion y evitar fallo en el procesamiento
                 }
 
@@ -410,11 +430,13 @@ public class MezclarFinal extends AppCompatActivity {
                 originJpg = mergedImages;
                 if(mergedImages != null) {
                     //Comando de prueba. Comentar esta linea en la version final
-                    collageImage.setImageBitmap(mergedImages);
+                    //collageImage.setImageBitmap(mergedImages);
                 }else{
                     //Ha habido un error al mezclar las imagenes
                     enviarNotification("Error mezclando imagen: " +i  +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    Log.d(xxx, "En metodoPrincipal_2, mergedImages es null, no se ha generado la imagen, salimos de la app");
+
                     return false;
 
                 }
@@ -439,21 +461,14 @@ public class MezclarFinal extends AppCompatActivity {
             //Ha habido un error al guardar la imagen, devolver false
             enviarNotification("Error guardando imagen predict" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, Ha habido un error al guardar la imagen compuesta, salimos de la app");
+
             return false;
         }
 
         //Return true al final del metodo. La app se queda abierta, esperando el resultado de la subida de predict.jpg con ftp
         enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp...");
         enviarNotificationConNumero("2");
-
-        //Enviar predict.jpg al server con POST
-        //java.lang.IllegalArgumentException: baseUrl must end in /: http://www.cesaral.com/test
-        //subirImagenConRetrofit2(obtenerImagen, urlServidor +"/");
-
-        //**************************************
-        //Solo falta activar un progress bar y ejecutar el asynctask para enviar la imagen al servidor con ftp
-        //new FtpAsyncTask().execute("string1", "string2", "string3");
-        //**************************************
 
         return true;
 
@@ -462,7 +477,7 @@ public class MezclarFinal extends AppCompatActivity {
     //Metodo que envia distintos iconos a la barra de notificaciones, segun el estado de la app
     private void enviarNotificationConNumero(String stringConCodigoDeError){
         //Este switch para seleccionar la imagen correcta de la notificacion a enviar
-        Log.d(xxx, "enviarNotificationConNumero, el error es: " + stringConCodigoDeError);
+        Log.d(xxx, "En metdo enviarNotificationConNumero, el codigo a enviar es: " + stringConCodigoDeError);
         int intIdentificadorDelIcon = R.drawable.ic_number_1;
         switch (stringConCodigoDeError){
             case "1"://N1
@@ -533,6 +548,20 @@ public class MezclarFinal extends AppCompatActivity {
         }
     }
 
+    //ESte metodo es como leerCoordenadasDeConfigTxt, pero devuelve el array list de pojos
+    private void leerCoordenadasDeConfigTxt_2(String linea){
+        String line = "This order was32354 placed 343434for 43411 QT ! OK?";
+        String regex = "[^\\d]+";
+        //String[] str = line.split(regex);
+        String[] str = linea.split(regex);
+        //String required = "";
+        int i = 0;
+        for(String st: str){
+            Log.d(xxx, "xxx Dato " +i +" es: " +st);
+            i++;
+        }
+    }
+
     //Metodo para:
     //Generar array de PojoCoordenadas con las coordenadas x e Y de posicionamiento de imagenes
     //Generar la URL para subir y almacenar la imagen generada a un servidor
@@ -545,17 +574,25 @@ public class MezclarFinal extends AppCompatActivity {
             //coordenadas por cada linea y lo guarda en el array de coordenadas
             String[] str = arrayLineasTextoLocal.get(i).split(regex);
             //Si la linea no tiene digitos, hago un break y continua el loop
-            if(str.length == 0) break;
+            //if(str.length == 0) break;
             PojoCoordenadas pojoCoordenadas = new PojoCoordenadas();
             try {
-                pojoCoordenadas.setCoordX(str[2]);
-                pojoCoordenadas.setCoordY(str[3]);
+                if(str.length > 2) {//Para evitar las lineas blancas y las que no tienen coordenadas y que de ArrayIndexOutOfBoundsException
+                    pojoCoordenadas.setCoordX(str[2]);
+                    pojoCoordenadas.setCoordY(str[3]);
+                    arrayPojoCoordenadas.add(pojoCoordenadas);
+
+                }else{
+                    Log.d(xxx, "En generarPojoGenerarUrl, la linea " +i +" esta vacia o no tiene coordenadas: "
+                            +arrayLineasTextoLocal.get(i));
+
+                }
             }
             catch (ArrayIndexOutOfBoundsException e) {
                 Log.d(xxx, "ArrayIndexOutOfBoundsException:  " +e.getMessage());
                 return null;
             }
-            arrayPojoCoordenadas.add(pojoCoordenadas);
+            //arrayPojoCoordenadas.add(pojoCoordenadas);
         }
 
         //Este for extrae la URL del servidor
@@ -596,96 +633,6 @@ public class MezclarFinal extends AppCompatActivity {
         return arrayPojoCoordenadas;
     }//Fin de generarPojoGenerarUrl
 
-
-    //Coordenadas globales para colocar la imagen transparente sobre origin.jpg
-    private float xFloat;
-    private float yFloat;
-    //Este metodo es solo para hacer pruebas
-    private void leerCoordenadasDeSuperposicion(int i){
-        //TODO: extraer las coordenadas del fichero CONFIG.text en CesaralMagic/ImageC
-
-
-        //Este es manual, con las coordenadas de CONFIG:
-        switch (i){
-            case 0://N1
-                xFloat = 94;
-                yFloat = 1;
-                break;
-            case 1://N2
-                xFloat = 115;
-                yFloat = 1;
-                break;
-            case 2://N3
-                xFloat = 94;
-                yFloat = 27;
-                break;
-            case 3://N4
-                xFloat = 115;
-                yFloat = 27;
-                break;
-            case 4://N5
-                xFloat = 94;
-                yFloat = 53;
-                break;
-            case 5://N6
-                xFloat = 115;
-                yFloat = 53;
-                break;
-            case 6://N7
-                xFloat = 94;
-                yFloat = 79;
-                break;
-            case 7://N8
-                xFloat = 115;
-                yFloat = 79;
-                break;
-            case 8://N9
-                xFloat = 94;
-                yFloat = 105;
-                break;
-            case 9://N10
-                xFloat = 115;
-                yFloat = 105;
-                break;
-            case 10://N11
-                xFloat = 94;
-                yFloat = 173;
-                break;
-            case 11://N12
-                xFloat = 115;
-                yFloat = 173;
-                break;
-            case 12://N13
-                xFloat = 94;
-                yFloat = 199;
-                break;
-            case 13://N14
-                xFloat = 115;
-                yFloat = 199;
-                break;
-            case 14://N15
-                xFloat = 0;
-                yFloat = 0;
-                break;
-            case 15://N16
-                xFloat = 0;
-                yFloat = 50;
-                break;
-
-        }
-
-    }
-
-
-    //Metodo de prueba
-    private Bitmap createSingleImageFromMultipleImages(Bitmap firstImage, Bitmap secondImage){
-
-        Bitmap result = Bitmap.createBitmap(firstImage.getWidth(), firstImage.getHeight(), firstImage.getConfig());
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(firstImage, 0f, 0f, null);
-        canvas.drawBitmap(secondImage, 10, 10, null);
-        return result;
-    }
 
     //Metodo final para la mezcla
     private Bitmap createSingleImageFromMultipleImagesWithCoord(Bitmap firstImage, Bitmap secondImage, float x, float y ){
@@ -769,8 +716,13 @@ public class MezclarFinal extends AppCompatActivity {
 
 
     private boolean metodoSubirImagenConFtp(ObtenerImagen obtenerImagen) {
+        Log.d(xxx, "En metodoSubirImagenConFtp");
 
-        //Campos----------------------------------------------------
+        //Lanzar notificacion de que la imagen ha sido compuesta y se inicia el preceso ftp
+        enviarNotificationConNumero("3");
+
+
+        //Este metodo es llamado desde el doInBackground del asynctask de ftp
 
         //EditText nombreArhivo;        // Almacena el id del componente donde está localizado el nombre del archivo a subir
         //Button subir;                // Almacena el id del componente donde está localizado el botón para subir el archivo
@@ -779,14 +731,7 @@ public class MezclarFinal extends AppCompatActivity {
         String ip;                    //Almacena la direción ip del servidor
         String usuario;                //Almacena el usuario
         String contrasena;            //Almacena la contraseña
-
         FtpClient ftp;                    //Instancia manejador ftp
-
-        //-----------------------------------------------------------
-        //Inicializa las credenciales
-        //ip = "192.168.0.1";
-        //usuario = "admin";
-        //contrasena = "admin";
 
         //ip = "ftp.cesaral.com/test";
         ip = urlServidor;
@@ -800,6 +745,9 @@ public class MezclarFinal extends AppCompatActivity {
 
         if(filePathDePredictJpg == null){
             enviarNotificationFtp("Error al obtener el file de predict.jpg para upload ftp" +", saliendo de la aplicacion");
+            enviarNotificationConNumero("E2");
+            Log.d(xxx, "En metodoSubirImagenConFtp, Error al obtener el file de predict.jpg para upload ftp");
+
             return false;
 
         }else {//Hemos obtenido el file de la imagen a subir, seguimos
@@ -808,19 +756,7 @@ public class MezclarFinal extends AppCompatActivity {
             Log.d(xxx, "Path a predict.jpg para enviar al servidor con ftp: " + filePathDePredictJpg.getName());
             Log.d(xxx, "Absolute Path a predict.jpg para enviar al servidor con ftp: " + filePathDePredictJpg.getAbsolutePath());
 
-
-
         //**********************************************
-
-
-        //Establece los ids de la vista
-        //nombreArhivo = (EditText) findViewById(R.id.edtxtNombreArchivo);
-        //subir = (Button) findViewById(R.id.btnSubir);
-
-        //Evento OnClick (btnSubir)
-        //subir.setOnClickListener(new OnClickListener() {
-
-            //public void onClick(View v) {
 
                 //Establece un servidor
                 ftp = new FtpClient(ip, usuario, contrasena, getApplicationContext());
@@ -832,19 +768,22 @@ public class MezclarFinal extends AppCompatActivity {
                         //Login correcto, enviamos el fichero con el try catch de abajo
                     }else{
                         enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
-                        Log.d(xxx, "Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E2");
+                        Log.d(xxx, "En metodoSubirImagenConFtp, Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                         return false;
                     }
                 } catch (SocketException e) {
                     //e.printStackTrace();
                     enviarNotificationFtp("Error Socket Exception en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
-                    Log.d(xxx, "Error Socket Exception en ftp login: " +e.getMessage());
+                    enviarNotificationConNumero("E2");
+                    Log.d(xxx, "En metodoSubirImagenConFtp, Error Socket Exception en ftp login: " +e.getMessage());
 
                     return false;
                 } catch (IOException e) {
                     //e.printStackTrace();
                     enviarNotificationFtp("Error IOException en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
-                    Log.d(xxx, "Error IOException en ftp login: " +e.getMessage());
+                    enviarNotificationConNumero("E2");
+                    Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp login: " +e.getMessage());
 
                     return false;
                 }
@@ -855,98 +794,31 @@ public class MezclarFinal extends AppCompatActivity {
                     //if(ftp.enviarFile("predict.jpg")){
                     if(ftp.enviarFileFinalFinal(filePathDePredictJpg, "predict.jpg")){
                         enviarNotificationFtp("Fichero predict.jpg enviado al servidor");
-                        Log.d(xxx, "Archivo predict.jpg enviado al servidor");
+
+                        //Lanzar notificacion de que el proceso ha terminado de forma correcta
+                        enviarNotificationConNumero("OK");
+                        Log.d(xxx, "En metodoSubirImagenConFtp, Archivo predict.jpg enviado al servidor");
 
                         return true;
                     }else{
                         enviarNotificationFtp("Error: Fallo al enviar el fichero predict.jpg al servidor" +", saliendo de la aplicacion");
-                        Log.d(xxx, "Error: Fallo al enviar el fichero predict.jpg al servidor");
+                        enviarNotificationConNumero("E2");
+                        Log.d(xxx, "En metodoSubirImagenConFtp, Error: Fallo al enviar el fichero predict.jpg al servidor");
                         return false;
                     }
                 } catch (IOException e) {
                     //e.printStackTrace();
                     enviarNotificationFtp("Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage() +", saliendo de la aplicacion");
-                    Log.d(xxx, "Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage());
+                    enviarNotificationConNumero("E2");
+                    Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage());
 
                     return false;
                 }
-
-            //}
-        //});
-
-
-
-            //return true;
 
         }//Fin del else de if(filePathDePredictJpg == null)
 
     }//Fin de metodo metodoSubirImagenConFtp
 
-
-
-    //**********************************************************************************************************
-    //NOTA 10 oct 2017: ESte codigo no lo uso, ni las clases en la carpeta retrofit, ya que para funcionar requiere
-    //un servidor node.js o php que tenga implementado web services.
-    //Me queda como ejercicio para hacer el servidor en node.js, como en la web de donde extraje este codigo.
-    //Servidor node.js para subir imagenes:  http://hidrodixtion.github.io/2016/06/02/create-simple-image-upload-server-in-node-js/
-
-    //Uso de retrofit para subir la imagen generada al servidor
-    //Recibe la instancia de ObtenerImagen usada en el metodo metodoPrincipal_2
-    //Como en https://medium.com/@adinugroho/upload-image-from-android-app-using-retrofit-2-ae6f922b184c
-    ServicioRetrofit2 servicioRetrofit2;
-    private boolean subirImagenConRetrofit2(ObtenerImagen obtenerImagen, String Url){
-        File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/",
-                "predict.jpg");
-
-        if(filePathDePredictJpg == null){
-            enviarNotification("Error al obtener el file de predict.jpg para retrofit2" +" ,saliendo de la aplicacion");
-            return false;
-
-        }else{//Hemos obtenido el file de la imagen a subir, seguimos
-
-            //Chequeamos que el path a predict.jpg es correcto:
-            Log.d(xxx, "Path a predict.jpg: " + filePathDePredictJpg.getName());
-
-            //Usamos interceptor para loggear retrofit
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
-            //Creamos una instancia de ServicioRetrofit2
-            servicioRetrofit2 = new Retrofit.Builder().baseUrl(Url).client(client).build().create(ServicioRetrofit2.class);
-
-            //Definimos los parametros necesarios para retrofit2
-            RequestBody reqFile = RequestBody.create(MediaType.parse("image/*"), filePathDePredictJpg);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("upload", filePathDePredictJpg.getName(), reqFile);
-            RequestBody name = RequestBody.create(MediaType.parse("text/plain"), "prueba_de_subida");
-
-            Call<ResponseBody> req = servicioRetrofit2.postImage(body, name);
-            req.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Toast.makeText(MezclarFinal.this, "Success " + response.message(), Toast.LENGTH_LONG).show();
-                    Toast.makeText(MezclarFinal.this, "Success " + response.body().toString(), Toast.LENGTH_LONG).show();
-                    Log.d(xxx, "Imagen subida correctamente con retrofit2: " +response.message());
-                    Log.d(xxx, "response.message: " +response.message());
-                    Log.d(xxx, "response.body().toString(): " +response.body().toString());
-                    enviarNotification("Imagen subida correctamente al servidor: " +response.message());
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    //t.printStackTrace();
-                    Log.d(xxx, "Error de retrofit2: " +t.getMessage());
-                    enviarNotification("Error al obtener el file de predict.jpg para retrofit2" +" ,saliendo de la aplicacion");
-                }
-            });
-
-
-
-
-            //**********************************************************************************
-            return true;
-        }
-    }
 
     //Clase para subir la imagen al servidor en un thread distinto de la UI
     private class FtpAsyncTask extends AsyncTask<String, Integer, Boolean> {
@@ -956,14 +828,13 @@ public class MezclarFinal extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            Log.d(xxx, "estoy en doInBackground");
+            Log.d(xxx, "estoy en doInBackground de FtpAsyncTask");
 
             if (metodoSubirImagenConFtp(obtenerImagen)) {
                 return true;
             } else {
                 return false;
             }
-
         }
 
         @Override
@@ -972,33 +843,87 @@ public class MezclarFinal extends AppCompatActivity {
         }
 
         protected void onPostExecute(Boolean boolResultado) {
-            Log.d(xxx, "onPostExecute, el resultado de doInBackground es: " +boolResultado);
+            Log.d(xxx, "onPostExecute de FtpAsyncTask, el resultado de doInBackground es: " +boolResultado);
 
             if(boolResultado) {
                 Log.d(xxx, "En onPostExecute: Success, Imagen enviada al servidor ftp");
-                //Mantener la app abierta
+                //Mantener la app abierta y avisar con snakc bar:
+                /*
                 Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Imagen predict.jpg guardada en DCIM/predict y enviada al servidor", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                        .setAction("Action", null).show(); */
+
                 //Si todo va bien, dejo la app abierta pero deshabilito el fab:
-                fabOnPostExecute = (FloatingActionButton) findViewById(R.id.fab);
-                fabOnPostExecute.setVisibility(View.INVISIBLE);
+
+                //No hago nada con el fab
+                //fabOnPostExecute = (FloatingActionButton) findViewById(R.id.fab);
+                //fabOnPostExecute.setVisibility(View.INVISIBLE);
 
             }else{
-                Log.d(xxx, "En onPostExecute: FAIL, Imagen NO enviada al servidor ftp");
+                Log.d(xxx, "En onPostExecute: FAIL, Imagen NO enviada al servidor ftp, saliendo de la app");
                 progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
                 finish();
-
             }
-
         }
 
         protected void onProgressUpdate(Integer[] values) {
         }
 
+        protected void onCancelled() {
+        }
+    }//FIN de la clase FtpAsyncTask
 
+
+    //Asynctask para componer la imagen
+    private class ComponerImagenAsyncTask extends AsyncTask<String, Integer, Boolean> {
+        public ComponerImagenAsyncTask() {
+            super();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            Log.d(xxx, "estoy en doInBackground de ComponerImagenAsyncTask");
+
+            boolean booleanContinuarApp = metodoPrincipal_2();
+            if(booleanContinuarApp){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected void onPostExecute(Boolean boolResultado) {
+            Log.d(xxx, "onPostExecute de ComponerImagenAsyncTask, el resultado de doInBackground es: " +boolResultado);
+
+            if(boolResultado) {
+                Log.d(xxx, "En onPostExecute: Success, Imagen compuesta correctamente, se inicia FtpAsyncTask");
+
+                //Mostramos la imagen compuesta en pantalla, no se puede manipular un componente grafico desde el thread
+                collageImage.setImageBitmap(mergedImages);
+
+                //Lanzamos el asynctask de enviar imagen al servidor con ftp
+                new FtpAsyncTask().execute("string1", "string2", "string3");
+
+            }else{
+                Log.d(xxx, "En onPostExecute: FAIL, Imagen jpg NO generada, saliendo de la app");
+                progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
+                //Cerrar aplicacion, ha habido un fallo
+                finish();
+            }
+        }
+
+        protected void onProgressUpdate(Integer[] values) {
+        }
 
         protected void onCancelled() {
         }
-    }
+    }//FIN de la clase ComponerImagenAsyncTask
+
+
+
 }//Fin del activity
