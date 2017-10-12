@@ -80,7 +80,7 @@ public class MezclarFinal extends AppCompatActivity {
     //Path a agregar al dir raiz del telefono
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
     String imagenPrincipal = "origin.jpg";
-    //String ficheroConfigTxt = "CONFIG.txt";
+    String ficheroConfigTxt = "CONFIG.txt";
 
     //No se usa la progress bar
     //ProgressBar progressBar;
@@ -97,7 +97,7 @@ public class MezclarFinal extends AppCompatActivity {
     //String ficheroConfigTxt = "CONFIG_genera_fallos.txt";
 
     //Fichero de prueba para probar fallo por lineas de comentarios
-    String ficheroConfigTxt = "CONFIG_genera_fallos_comments.txt";
+    //String ficheroConfigTxt = "CONFIG_genera_fallos_comments.txt";
 
 
     @Override
@@ -377,7 +377,9 @@ public class MezclarFinal extends AppCompatActivity {
             enviarNotificationConNumero("1");
             //Obtener la imagen a superponer como un bitmap
             imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                    +arrayImagesSequence[i]+".jpg");
+                    //+arrayImagesSequence[i]+".jpg");
+                    //Prueba con ficheros .bmp
+                    +arrayImagesSequence[i]+".bmp");
             if(imagenParaSuperponerConOrigin == null){
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
