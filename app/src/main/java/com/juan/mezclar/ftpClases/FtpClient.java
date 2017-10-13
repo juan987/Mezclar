@@ -209,25 +209,6 @@ public class FtpClient {
 
      }
 
-
-
-        /*
-        //Hace login en el servidor
-        if (ftpClient.login(usuario, contrasena)){
-
-            //Informa al usuario
-            Toast.makeText(context, "Login correcto . . .", Toast.LENGTH_SHORT).show();
-            return true;	//En caso de login correcto
-        }
-        else{
-
-            //Informa al usuario
-            Toast.makeText(context, "Login incorrecto . . .", Toast.LENGTH_SHORT).show();
-
-            Log.d(xxx, "Fallo en el login al servidor ftp ftpClient.login(usuario, contrasena))");
-            return false;	//En caso de login incorrecto
-        }  */
-
     }//Fin del metodo login
 
     /**
@@ -236,121 +217,6 @@ public class FtpClient {
      * @return	Verdad en caso de que se haya subido con éxito
      * @throws IOException
      */
-
-    //Metodo original, no lo uso, deprecated
-    public boolean enviarFile (String nombreArchivo) throws IOException{
-
-        ftpClient.enterLocalActiveMode();
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-        //Cambia la carpeta Ftp
-        //if (ftpClient.changeWorkingDirectory("ftp")){
-
-        //Cambiar a la carpeta test
-        if (ftpClient.changeWorkingDirectory("test")){
-
-            //Informa al usuario
-            Toast.makeText(context, "Carpeta ftp cambiada . . .", Toast.LENGTH_SHORT).show();
-
-            //Obtiene la dirección de la ruta sd
-            Toast.makeText(context, "Ruta SD obtenida . . .", Toast.LENGTH_SHORT).show();
-            rutaSd = Environment.getExternalStorageDirectory();
-
-            //Obtiene la ruta completa donde se encuentra el archivo
-            Toast.makeText(context, "Ruta completa archivo obtenida . . .", Toast.LENGTH_SHORT).show();
-            rutaCompleta = new File(rutaSd.getAbsolutePath(), nombreArchivo);
-
-            //Crea un buffer hacia el servidor de subida
-            buffer = new BufferedInputStream(new FileInputStream(rutaCompleta));
-
-            if (ftpClient.storeFile(nombreArchivo, buffer)){
-
-                //Informa al usuario
-                Toast.makeText(context, "Archivo subido . . .", Toast.LENGTH_SHORT).show();
-
-                buffer.close();		//Cierra el bufer
-                return true;		//Se ha subido con éxito
-            }
-            else{
-
-                //Informa al usuario
-                Toast.makeText(context, "Imposible subir archivo . . .", Toast.LENGTH_SHORT).show();
-
-                buffer.close();		//Cierra el bufer
-                return false;		//No se ha subido
-            }
-        }
-        else{
-
-            //Informa al usuario
-            Toast.makeText(context, "Carpeta ftp imposible cambiar . . .", Toast.LENGTH_SHORT).show();
-
-            return false;		//Imposible cambiar de directo en servidor ftp
-        }
-
-    }//Fin de enviarFile, no uso este metodo
-
-    //Metodo deprecated
-    public boolean enviarFileFinal (File ruta, String nombreArchivo) throws IOException{
-        Log.d(xxx, "Estoy en el metodo enviarFileFinal");
-
-        ftpClient.enterLocalActiveMode();
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-        //Cambia la carpeta Ftp
-        if (ftpClient.changeWorkingDirectory("test")){
-        //No cambio nada, a ver que pasa
-        //if (true){
-            /*
-            //Informa al usuario
-            Toast.makeText(context, "Carpeta ftp cambiada . . .", Toast.LENGTH_SHORT).show();
-
-            //Obtiene la dirección de la ruta sd
-            Toast.makeText(context, "Ruta SD obtenida . . .", Toast.LENGTH_SHORT).show();
-            rutaSd = Environment.getExternalStorageDirectory();
-
-            //Obtiene la ruta completa donde se encuentra el archivo
-            Toast.makeText(context, "Ruta completa archivo obtenida . . .", Toast.LENGTH_SHORT).show();
-            rutaCompleta = new File(rutaSd.getAbsolutePath(), nombreArchivo);
-
-            //Crea un buffer hacia el servidor de subida
-            buffer = new BufferedInputStream(new FileInputStream(rutaCompleta));
-            */
-
-            //Crear buffer al servidor
-            buffer = new BufferedInputStream(new FileInputStream(ruta));
-
-            if (ftpClient.storeFile(nombreArchivo, buffer)){
-
-                //Informa al usuario
-                Toast.makeText(context, "Archivo subido . . .", Toast.LENGTH_SHORT).show();
-
-                buffer.close();		//Cierra el bufer
-                return true;		//Se ha subido con éxito
-            }
-            else{
-
-                //Informa al usuario
-                Toast.makeText(context, "Imposible subir archivo . . .", Toast.LENGTH_SHORT).show();
-
-                buffer.close();		//Cierra el bufer
-                return false;		//No se ha subido
-            }
-        }
-        else{
-
-            //Informa al usuario
-            Toast.makeText(context, "Carpeta ftp imposible cambiar . . .", Toast.LENGTH_SHORT).show();
-
-            return false;		//Imposible cambiar de directo en servidor ftp
-        }
-
-    }//Fin de enviarFileFinal
-
-
-
-
-
 
     //Enviar con try catch
     public boolean enviarFileFinalFinal (File ruta, String nombreArchivo) throws IOException{
@@ -363,24 +229,26 @@ public class FtpClient {
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
             //Cambia la carpeta Ftp
-            boolean boolCambioDirectorioHecho = false;
-            boolCambioDirectorioHecho = ftpClient.changeWorkingDirectory("test");
+            //boolean boolCambioDirectorioHecho = false;
+            //boolCambioDirectorioHecho = ftpClient.changeWorkingDirectory("test");
+
+            //NO cambiamos de carpeta
+            //if(boolCambioDirectorioHecho){
+            /* if(true){
+                    //Cambio de directorio hecho
+                    Log.d(xxx, "Cambio de directorio hecho");
+                    //Continuamos
+                    Log.d(xxx, "Cambio de directorio hecho, codigo de respuesta:  " +ftpClient.getReplyCode());
+                    Log.d(xxx, "Cambio de directorio hecho:  " +ftpClient.printWorkingDirectory());
 
 
-            if(boolCambioDirectorioHecho){
-                //Cambio de directorio hecho
-                Log.d(xxx, "Cambio de directorio hecho");
-                //Continuamos
-                Log.d(xxx, "Cambio de directorio hecho, codigo de respuesta:  " +ftpClient.getReplyCode());
-                Log.d(xxx, "Cambio de directorio hecho:  " +ftpClient.printWorkingDirectory());
+                }else{
+                    Log.d(xxx, "Cambio de directorio ES FALSE");
+                    Log.d(xxx, "Cambio de directorio Es FALSE, NO HECHO:  " +ftpClient.getReplyCode());
 
+                    return false;
+            } */
 
-            }else{
-                Log.d(xxx, "Cambio de directorio ES FALSE");
-                Log.d(xxx, "Cambio de directorio Es FALSE, NO HECHO:  " +ftpClient.getReplyCode());
-
-                return false;
-            }
 
             //Crear buffer al servidor
             buffer = new BufferedInputStream(new FileInputStream(ruta));
@@ -439,105 +307,4 @@ public class FtpClient {
     }//Fin de enviarFileFinalFinal
 
 
-
-    //Metodo deprecated
-    public boolean login_original (String usuario, String contrasena) throws SocketException, IOException {
-
-        //Almacena los valores en la clase
-        this.usuario = usuario;
-        this.contrasena = contrasena;
-
-        //Establece conexión con el servidor
-        Toast.makeText(context, "Conectando . . .", Toast.LENGTH_SHORT).show();
-        try{
-            ftpClient = new FTPClient();
-
-            //Para ver los traceos en el monitor
-            ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));//No funciona?????
-
-
-            //Usar puerto 21
-
-
-            //ftpClient.connect(ip);//Fallo
-            ftpClient.connect("ftp.cesaral.com");//OK, pero anulando el strict mode, si no, me da fallo
-            Log.d(xxx, "Codigo de respuesta del connect:   " +ftpClient.getReplyCode());
-
-
-            //ftpClient.connect("ftp.cesaral.com/test");//Falla con error unable to resolve host
-            //ftpClient.connect("ftp.cesaral.com/");//Fallo
-            //ftpClient.connect("ftp://ftp.cesaral.com");//Fallo
-            //ftpClient.connect("ftp://ftp.cesaral.com/");//Fallo
-            //ftpClient.connect("http://ftp.cesaral.com");//Fallo
-            //ftpClient.connect("http://www.cesaral.com/");//Fallo
-            //ftpClient.connect("http://www.cesaral.com/", 21);//Fallo
-            ftpClient.login(usuario, contrasena);
-            Log.d(xxx, "Codigo de respuesta del login:   " +ftpClient.getReplyCode());
-
-
-            Log.d(xxx, "Conexion y Login al servidor correctos: ");
-
-
-
-            return true;	//En caso de login correcto
-
-
-
-        }
-        /*
-        catch (Exception e){
-
-            //Informa al usuario
-            Toast.makeText(context, "Imposible conectar . . .", Toast.LENGTH_SHORT).show();
-
-            Log.d(xxx, "Fallo en la conexion al server ftpClient.connect(ip): " + e.getMessage());
-            Log.d(xxx, "Fallo en la conexion al server ftpClient.connect(ip): " + e.getLocalizedMessage());
-            Log.d(xxx, "Fallo en la conexion al server ftpClient.connect(ip): " + e.getCause());
-            Log.d(xxx, "Fallo en la conexion al server ftpClient.connect(ip): " + e.getStackTrace().toString());
-            return false;	//En caso de que no sea posible la conexion
-        } */
-
-
-        catch (SocketException e) {
-            e.printStackTrace();
-            Log.d(xxx, "Fallo 1 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
-            return false;	//En caso de que no sea posible la conexion, Si no retorno, me sale el fallo de strict mode
-
-
-        }
-        catch (UnknownHostException e) {
-            e.printStackTrace();
-            Log.d(xxx, "Fallo  2 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
-            return false;	//En caso de que no sea posible la conexion
-
-
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            Log.d(xxx, "Fallo 3 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
-            return false;	//En caso de que no sea posible la conexion
-
-
-        }
-
-
-
-        /*
-        //Hace login en el servidor
-        if (ftpClient.login(usuario, contrasena)){
-
-            //Informa al usuario
-            Toast.makeText(context, "Login correcto . . .", Toast.LENGTH_SHORT).show();
-            return true;	//En caso de login correcto
-        }
-        else{
-
-            //Informa al usuario
-            Toast.makeText(context, "Login incorrecto . . .", Toast.LENGTH_SHORT).show();
-
-            Log.d(xxx, "Fallo en el login al servidor ftp ftpClient.login(usuario, contrasena))");
-            return false;	//En caso de login incorrecto
-        }  */
-
-    }
 }//Fin de la clase

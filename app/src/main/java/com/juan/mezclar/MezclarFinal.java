@@ -522,7 +522,7 @@ public class MezclarFinal extends AppCompatActivity {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(intIdentificadorDelIcon)
-                        .setContentTitle("Mezclar");
+                        .setContentTitle("Cesaral Magic Photo");
                         //.setStyle(new NotificationCompat.BigTextStyle().bigText(mensaje));
         //.setContentText(mensaje);
         // Gets an instance of the NotificationManager service//
@@ -682,8 +682,8 @@ public class MezclarFinal extends AppCompatActivity {
 
     //Metodo anulado para que no envie las notificaciones con texto
     private void enviarNotification(String mensaje){
-        /*
 
+        /*
         //Get an instance of NotificationManager//
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -703,15 +703,15 @@ public class MezclarFinal extends AppCompatActivity {
         // If the previous notification is still visible, the system will update this existing notification,
         // rather than create a new one. In this example, the notification’s ID is 001//
 
-        mNotificationManager.notify(001, mBuilder.build());
+        mNotificationManager.notify(001, mBuilder.build()); */
 
-        */
+
     }
 
     //Metodo anulado para que no envie las notificaciones con texto
     private void enviarNotificationFtp(String mensaje){
-        /*
 
+        /*
         //Get an instance of NotificationManager//
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -731,10 +731,10 @@ public class MezclarFinal extends AppCompatActivity {
         // If the previous notification is still visible, the system will update this existing notification,
         // rather than create a new one. In this example, the notification’s ID is 001//
 
-        mNotificationManager.notify(002, mBuilder.build());
+        mNotificationManager.notify(002, mBuilder.build()); */
 
 
-        */
+
     }
 
 
@@ -750,11 +750,8 @@ public class MezclarFinal extends AppCompatActivity {
         //Lanzar notificacion de que la imagen ha sido compuesta y se inicia el preceso ftp
         enviarNotificationConNumero("3");
 
-
         //Este metodo es llamado desde el doInBackground del asynctask de ftp
 
-        //EditText nombreArhivo;        // Almacena el id del componente donde está localizado el nombre del archivo a subir
-        //Button subir;                // Almacena el id del componente donde está localizado el botón para subir el archivo
 
         //Credenciales
         String ip;                    //Almacena la direción ip del servidor
@@ -764,12 +761,10 @@ public class MezclarFinal extends AppCompatActivity {
 
         //ip = "ftp.cesaral.com/test";
         ip = urlServidor;
-        usuario = "textx";
+        usuario = "testx";
         contrasena = "test.2017";
 
-        //**********************************************
-        //Mi codigo:
-        //File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
+
         File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
 
         if(filePathDePredictJpg == null){
@@ -785,64 +780,62 @@ public class MezclarFinal extends AppCompatActivity {
             Log.d(xxx, "Path a predict.jpg para enviar al servidor con ftp: " + filePathDePredictJpg.getName());
             Log.d(xxx, "Absolute Path a predict.jpg para enviar al servidor con ftp: " + filePathDePredictJpg.getAbsolutePath());
 
-        //**********************************************
+            //Establece un servidor
+            ftp = new FtpClient(ip, usuario, contrasena, getApplicationContext());
 
-                //Establece un servidor
-                ftp = new FtpClient(ip, usuario, contrasena, getApplicationContext());
+            //Realiza login en el servidor
 
-                //Realiza login en el servidor
-
-                try {
-                    if(ftp.login(usuario, contrasena)){
-                        //Login correcto, enviamos el fichero con el try catch de abajo
-                    }else{
-                        enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
-                        enviarNotificationConNumero("E2");
-                        Log.d(xxx, "En metodoSubirImagenConFtp, Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
-                        return false;
-                    }
-                } catch (SocketException e) {
-                    //e.printStackTrace();
-                    enviarNotificationFtp("Error Socket Exception en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
+            try {
+                if(ftp.login(usuario, contrasena)){
+                    //Login correcto, enviamos el fichero con el try catch de abajo
+                }else{
+                    enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
-                    Log.d(xxx, "En metodoSubirImagenConFtp, Error Socket Exception en ftp login: " +e.getMessage());
-
-                    return false;
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    enviarNotificationFtp("Error IOException en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
-                    enviarNotificationConNumero("E2");
-                    Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp login: " +e.getMessage());
-
+                    Log.d(xxx, "En metodoSubirImagenConFtp, Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     return false;
                 }
+            } catch (SocketException e) {
+                //e.printStackTrace();
+                enviarNotificationFtp("Error Socket Exception en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
+                enviarNotificationConNumero("E2");
+                Log.d(xxx, "En metodoSubirImagenConFtp, Error Socket Exception en ftp login: " +e.getMessage());
 
-                //Sube el archivo al servidor
-                try {
-                    //if(ftp.enviarFile(nombreArhivo)){
-                    //if(ftp.enviarFile("predict.jpg")){
-                    if(ftp.enviarFileFinalFinal(filePathDePredictJpg, "predict.jpg")){
-                        enviarNotificationFtp("Fichero predict.jpg enviado al servidor");
+                return false;
+            } catch (IOException e) {
+                //e.printStackTrace();
+                enviarNotificationFtp("Error IOException en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
+                enviarNotificationConNumero("E2");
+                Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp login: " +e.getMessage());
 
-                        //Lanzar notificacion de que el proceso ha terminado de forma correcta
-                        enviarNotificationConNumero("OK");
-                        Log.d(xxx, "En metodoSubirImagenConFtp, Archivo predict.jpg enviado al servidor");
+                return false;
+            }
 
-                        return true;
-                    }else{
-                        enviarNotificationFtp("Error: Fallo al enviar el fichero predict.jpg al servidor" +", saliendo de la aplicacion");
-                        enviarNotificationConNumero("E2");
-                        Log.d(xxx, "En metodoSubirImagenConFtp, Error: Fallo al enviar el fichero predict.jpg al servidor");
-                        return false;
-                    }
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    enviarNotificationFtp("Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage() +", saliendo de la aplicacion");
+            //Sube el archivo al servidor
+            try {
+                //if(ftp.enviarFile(nombreArhivo)){
+                //if(ftp.enviarFile("predict.jpg")){
+                if(ftp.enviarFileFinalFinal(filePathDePredictJpg, "predict.jpg")){
+                    enviarNotificationFtp("Fichero predict.jpg enviado al servidor");
+
+                    //Lanzar notificacion de que el proceso ha terminado de forma correcta
+                    enviarNotificationConNumero("OK");
+                    Log.d(xxx, "En metodoSubirImagenConFtp, Archivo predict.jpg enviado al servidor");
+
+                    return true;
+                }else{
+                    enviarNotificationFtp("Error: Fallo al enviar el fichero predict.jpg al servidor" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
-                    Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage());
-
+                    Log.d(xxx, "En metodoSubirImagenConFtp, Error: Fallo al enviar el fichero predict.jpg al servidor");
                     return false;
                 }
+            } catch (IOException e) {
+                //e.printStackTrace();
+                enviarNotificationFtp("Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage() +", saliendo de la aplicacion");
+                enviarNotificationConNumero("E2");
+                Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage());
+
+                return false;
+            }
 
         }//Fin del else de if(filePathDePredictJpg == null)
 
@@ -893,6 +886,8 @@ public class MezclarFinal extends AppCompatActivity {
                 //Cerrar aplicacion, ha habido un fallo
                 //finish();
             }
+            //Tanto si hay fallo como si se ejecuta correctamente, se cierra la app
+            finish();
         }
 
         protected void onProgressUpdate(Integer[] values) {
@@ -942,7 +937,7 @@ public class MezclarFinal extends AppCompatActivity {
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen jpg NO generada, saliendo de la app");
                 //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
-                //finish();
+                finish();
             }
         }
 
