@@ -590,11 +590,26 @@ public class MezclarFinal extends AppCompatActivity {
             return false;
         }
 
-        //Return true al final del metodo. La app se queda abierta, esperando el resultado de la subida de predict.jpg con ftp
-        enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp...");
-        enviarNotificationConNumero("2");
 
-        return true;
+
+        //Escribir la fecha en la que se ha generado la imagen en el fichero CONFIG.txt
+        EscribirEnFicheroTxt escribirEnFicheroTxt = new EscribirEnFicheroTxt(MezclarFinal.this);
+        if(escribirEnFicheroTxt.appendDateEnFichero(pathCesaralMagicImageC + ficheroConfigTxt)){
+            //Return true al final del metodo. La app se queda abierta, esperando el resultado de la subida de predict.jpg con ftp
+            enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp...");
+            enviarNotificationConNumero("2");
+            Log.d(xxx, "En metodoPrincipal_2, Se ha guardado la fecha en CONFIG.txt, seguimos con el ftp");
+            return true;
+
+        }else{
+            //Ha habido un error al escribir la fecha en CONFIG.txt, cerrar la app y no hacer ftp
+            enviarNotification("Error al escribir la fecha en CONFIG.txt" +", saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, Error al escribir la fecha en CONFIG.txt, salimos de la app");
+            return false;
+
+        }
+
 
     }//Fin de metodoPrincipal_2
 
