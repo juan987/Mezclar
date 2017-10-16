@@ -3,7 +3,6 @@ package com.juan.mezclar;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -17,11 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.juan.mezclar.ftpClases.FtpClient;
-import com.juan.mezclar.retrofit.ServicioRetrofit2;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,23 +25,12 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-
 
 //NOTA FINAL: ESTA CLASE ES LA ACTIVIDAD PRINCIPAL DE LA ACTIVIDAD
 
 //Gestion de errores
 /*
-La App no necesita un interfaz de usuario, pero sería bueno que informara, a través de un icono en la barra superior del teléfono, del proceso que está realizando:
+La App no necesita un interfaz de user, pero sería bueno que informara, a través de un icono en la barra superior del teléfono, del proceso que está realizando:
 1)    Un icono cuadrado con un “1” dentro significaría que la App está componiendo la imagen
 2)    Un icono cuadrado con un “2” dentro significaría que a imagen ha sido generada
 3)    Un icono cuadrado con un “3” dentro significaría que la imagen ha sido generada y se está subiendo al directorio web indicado en el fichero de configuración (en caso de existir).
@@ -81,8 +66,30 @@ public class MezclarFinal extends AppCompatActivity {
     //String stringImagesSecuence = "0";
     //Path a agregar al dir raiz del telefono
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
+    //Nombre de la imagen principal sobre la que se superponen las imagenes de o a 9.
     String imagenPrincipal = "origin.jpg";
+
+    //Fichero de datos: CONFIG.txt
+    //Contiene las coordenadas N1 a N15
+    //Contiene la url del servidor ftp
+    //Contiene user y password para hacer login en el servidor ftp
     String ficheroConfigTxt = "CONFIG.txt";
+
+    //Fichero para hacer pruebas y corregir fallos
+    //String ficheroConfigTxt = "CONFIG_fallo_cesar.txt";
+
+    //Campos de user y password para ftp server
+    //user=testx
+    //password=test.2017
+    //Almacena la url del servidor ftp
+    String urlServidor = "";
+    //Almacena el user, a partir de version 1.0.1
+    String user = "";
+    //Almacena la contraseña a partir de version 1.0.1
+    String password = "";
+
+    //Almacena el SOR a partir de version 1.0.2
+    String stringSOR = "";
 
     //No se usa la progress bar
     //ProgressBar progressBar;
@@ -222,6 +229,10 @@ public class MezclarFinal extends AppCompatActivity {
 
     }//Fin de recuperarIntentConDatosIniciales
 
+    //Array numerico para ordenar arrayImagesSequence segun el algoritmo proporcionado por cesar
+    int[] gOrigen;
+    int[] gOriginFinal;
+
     //Coordenadas globales para colocar la imagen transparente sobre origin.jpg
     private float xFloat;
     private float yFloat;
@@ -244,11 +255,15 @@ public class MezclarFinal extends AppCompatActivity {
         //Chequeo el array de secuencia de imagenes: si es null o esta vacio, termina el programa
 
         if (arrayImagesSequence != null) {
-            if (arrayImagesSequence.length == 0) {
+            //Verificacion del tamaño del array antes de version 1.0.2 solo era ver si estaba vacio
+            //if (arrayImagesSequence.length == 0) {
+            //A partir de la version 1.0.2, se verifica que la longitud del array es igual a 16,
+            //si no, el algoritmo de ordenacion no funciona y la app casca
+            if (arrayImagesSequence.length != 16) {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
-                enviarNotification("Error: el array de imagenes esta vacio, saliendo de la aplicacion");
+                enviarNotification("Error: el array de imagenes esta vacio o no tiene longitud 16, saliendo de la aplicacion");
                 enviarNotificationConNumero("E1");
-                Log.d(xxx, "En metodoPrincipal_2, arrayImagesSequence.length == 0, salimos de la app");
+                Log.d(xxx, "En metodoPrincipal_2, arrayImagesSequence.length != 16, salimos de la app");
 
                 return false;
             }else{
@@ -368,6 +383,103 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Instruccion para cargar directamente de la memoria una imagen
         //imageView.setImageBitmap(BitmapFactory.decodeFile(pathToPicture));
+
+        //
+
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+        /**
+         * Requeriniento SOR, incluido en version 1.0.2.
+         * Esta clase tiene un metodo para ordenar el array de imagenes recibido desde el lanzador.
+         * El codigo me lo proporciono cesar en el correo "nuevas funciones"
+         */
+
+        //Paso 1:
+        //Inicializo gOrigen  al tamaño de arrayImagesSequence
+        gOrigen = new int[arrayImagesSequence.length];
+        //Convierto el arrayImagesSequence que es tipo char a un array de tipo byte
+        //Hay que usar algo asi:
+        //int a = Character.getNumericValue('3');
+        //int a = Integer.parseInt(String.valueOf('3');
+        for (int i = 0; i < arrayImagesSequence.length; i++){
+            gOrigen[i] = Character.getNumericValue(arrayImagesSequence[i]);
+            Log.d(xxx, "secuencia de imagenes en gOrigen recibida del lanzador, digito: " +i +" es: " +gOrigen[i]);
+        }
+
+        //Prueba 1: ORDENACION 1, tipo de ordenacion: 1, 2, o 4:, input: 10 digitos
+        //ordenaNumeros(6);
+
+        int integerSOR = Integer.parseInt(stringSOR);
+        if(integerSOR < 1 || integerSOR >6){
+            //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Error, SOR esta fuera de rango, debe estar entre 1 y 6" +", saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, Error, SOR esta fuera de rango, debe estar entre 1 y 6, salimos de la app");
+            return false;
+
+        }
+        //Llamamos a la rutina de ordenar
+        ordenaNumeros(integerSOR); //Coloca en gOrigin[] el resultado ordenado
+
+
+        //Numeracion final
+        // ORDENACION 1= LOS 5 PRIMEROS NUMEROS SE ORDENAN
+        if ((integerSOR==1)||(integerSOR==2)||(integerSOR==4)) {
+            gOriginFinal = new int[10];
+            for (int x=0; x<10; x++) {
+                gOriginFinal[x] = gOrigen[x];
+            }
+        }
+        // ORDENACION 2 = LOS 6 PRIMEROS NUMEROS SE ORDENAN
+        else if ((integerSOR==3)||(integerSOR==6)) {
+            gOriginFinal = new int[12];
+            for (int x=0; x<12; x++) {
+                gOriginFinal[x] = gOrigen[x];
+            }
+        }
+        // ORDENACION 3 = LOS 7 PRIMEROS NUMEROS SE ORDENAN
+        else if (integerSOR==5) {
+            gOriginFinal = new int[14];
+            for (int x=0; x<14; x++) {
+                gOriginFinal[x] = gOrigen[x];
+            }
+        }
+
+        if (gOriginFinal == null || gOrigen == null){
+            //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Fallo al ordenar el array de imagenes" +", saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, Fallo al ordenar el array de imagenesl, salimos de la app");
+            return false;
+        }
+
+        String stringSecuenciaOrdenada = "";
+        for (int i = 0; i < gOriginFinal.length; i++){
+            Log.d(xxx, "En metodoPrincipal_2, req SOR secuencia de imagenes en gOrigen ordenada, digito: " +i +" es: " +gOrigen[i]);
+            stringSecuenciaOrdenada = stringSecuenciaOrdenada + gOrigen[i];
+        }
+        Log.d(xxx, "En metodoPrincipal_2, req SOR stringSecuenciaOrdenada: " +stringSecuenciaOrdenada);
+
+
+
+        //Por ultimo, sobreescribimos arrayImagesSequence con la secuencia ordenada
+        arrayImagesSequence = null;
+        //Convertir el string de secuencia de imagenes en un array de secuencia de imagenes, character a character
+        arrayImagesSequence = stringSecuenciaOrdenada.toCharArray();
+        //Verificamos el nuevo array ordenado
+        for (char temp : arrayImagesSequence) {
+            Log.d(xxx, "En metodo metodoPrincipal_2, secuencia de imagenes ordenada " +temp);
+        }//OK, la app continua
+
+
+
+        //FIN del requerimiento SOR
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
 
         //Loop principal de la aplicacion
         Bitmap imagenParaSuperponerConOrigin;
@@ -577,50 +689,77 @@ public class MezclarFinal extends AppCompatActivity {
     //Metodo para:
     //Generar array de PojoCoordenadas con las coordenadas x e Y de posicionamiento de imagenes
     //Generar la URL para subir y almacenar la imagen generada a un servidor
-    String urlServidor;
+    //tambien lee user, password, SOR.
     private List<PojoCoordenadas> generarPojoGenerarUrl(List<String> arrayLineasTextoLocal){
         ArrayList<PojoCoordenadas> arrayPojoCoordenadas = new ArrayList<>();
         String regex = "[^\\d]+";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
-            //Extrae las coordenadas x e y de cada linea con regex y genera pojo de
-            //coordenadas por cada linea y lo guarda en el array de coordenadas
-            String[] str = arrayLineasTextoLocal.get(i).split(regex);
-            //Recorro y muestro con Log.d el array str
-            for(int i2 = 0; i2 < str.length; i2++) {
-                Log.d(xxx, "En metodo generarPojoGenerarUrl, despues del split con regex" + "\n"
-                                    +"Linea " +i +"\n"
-                                    +"posicion " +i2 +" tiene: " +str[i2]);
-            }
-            //Si la linea no tiene digitos, hago un break y continua el loop
-            //if(str.length == 0) break;
-            PojoCoordenadas pojoCoordenadas = new PojoCoordenadas();
-            try {
-                if(str.length > 2) {//Para evitar las lineas blancas y las que no tienen coordenadas y que de ArrayIndexOutOfBoundsException
-                    pojoCoordenadas.setCoordX(str[2]);
-                    pojoCoordenadas.setCoordY(str[3]);
-                    arrayPojoCoordenadas.add(pojoCoordenadas);
+            //Solo quiero las lineas que empiezan con N
+            if(arrayLineasTextoLocal.get(i).startsWith("N")) {
 
-                }else{
-                    Log.d(xxx, "En generarPojoGenerarUrl, la linea " +i +" esta vacia o no tiene coordenadas: "
-                            +arrayLineasTextoLocal.get(i));
-
+                //Extrae las coordenadas x e y de cada linea con regex y genera pojo de
+                //coordenadas por cada linea y lo guarda en el array de coordenadas
+                String[] str = arrayLineasTextoLocal.get(i).split(regex);
+                //Recorro y muestro con Log.d el array str
+                for (int i2 = 0; i2 < str.length; i2++) {
+                    Log.d(xxx, "En metodo generarPojoGenerarUrl, despues del split con regex" + "\n"
+                            + "Linea " + i + "\n"
+                            + "posicion " + i2 + " tiene: " + str[i2]);
                 }
-            }
-            catch (ArrayIndexOutOfBoundsException e) {
-                Log.d(xxx, "ArrayIndexOutOfBoundsException:  " +e.getMessage());
-                return null;
-            }
-            //arrayPojoCoordenadas.add(pojoCoordenadas);
+                //Si la linea no tiene digitos, hago un break y continua el loop
+                //if(str.length == 0) break;
+                PojoCoordenadas pojoCoordenadas = new PojoCoordenadas();
+                try {
+                    if (str.length > 2) {//Para evitar las lineas blancas y las que no tienen coordenadas y que de ArrayIndexOutOfBoundsException
+                        pojoCoordenadas.setCoordX(str[2]);
+                        pojoCoordenadas.setCoordY(str[3]);
+                        arrayPojoCoordenadas.add(pojoCoordenadas);
+
+                    } else {
+                        Log.d(xxx, "En generarPojoGenerarUrl, la linea " + i + " esta vacia o no tiene coordenadas: "
+                                + arrayLineasTextoLocal.get(i));
+
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Log.d(xxx, "ArrayIndexOutOfBoundsException:  " + e.getMessage());
+                    return null;
+                }
+                //arrayPojoCoordenadas.add(pojoCoordenadas);
+            }//Fion de if(arrayLineasTextoLocal.get(i).startsWith("N"))
         }
 
-        //Este for extrae la URL del servidor
+        //Este for extrae la URL del servidor, el user y el password que estan en CONFIG.txt
         String[] stringURLFinal = null;
+        String[] arrayStringUser = null;
+        String[] arrayStringPass = null;
+        String[] arrayStringSOR = null;
+        String regexUrl = "web=";
+        String regexUser = "user=";
+        String regexPass = "password=";
+        String regexSOR = "SOR=";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
             //Obtener URL del Servidor para almacenar imagen generada
-            String regexUrl = "web=";
-            stringURLFinal = arrayLineasTextoLocal.get(i).split(regexUrl);
+            if(arrayLineasTextoLocal.get(i).startsWith("web")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTextoLocal.get(i));
+                stringURLFinal = arrayLineasTextoLocal.get(i).split(regexUrl);
+            }
+            if(arrayLineasTextoLocal.get(i).startsWith("user")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayStringUser = arrayLineasTextoLocal.get(i).split(regexUser);
+            }
+            if(arrayLineasTextoLocal.get(i).startsWith("password")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayStringPass = arrayLineasTextoLocal.get(i).split(regexPass);
+            }
+            if(arrayLineasTextoLocal.get(i).startsWith("SOR")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con SOR y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayStringSOR = arrayLineasTextoLocal.get(i).split(regexSOR);
+            }
         }
 
+
+        //COJONES, quitar esto
+        /*
         if(stringURLFinal != null) {
             int i = 0;
             for (String st : stringURLFinal) {
@@ -628,16 +767,17 @@ public class MezclarFinal extends AppCompatActivity {
                 urlServidor = stringURLFinal[i];
                 i++;
             }
-        }
+        } */
 
-        //Imprime las coordenadas
+        //Imprime las coordenadas, solo para pruebas
+        /*
         for (int i = 0; i < arrayPojoCoordenadas.size(); i++ ){
             Log.d(xxx, "Coordenada X en arraPojo " + i + " es: " + arrayPojoCoordenadas.get(i).getCoordX()
                             +"\n"
                              +"Coordenada y en arraPojo " + i + " es: " + arrayPojoCoordenadas.get(i).getCoordY());
-        }
+        } */
 
-        //Imprime la url
+        //Imprime la url y la asigna a la variable global
         if(stringURLFinal != null) {
             int i = 0;
             for (String st : stringURLFinal) {
@@ -647,9 +787,46 @@ public class MezclarFinal extends AppCompatActivity {
             }
         }
 
+        //Imprime el user y lo asigna a la variable global
+        if(arrayStringUser != null) {
+            int i = 0;
+            for (String usuario : arrayStringUser) {
+                Log.d(xxx, "xxx Dato de user en arrayStringUser " + i + " es: " + usuario);
+                user = arrayStringUser[i];
+                i++;
+            }
+        }
+
+        //Imprime el password y lo asigna a la variable global
+        if(arrayStringPass != null) {
+            int i = 0;
+            for (String pass : arrayStringPass) {
+                Log.d(xxx, "xxx Dato de user en arrayStringUser " + i + " es: " + pass);
+                password = arrayStringPass[i];
+                i++;
+            }
+        }
+
+
+        //Imprime el SOR y lo asigna a la variable global
+        if(arrayStringSOR != null) {
+            int i = 0;
+            for (String sor : arrayStringSOR) {
+                Log.d(xxx, "xxx Dato de user en arrayStringSOR " + i + " es: " + sor);
+                stringSOR = arrayStringSOR[i];
+                i++;
+            }
+        }
+
+        Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
+                +"\n"  +"xxx Variable user: " +user
+                +"\n"  +"xxx Variable password: " +password
+                +"\n"  +"xxx Variable SOR: " +stringSOR);
+
+
 
         return arrayPojoCoordenadas;
-    }//Fin de generarPojoGenerarUrl
+    }//Fin de generarPojoGenerarUrl y obtener user y password
 
 
     //Metodo final para la mezcla
@@ -755,14 +932,14 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Credenciales
         String ip;                    //Almacena la direción ip del servidor
-        String usuario;                //Almacena el usuario
-        String contrasena;            //Almacena la contraseña
         FtpClient ftp;                    //Instancia manejador ftp
 
         //ip = "ftp.cesaral.com/test";
         ip = urlServidor;
-        usuario = "testx";
-        contrasena = "test.2017";
+
+        //Asignaciones solo para pruebas
+        //user = "testx";
+        //password = "test.2017";
 
 
         File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
@@ -781,12 +958,12 @@ public class MezclarFinal extends AppCompatActivity {
             Log.d(xxx, "Absolute Path a predict.jpg para enviar al servidor con ftp: " + filePathDePredictJpg.getAbsolutePath());
 
             //Establece un servidor
-            ftp = new FtpClient(ip, usuario, contrasena, getApplicationContext());
+            ftp = new FtpClient(ip, user, password, getApplicationContext());
 
             //Realiza login en el servidor
 
             try {
-                if(ftp.login(usuario, contrasena)){
+                if(ftp.login(user, password)){
                     //Login correcto, enviamos el fichero con el try catch de abajo
                 }else{
                     enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
@@ -948,6 +1125,98 @@ public class MezclarFinal extends AppCompatActivity {
         }
     }//FIN de la clase ComponerImagenAsyncTask
 
+    //Metodo de ordenacion proporcionado por cesar
+    //------------------------------------------------------------------------------
+// A la función se le pasa el numero asociado al parámetro SOR
+//
+// Variable global donde están los números a ordenar = gOrigen[]
+// Variable global donde se dejan los números a ordenados = gOrigen[]
+//------------------------------------------------------------------------------
+    void ordenaNumeros(int TipoOrdenacion){
+
+
+        int x, num, numc1=0, numc2=0;
+        int gCad[] = new int[100];
+
+        // BORRO LA MEMORIA DE TRABAJO
+        for (x=0; x<=99; x++) gCad[x]=0;
+
+
+        // ORDENACION 1= LOS 5 PRIMEROS NUMEROS SE ORDENAN
+        if ((TipoOrdenacion==1)||(TipoOrdenacion==2)||(TipoOrdenacion==4)) {
+            for (x=0; x<=8; x++) {
+                num=gOrigen[x]*10 + gOrigen[x+1];
+                if (num!=0) gCad[num]=1;
+                x+=1;
+            }
+        }
+        // ORDENACION 2 = LOS 6 PRIMEROS NUMEROS SE ORDENAN
+        else if ((TipoOrdenacion==3)||(TipoOrdenacion==6)) {
+            for (x=0; x<=10; x++) {
+                num=gOrigen[x]*10 + gOrigen[x+1];
+                if (num!=0) gCad[num]=1;
+                x+=1;
+            }
+        }
+        // ORDENACION 3 = LOS 7 PRIMEROS NUMEROS SE ORDENAN
+        else if (TipoOrdenacion==5) {
+            for (x=0; x<=12; x++) {
+                num=gOrigen[x]*10 + gOrigen[x+1];
+                if (num!=0) gCad[num]=1;
+                x+=1;
+            }
+        }
+
+        // ME QUEDO CON DOS DATOS QUE PUEDO NECESITAR...
+        numc1=gOrigen[10]*10+gOrigen[11];
+        numc2=gOrigen[12]*10+gOrigen[13];
+
+
+        for (x=0; x<16; x++) gOrigen[x]=0;
+
+        // AHORA RECORRO LA MEMORIA Y CARGO LOS NUEVOS NUMEROS
+        int y=0;
+        for (x=0; x<=99; x++) {
+            if (gCad[x]!=0) {
+                gOrigen[y++]=x/10;
+                gOrigen[y++]=x%10;
+            }
+        }
+
+        if (TipoOrdenacion==1) {
+            // EL QUINTO NUMERO NO LO TOCO EN EL CASO DE UK.
+            gOrigen[10]=numc1/10;
+            gOrigen[11]=numc1%10;
+        }
+        else if (TipoOrdenacion==2) {
+            if (numc1==0) numc1=11;
+            if (numc2==0) numc2=12;
+
+            if (numc2<numc1) {
+                gOrigen[10]=numc2/10;
+                gOrigen[11]=numc2%10;
+                gOrigen[12]=numc1/10;
+                gOrigen[13]=numc1%10;
+            }
+            else {
+                gOrigen[10]=numc1/10;
+                gOrigen[11]=numc1%10;
+                gOrigen[12]=numc2/10;
+                gOrigen[13]=numc2%10;
+            }
+        }
+        else if (TipoOrdenacion==4) {
+            gOrigen[10]=numc1/10;
+            gOrigen[11]=numc1%10;
+        }
+        else if (TipoOrdenacion==6) {
+            gOrigen[12]=numc2/10;
+            gOrigen[13]=numc2%10;
+        }
+    }
+
+
+    //Fin del algoritmo de ordenacion proporcionado por cesar
 
 
 }//Fin del activity

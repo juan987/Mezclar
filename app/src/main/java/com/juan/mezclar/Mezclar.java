@@ -695,7 +695,7 @@ public class Mezclar extends AppCompatActivity {
 
         //Credenciales
         String ip;                    //Almacena la direción ip del servidor
-        String usuario;                //Almacena el usuario
+        String usuario;                //Almacena el user
         String contrasena;            //Almacena la contraseña
 
         FtpClient ftp;                    //Instancia manejador ftp
@@ -703,8 +703,8 @@ public class Mezclar extends AppCompatActivity {
         //-----------------------------------------------------------
         //Inicializa las credenciales
         //ip = "192.168.0.1";
-        //usuario = "admin";
-        //contrasena = "admin";
+        //user = "admin";
+        //password = "admin";
 
         //ip = "ftp.cesaral.com/test";
         ip = urlServidor;
