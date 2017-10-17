@@ -63,6 +63,7 @@ public class MezclarFinal extends AppCompatActivity {
     private ImageView finalImage;
     //Array para almacenar la secuencia de imagenes a superponer
     char[] arrayImagesSequence;
+    int sizearrayImagesSequence;
     //String de secuencia de imagenes inicializada con la imagen 0.
     String stringImagesSecuence; //Para prueba con el array vacio
     //String stringImagesSecuence = "0";
@@ -92,6 +93,7 @@ public class MezclarFinal extends AppCompatActivity {
 
     //Almacena el SOR a partir de version 1.0.2
     String stringSOR = "";
+
 
     //No se usa la progress bar
     //ProgressBar progressBar;
@@ -210,7 +212,12 @@ public class MezclarFinal extends AppCompatActivity {
                 //Lo muestro con
                 for (char temp : arrayImagesSequence) {
                     Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Caracter " +temp);
-                }//OK, la app continua
+                }
+
+                sizearrayImagesSequence = arrayImagesSequence.length;
+                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, numero de digitos recibidos: " +sizearrayImagesSequence);
+
+                //OK, la app continua
 
             }else{//Salta aqui si no hay datos en el intent
                 Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: No hay datos");
@@ -261,6 +268,9 @@ public class MezclarFinal extends AppCompatActivity {
             //if (arrayImagesSequence.length == 0) {
             //A partir de la version 1.0.2, se verifica que la longitud del array es igual a 16,
             //si no, el algoritmo de ordenacion no funciona y la app casca
+
+
+            /*
             if (arrayImagesSequence.length != 16) {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error: el array de imagenes esta vacio o no tiene longitud 16, saliendo de la aplicacion");
@@ -271,6 +281,10 @@ public class MezclarFinal extends AppCompatActivity {
             }else{
                 //El array de sequencia existe, continuamos
             }
+            */
+
+            //Seguimos
+
         }else
         {
             enviarNotification("Error: el array de imagenes es null, saliendo de la aplicacion");
@@ -409,7 +423,13 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Paso 1:
         //Inicializo gOrigen  al tamaño de arrayImagesSequence
-        gOrigen = new int[arrayImagesSequence.length];
+        //gOrigen = new int[arrayImagesSequence.length];
+
+        //Inicializo a 50 el array
+        gOrigen = new int[100];
+
+
+
         //Convierto el arrayImagesSequence que es tipo char a un array de tipo byte
         //Hay que usar algo asi:
         //int a = Character.getNumericValue('3');
@@ -438,21 +458,21 @@ public class MezclarFinal extends AppCompatActivity {
         //Numeracion final
         // ORDENACION 1= LOS 5 PRIMEROS NUMEROS SE ORDENAN
         if ((integerSOR==1)||(integerSOR==2)||(integerSOR==4)) {
-            gOriginFinal = new int[10];
+            gOriginFinal = new int[sizearrayImagesSequence];
             for (int x=0; x<10; x++) {
                 gOriginFinal[x] = gOrigen[x];
             }
         }
         // ORDENACION 2 = LOS 6 PRIMEROS NUMEROS SE ORDENAN
         else if ((integerSOR==3)||(integerSOR==6)) {
-            gOriginFinal = new int[12];
+            gOriginFinal = new int[sizearrayImagesSequence];
             for (int x=0; x<12; x++) {
                 gOriginFinal[x] = gOrigen[x];
             }
         }
         // ORDENACION 3 = LOS 7 PRIMEROS NUMEROS SE ORDENAN
         else if (integerSOR==5) {
-            gOriginFinal = new int[14];
+            gOriginFinal = new int[sizearrayImagesSequence];
             for (int x=0; x<14; x++) {
                 gOriginFinal[x] = gOrigen[x];
             }
@@ -481,6 +501,7 @@ public class MezclarFinal extends AppCompatActivity {
         arrayImagesSequence = stringSecuenciaOrdenada.toCharArray();
         //Verificamos el nuevo array ordenado
         for (char temp : arrayImagesSequence) {
+            //AQUI AQUI AQUI AQUOI
             Log.d(xxx, "En metodo metodoPrincipal_2, secuencia de imagenes ordenada " +temp);
         }//OK, la app continua
 
