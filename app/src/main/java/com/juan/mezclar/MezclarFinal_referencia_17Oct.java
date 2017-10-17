@@ -29,7 +29,8 @@ import java.util.Date;
 import java.util.List;
 
 
-//NOTA FINAL: ESTA CLASE ES LA ACTIVIDAD PRINCIPAL DE LA ACTIVIDAD
+//NOTA FINAL: ESTA CLASE ES copia de MezclarFinal el dia 17 oct 2017, para referencia.
+//SOLO PARA REFERENCIA
 
 //Gestion de errores
 /*
@@ -56,7 +57,7 @@ Si la App encuentra un error, pondría el icono E1 o E2 y terminaría.
 //OJO: si una coordenada es una letra, la aplicacion falla por null pointer
 //Prueba quitar todas las notificaciones, lo hago modificando los metodos de notificaciones, no las llamadas
 
-public class MezclarFinal extends AppCompatActivity {
+public class MezclarFinal_referencia_17Oct extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
     String xxx = this.getClass().getSimpleName();
 
@@ -139,7 +140,7 @@ public class MezclarFinal extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Muestr snakbar con lo que ha mandado la app Launch Mezclar
-        Snackbar.make(findViewById(R.id.coordinatorlayout_1), "received: " +stringImagesSecuence, Snackbar.LENGTH_LONG)
+        Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Secuencia de imágenes recibidas: " +stringImagesSecuence, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
 
         //Llamo al metodo desde el Floating button
@@ -256,7 +257,6 @@ public class MezclarFinal extends AppCompatActivity {
     private boolean metodoPrincipal_2(){
         Log.d(xxx, "En metodoPrincipal_2");
 
-
         //progressBar.setVisibility(View.VISIBLE); //To Hide ProgressBar
 
         //Lanzar notificacon de inicio de lageneracion de la imagen
@@ -297,7 +297,7 @@ public class MezclarFinal extends AppCompatActivity {
         }
 
         //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
-        LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(MezclarFinal.this);
+        LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(MezclarFinal_referencia_17Oct.this);
         //arrayLineasTexto contiene todas las lineas de CONFIG.txt
         List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
         if(arrayLineasTexto == null){
@@ -391,7 +391,7 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Obtener la imagen origin.jpg como un bitmap
         //Si la imagen origin.jpg no existe, entonces buscamos con el nombre origin.xjpg, implementado en version 1.0.2
-        obtenerImagen = new ObtenerImagen(MezclarFinal.this);
+        obtenerImagen = new ObtenerImagen(MezclarFinal_referencia_17Oct.this);
         Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
         if(originJpg == null){//No encuentra origin.jpg
             //Buscamos origin.xjpg
@@ -523,7 +523,7 @@ public class MezclarFinal extends AppCompatActivity {
         }//Fin del loop principal
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
-        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(MezclarFinal.this, mergedImages);
+        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(MezclarFinal_referencia_17Oct.this, mergedImages);
         //Guardar imagen el directorio pictures/predict
         //No hace falta, guardo directamente en DCIM/predict
         /*
