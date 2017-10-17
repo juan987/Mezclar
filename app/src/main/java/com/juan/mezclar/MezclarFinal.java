@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -316,6 +317,7 @@ public class MezclarFinal extends AppCompatActivity {
             return false;
         }
 
+        /*
         //Recorro y muestro la lista con el contenido de CONFIG.txt, solo para pruebas
         String[] coordenates;
         String linea;
@@ -333,6 +335,7 @@ public class MezclarFinal extends AppCompatActivity {
             }
             leerCoordenadasDeConfigTxt(arrayLineasTexto.get(i));
         }
+        */
 
 
 
@@ -411,107 +414,20 @@ public class MezclarFinal extends AppCompatActivity {
 
         //
 
-        //************************************************************************************************
-        //************************************************************************************************
-        //************************************************************************************************
-        //************************************************************************************************
-        /**
-         * Requeriniento SOR, incluido en version 1.0.2.
-         * Esta clase tiene un metodo para ordenar el array de imagenes recibido desde el lanzador.
-         * El codigo me lo proporciono cesar en el correo "nuevas funciones"
-         */
+        if(stringSOR.equals("")){
+            //NO hay string SOR, seguimos
+            Log.d(xxx, "En metodoPrincipal_2, NO parametro SOR, seguimos");
 
-        //Paso 1:
-        //Inicializo gOrigen  al tamaño de arrayImagesSequence
-        //gOrigen = new int[arrayImagesSequence.length];
+        }else{
+            Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR, se ejecuta metodo ejecutarConParametroSor");
 
-        //Inicializo a 50 el array
-        gOrigen = new int[100];
-
-
-
-        //Convierto el arrayImagesSequence que es tipo char a un array de tipo byte
-        //Hay que usar algo asi:
-        //int a = Character.getNumericValue('3');
-        //int a = Integer.parseInt(String.valueOf('3');
-        for (int i = 0; i < arrayImagesSequence.length; i++){
-            gOrigen[i] = Character.getNumericValue(arrayImagesSequence[i]);
-            Log.d(xxx, "secuencia de imagenes en gOrigen recibida del lanzador, digito: " +i +" es: " +gOrigen[i]);
-        }
-
-        //Prueba 1: ORDENACION 1, tipo de ordenacion: 1, 2, o 4:, input: 10 digitos
-        //ordenaNumeros(6);
-
-        int integerSOR = Integer.parseInt(stringSOR);
-        if(integerSOR < 1 || integerSOR >6){
-            //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
-            enviarNotification("Error, SOR esta fuera de rango, debe estar entre 1 y 6" +", saliendo de la aplicacion");
-            enviarNotificationConNumero("E1");
-            Log.d(xxx, "En metodoPrincipal_2, Error, SOR esta fuera de rango, debe estar entre 1 y 6, salimos de la app");
-            return false;
-
-        }
-        //Llamamos a la rutina de ordenar
-        ordenaNumeros(integerSOR); //Coloca en gOrigin[] el resultado ordenado
-
-
-        //Numeracion final
-        // ORDENACION 1= LOS 5 PRIMEROS NUMEROS SE ORDENAN
-        if ((integerSOR==1)||(integerSOR==2)||(integerSOR==4)) {
-            gOriginFinal = new int[sizearrayImagesSequence];
-            for (int x=0; x<10; x++) {
-                gOriginFinal[x] = gOrigen[x];
+            if(!ejecutarConParametroSor()){
+                //Ha habido un problema con la ordenacion, salir del programa
+                enviarNotificationConNumero("E1");
+                Log.d(xxx, "En metodoPrincipal_2, Error en metodo ejecutarConParametroSor, salimos de la app");
             }
+
         }
-        // ORDENACION 2 = LOS 6 PRIMEROS NUMEROS SE ORDENAN
-        else if ((integerSOR==3)||(integerSOR==6)) {
-            gOriginFinal = new int[sizearrayImagesSequence];
-            for (int x=0; x<12; x++) {
-                gOriginFinal[x] = gOrigen[x];
-            }
-        }
-        // ORDENACION 3 = LOS 7 PRIMEROS NUMEROS SE ORDENAN
-        else if (integerSOR==5) {
-            gOriginFinal = new int[sizearrayImagesSequence];
-            for (int x=0; x<14; x++) {
-                gOriginFinal[x] = gOrigen[x];
-            }
-        }
-
-        if (gOriginFinal == null || gOrigen == null){
-            //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
-            enviarNotification("Fallo al ordenar el array de imagenes" +", saliendo de la aplicacion");
-            enviarNotificationConNumero("E1");
-            Log.d(xxx, "En metodoPrincipal_2, Fallo al ordenar el array de imagenesl, salimos de la app");
-            return false;
-        }
-
-        String stringSecuenciaOrdenada = "";
-        for (int i = 0; i < gOriginFinal.length; i++){
-            Log.d(xxx, "En metodoPrincipal_2, req SOR secuencia de imagenes en gOrigen ordenada, digito: " +i +" es: " +gOrigen[i]);
-            stringSecuenciaOrdenada = stringSecuenciaOrdenada + gOrigen[i];
-        }
-        Log.d(xxx, "En metodoPrincipal_2, req SOR stringSecuenciaOrdenada: " +stringSecuenciaOrdenada);
-
-
-
-        //Por ultimo, sobreescribimos arrayImagesSequence con la secuencia ordenada
-        arrayImagesSequence = null;
-        //Convertir el string de secuencia de imagenes en un array de secuencia de imagenes, character a character
-        arrayImagesSequence = stringSecuenciaOrdenada.toCharArray();
-        //Verificamos el nuevo array ordenado
-        for (char temp : arrayImagesSequence) {
-            //AQUI AQUI AQUI AQUOI
-            Log.d(xxx, "En metodo metodoPrincipal_2, secuencia de imagenes ordenada " +temp);
-        }//OK, la app continua
-
-
-
-        //FIN del requerimiento SOR
-        //************************************************************************************************
-        //************************************************************************************************
-        //************************************************************************************************
-        //************************************************************************************************
 
         //Loop principal de la aplicacion
         Bitmap imagenParaSuperponerConOrigin;
@@ -626,6 +542,125 @@ public class MezclarFinal extends AppCompatActivity {
             return false;
         }
 
+        //Hemos terminado
+        return true;
+    }//Fin de metodoPrincipal_2
+
+
+
+    private boolean ejecutarConParametroSor(){
+        //Si existe el parametro SOR en la app, se ejecuta este metodo
+
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+        /**
+         * Requeriniento SOR, incluido en version 1.0.2.
+         * Esta clase tiene un metodo para ordenar el array de imagenes recibido desde el lanzador.
+         * El codigo me lo proporciono cesar en el correo "nuevas funciones"
+         */
+
+        //Paso 1:
+        //Inicializo gOrigen  al tamaño de arrayImagesSequence
+        //gOrigen = new int[arrayImagesSequence.length];
+
+        //Inicializo a 50 el array
+        gOrigen = new int[100];
+
+
+
+        //Convierto el arrayImagesSequence que es tipo char a un array de tipo byte
+        //Hay que usar algo asi:
+        //int a = Character.getNumericValue('3');
+        //int a = Integer.parseInt(String.valueOf('3');
+        for (int i = 0; i < arrayImagesSequence.length; i++){
+            gOrigen[i] = Character.getNumericValue(arrayImagesSequence[i]);
+            Log.d(xxx, "secuencia de imagenes en gOrigen recibida del lanzador, digito: " +i +" es: " +gOrigen[i]);
+        }
+
+        //Prueba 1: ORDENACION 1, tipo de ordenacion: 1, 2, o 4:, input: 10 digitos
+        //ordenaNumeros(6);
+
+        int integerSOR = Integer.parseInt(stringSOR);
+        if(integerSOR < 1 || integerSOR >6){
+            //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Error, SOR esta fuera de rango, debe estar entre 1 y 6" +", saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, Error, SOR esta fuera de rango, debe estar entre 1 y 6, salimos de la app");
+            return false;
+
+        }
+        //Llamamos a la rutina de ordenar
+        ordenaNumeros(integerSOR); //Coloca en gOrigin[] el resultado ordenado
+
+
+        //Numeracion final
+        // ORDENACION 1= LOS 5 PRIMEROS NUMEROS SE ORDENAN
+        if ((integerSOR==1)||(integerSOR==2)||(integerSOR==4)) {
+            gOriginFinal = new int[sizearrayImagesSequence];
+            for (int x=0; x<10; x++) {
+                gOriginFinal[x] = gOrigen[x];
+            }
+        }
+        // ORDENACION 2 = LOS 6 PRIMEROS NUMEROS SE ORDENAN
+        else if ((integerSOR==3)||(integerSOR==6)) {
+            gOriginFinal = new int[sizearrayImagesSequence];
+            for (int x=0; x<12; x++) {
+                gOriginFinal[x] = gOrigen[x];
+            }
+        }
+        // ORDENACION 3 = LOS 7 PRIMEROS NUMEROS SE ORDENAN
+        else if (integerSOR==5) {
+            gOriginFinal = new int[sizearrayImagesSequence];
+            for (int x=0; x<14; x++) {
+                gOriginFinal[x] = gOrigen[x];
+            }
+        }
+
+        if (gOriginFinal == null || gOrigen == null){
+            //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Fallo al ordenar el array de imagenes" +", saliendo de la aplicacion");
+            enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, Fallo al ordenar el array de imagenesl, salimos de la app");
+            return false;
+        }
+
+        String stringSecuenciaOrdenada = "";
+        for (int i = 0; i < gOriginFinal.length; i++){
+            Log.d(xxx, "En metodoPrincipal_2, req SOR secuencia de imagenes en gOrigen ordenada, digito: " +i +" es: " +gOrigen[i]);
+            stringSecuenciaOrdenada = stringSecuenciaOrdenada + gOrigen[i];
+        }
+        Log.d(xxx, "En metodoPrincipal_2, req SOR stringSecuenciaOrdenada: " +stringSecuenciaOrdenada);
+
+
+
+        //Por ultimo, sobreescribimos arrayImagesSequence con la secuencia ordenada
+        arrayImagesSequence = null;
+        //Convertir el string de secuencia de imagenes en un array de secuencia de imagenes, character a character
+        arrayImagesSequence = stringSecuenciaOrdenada.toCharArray();
+        //Verificamos el nuevo array ordenado
+        for (char temp : arrayImagesSequence) {
+            //AQUI AQUI AQUI AQUOI
+            Log.d(xxx, "En metodo metodoPrincipal_2, secuencia de imagenes ordenada " +temp);
+        }//OK, la app continua
+
+        return true;
+
+
+
+        //FIN del requerimiento SOR
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+    }
+
+
+    /*
+    public boolean modificarParametroFechaEnCofigTxt(){
+        //Este metodo no lo uso, 17 oct 2017
+        //Sirve para modificar o agregar el parametro Date en el fichero CONFIG.txt
 
 
         //Escribir la fecha en la que se ha generado la imagen en el fichero CONFIG.txt
@@ -688,12 +723,66 @@ public class MezclarFinal extends AppCompatActivity {
 
         }
 
-        //************************************************************************************************
-        //************************************************************************************************
-        //************************************************************************************************
-        //************************************************************************************************
 
-    }//Fin de metodoPrincipal_2
+    }  */
+
+    public void modificarFechaEnFichero(){
+        //Modificar la fecha de predict.jpg si el parametro Date esta en config.txt
+        //Obtengo la un objeto file con el path a predict.jpg y uso los metodos:
+        //setLastModified(long time)
+        //lastModified(), retorna un long
+
+        //if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg")){
+        File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        String directorio = picturesDir.getAbsolutePath() ;
+
+        String pathToFile = directorio +"/predict/"  +"predict.jpg";
+        File file = new File(pathToFile);
+        if(file.exists()) {
+            long date = file.lastModified();
+            Date fileData = new Date(date);
+
+            SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+            String fechaDeLaFoto = sdf2.format(fileData);
+            Log.d(xxx, "modificarFechaEnFichero La fecha del fichero: " +file.getAbsolutePath() +" es:" +fileData);
+            Log.d(xxx, "modificarFechaEnFichero La fecha del fichero: " +file.getAbsolutePath() +" formateada es:" +fechaDeLaFoto);
+
+            file.setLastModified(getDate(2017, 3, 1));
+
+            //Verifico el cambio:
+            date = file.lastModified();
+        /* Do your modified date stuff here */
+            fileData = new Date(date);
+            fechaDeLaFoto = sdf2.format(fileData);
+            Log.d(xxx, "modificarFechaEnFichero La fecha del fichero modoficada: " +file.getAbsolutePath() +" es:" +fileData);
+            Log.d(xxx, "modificarFechaEnFichero La fecha del fichero modificada: " +file.getAbsolutePath() +" formateada es:" +fechaDeLaFoto);
+
+
+
+        }
+
+    }
+
+    //metodo que devuelve un long de acuerdo a los parametros pasados
+    public long getDate(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DAY_OF_MONTH, day);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Log.d(xxx, "en metodo getDate: la fecha creada con cal es " +cal.getTime());
+
+        Date date = cal.getTime();
+        Log.d(xxx, "en metodo getDate: la fecha creada con date es " +date.toString());
+
+        return date.getTime();
+    }
+
+
+
 
     //Metodo que envia distintos iconos a la barra de notificaciones, segun el estado de la app
     private void enviarNotificationConNumero(String stringConCodigoDeError){

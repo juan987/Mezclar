@@ -9,6 +9,9 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Juan on 04/10/2017.
@@ -101,6 +104,23 @@ public class GuardarImagenFinal {
 
 // 100 means no compression, the lower you go, the stronger the compression
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+
+            //****************************************************************************
+            //Prueba de cambio de fecha en fichero
+            /*
+            boolean fechaModificada = file.setLastModified(1310198774000L);
+            //boolean fechaModificada = file.setLastModified(getDate(2017, 3, 1));
+            long date = file.lastModified();
+            Date fileData = new Date(date);
+
+            SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+            String fechaDeLaFoto = sdf2.format(fileData);
+            Log.d(xxx, "modificarFechaEnFichero La fecha del fichero: " +file.getAbsolutePath() +" es:" +fileData);
+            Log.d(xxx, "modificarFechaEnFichero boolean:   " +fechaModificada);
+            */
+            //*************************************************************************************************************
+
+
             fOut.flush();
             fOut.close();
 
@@ -115,6 +135,24 @@ public class GuardarImagenFinal {
                     //e.getMessage(), Toast.LENGTH_LONG).show();
             return false;
         }
+    }
+
+    //metodo que devuelve un long de acuerdo a los parametros pasados
+    public long getDate(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DAY_OF_MONTH, day);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Log.d(xxx, "en metodo getDate: la fecha creada con cal es " +cal.getTime());
+
+        Date date = cal.getTime();
+        Log.d(xxx, "en metodo getDate: la fecha creada con date es " +date.toString());
+
+        return date.getTime();
     }
 
 }
