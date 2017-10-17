@@ -22,7 +22,9 @@ import com.juan.mezclar.ftpClases.FtpClient;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -280,6 +282,7 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
         LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(MezclarFinal.this);
+        //arrayLineasTexto contiene todas las lineas de CONFIG.txt
         List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
         if(arrayLineasTexto == null){
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
@@ -300,7 +303,6 @@ public class MezclarFinal extends AppCompatActivity {
         }
 
         //Recorro y muestro la lista con el contenido de CONFIG.txt, solo para pruebas
-
         String[] coordenates;
         String linea;
         for (int i=0; i < arrayLineasTexto.size(); i++){
@@ -317,6 +319,9 @@ public class MezclarFinal extends AppCompatActivity {
             }
             leerCoordenadasDeConfigTxt(arrayLineasTexto.get(i));
         }
+
+
+
 
         //Leer coordenadas y URL del array de lineas obtenido del fichero CONFIG.txt
         List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
@@ -367,8 +372,14 @@ public class MezclarFinal extends AppCompatActivity {
 
 
         //Obtener la imagen origin.jpg como un bitmap
+        //Si la imagen origin.jpg no existe, entonces buscamos con el nombre origin.xjpg, implementado en version 1.0.2
         obtenerImagen = new ObtenerImagen(MezclarFinal.this);
         Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
+        if(originJpg == null){//No encuentra origin.jpg
+            //Buscamos origin.xjpg
+            Log.d(xxx, "No existe origin.jpg, buscamos origin.xjpg");
+            originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + "origin.xjpg");
+        }
         if(originJpg == null){
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error al recuperar origin.jpg, saliendo de la aplicacion");
@@ -491,9 +502,13 @@ public class MezclarFinal extends AppCompatActivity {
             enviarNotificationConNumero("1");
             //Obtener la imagen a superponer como un bitmap
             imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                    //+arrayImagesSequence[i]+".jpg");
-                    //Prueba con ficheros .bmp
                     +arrayImagesSequence[i]+".bmp");
+            if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
+                //Buscamos la imagen a superponer con extension .xbmp
+                Log.d(xxx, "No existe la imagen a superponer: " +i +"con extension .bmp, buscamos con extension .xbmp");
+                imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                        +arrayImagesSequence[i]+".xbmp");
+            }
             if(imagenParaSuperponerConOrigin == null){
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
@@ -593,8 +608,50 @@ public class MezclarFinal extends AppCompatActivity {
 
 
         //Escribir la fecha en la que se ha generado la imagen en el fichero CONFIG.txt
+        //Implementado en version 1.0.2
+        //************************************************************************************************
+        //Requerimiento: Nuevo parámetro para fijar la fecha del fichero jpg generado.
+        //poner en CONFIG.txt la fecha de generacion de la imagen
+        //Generar un string con todo el contenido de CONFIG.txt a partir de arrayLineasTexto
+        String textoDeConfigTxt = "";
+        String oldDate = "";
+        String newTextInConfigTxt = "";
+        for (int i=0; i < arrayLineasTexto.size(); i++){
+            //Log.d(xxx, "Linea "  +(i+1) +" contiene: " +arrayLineasTexto.get(i));
+            if(arrayLineasTexto.get(i).startsWith("Date=")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTexto.get(i));
+                oldDate = arrayLineasTexto.get(i);
+                Log.d(xxx, "xxx, oldDate tiene: " +oldDate);
+
+            }
+
+            textoDeConfigTxt += arrayLineasTexto.get(i) +"\r\n";
+        }
+        Log.d(xxx, "Texto Viejo de CONFIG.txt en string textoDeConfigTxt: " +textoDeConfigTxt);
+        //Generamos la fecha actual
+        //Con la hora
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy_HHmm");
+        //Sin la hora
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String currentDateandTime = sdf.format(new Date());
+        String textoFechaActualizada = "Date=" +currentDateandTime;
+
+        if(oldDate.equals("")){
+            //No hay un string con date en CONFIG.txt
+            //Insertamos la nueva fecha en textoDeConfigTxt al final
+            textoDeConfigTxt += textoFechaActualizada +"\r\n";
+            newTextInConfigTxt = textoDeConfigTxt;
+
+        }else{
+            newTextInConfigTxt = textoDeConfigTxt.replaceAll(oldDate, textoFechaActualizada);
+
+        }
+        Log.d(xxx, "Texto Nuevo de CONFIG.txt en string newTextInConfigTxt: " +newTextInConfigTxt);
+
+
+
         EscribirEnFicheroTxt escribirEnFicheroTxt = new EscribirEnFicheroTxt(MezclarFinal.this);
-        if(escribirEnFicheroTxt.appendDateEnFichero(pathCesaralMagicImageC + ficheroConfigTxt)){
+        if(escribirEnFicheroTxt.appendDateEnFichero(pathCesaralMagicImageC + ficheroConfigTxt, newTextInConfigTxt)){
             //Return true al final del metodo. La app se queda abierta, esperando el resultado de la subida de predict.jpg con ftp
             enviarNotification("Imagen guardada en /DCIM/predict/  Ejecucion correcta" +"\n" +"Esperando resultado ftp...");
             enviarNotificationConNumero("2");
@@ -610,6 +667,10 @@ public class MezclarFinal extends AppCompatActivity {
 
         }
 
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
+        //************************************************************************************************
 
     }//Fin de metodoPrincipal_2
 

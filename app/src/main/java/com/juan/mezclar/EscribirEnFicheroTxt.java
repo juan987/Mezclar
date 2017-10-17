@@ -30,44 +30,39 @@ public class EscribirEnFicheroTxt {
     }
 
 
-    //Este metodo escribe la fecha en la que se genero la imagen y se guardo en el dispositivo
+    //Este metodo re-escribe la fecha en la que se genero la imagen y se guardo en el dispositivo
     //La fecha se escribe en la ultima linea de CONFIG
-    public boolean appendDateEnFichero(String pathToFileTxt){
+    public boolean appendDateEnFichero(String pathToFileTxt, String nuevoTexto){
         String data = "Hola soy juan";
+
+        char[] charData = nuevoTexto.toCharArray();
+
         File directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt);
         String directorio = directorioMain.getAbsolutePath();
 
-        BufferedWriter bw = null;
 
-        FileWriter fw = null;
 
         Log.d(xxx, "El directorio es: " + directorioMain);
         if(isExternalStorageWritable()) {
 
-
-
             try {
-                //el flag de append hay que ponerlo a true, default es false en FileOutputStream
+                //el flag de append hay que ponerlo a true, default es false en FileWriter
 
+                /*
                 FileOutputStream fileOutputStream = new FileOutputStream(directorioMain);
                 OutputStreamWriter writer = new OutputStreamWriter(fileOutputStream);
-                writer.append(data);
+                writer.append(charData);
                 writer.close();
                 fileOutputStream.close();
+                */
 
+                directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt);
+                directorio = directorioMain.getAbsolutePath();
 
+                FileWriter fw = new FileWriter(directorio, false);
+                fw.write(charData);
+                fw.close();
 
-
-                //String filename = Environment.getExternalStorageDirectory().getAbsolutePath() + mFileName;
-                //fw = new FileWriter(directorioMain, true);
-
-                //bw = new BufferedWriter(fw);
-
-                //bw.write(data);
-
-                //fw.write(data);
-                //fw.close();
-                //bw.close();
 
                 return true;
 
@@ -80,36 +75,14 @@ public class EscribirEnFicheroTxt {
                 Log.d(xxx, e.getMessage());
                 return false;
             }
-            finally {
-
-                try {
-
-                    if (bw != null)
-                        bw.close();
-
-                    if (fw != null)
-                        fw.close();
-
-                    return true;
-
-
-                } catch (IOException e) {
-
-                    //ex.printStackTrace();
-                    Log.d(xxx, e.getMessage());
-                    return false;
-
-                }
-            }
-
-
-
 
         }else{
             Log.d(xxx, "El external public storage no esta montado ");
             return false;
         }
     }
+
+
 
 
     /* Checks if external storage is available for read and write */
