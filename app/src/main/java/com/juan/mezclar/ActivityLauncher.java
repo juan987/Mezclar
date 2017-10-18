@@ -98,6 +98,7 @@ public class ActivityLauncher extends AppCompatActivity {
             return true;
     }
 
+    //Intent cuando el string es solo digitos
     public void sendIntentToAppMezclar(){
 
         //Chequeo que el string no esta vacio
@@ -115,18 +116,19 @@ public class ActivityLauncher extends AppCompatActivity {
         }
     }
 
+    //Intent con la secuencia alfanumerica
     public void sendIntentToAppMezclarAlfanumerico(){
 
         //Chequeo que el string no esta vacio
         if(secuenciaDeImagenesAlfanumerica.length() != 0) {
-            //TODO chequea que el string solo tiene letras (mayusculas y minusculas) y digitos.
+            //chequea que el string solo tiene letras (mayusculas y minusculas) y digitos.
             String pruebaRegex = secuenciaDeImagenesAlfanumerica.getText().toString();
             if(isLettersAndDigits(pruebaRegex)){
                 Log.d(xxx, "En metodo sendIntentToAppMezclarAlfanumerico, regex TRUE para: " +pruebaRegex);
                 //El string es correcto: solo tiene letras en May/min y digitos. No tiene las letras ñ ni Ñ
-                //Intent intent = new Intent(this, MezclarFinal.class);
-                //intent.putExtra("KeyName", secuenciaDeImagenesAlfanumerica.getText().toString());
-                //startActivity(intent);
+                Intent intent = new Intent(this, MezclarFinal.class);
+                intent.putExtra("Alfanumerico", secuenciaDeImagenesAlfanumerica.getText().toString());
+                startActivity(intent);
             }else{
                 Log.d(xxx, "En metodo sendIntentToAppMezclarAlfanumerico, regex FALSE para: " +pruebaRegex);
 

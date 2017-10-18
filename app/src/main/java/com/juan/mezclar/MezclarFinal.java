@@ -659,21 +659,14 @@ public class MezclarFinal extends AppCompatActivity {
                 //Acabamos la ejecucion
                 return false;
             }else{
-                //Continuamos con el procesamiento
-                //Se muestra la imagen pequeña en la UI, solo para pruebas
-                //ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
-                //imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
 
                 //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
                 imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
-                //Leer las coordenadas de prueba
-                //leerCoordenadasDeSuperposicion(i);
-
 
                 //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
                 //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
                 //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
-                if(i >= listaCoordenadas.size()){
+                if(i >= arrayPojoCoordenadasAlfanumerico.size()){
                     enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
@@ -689,8 +682,8 @@ public class MezclarFinal extends AppCompatActivity {
                     xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
                     yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
                 } */
-                xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
-                yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+                xFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordX());
+                yFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordY());
 
                 //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
                 //Float.isNaN retorna true si no es un numero
