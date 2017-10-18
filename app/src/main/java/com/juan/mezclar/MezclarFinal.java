@@ -72,6 +72,12 @@ public class MezclarFinal extends AppCompatActivity {
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
     //Nombre de la imagen principal sobre la que se superponen las imagenes de o a 9.
     String imagenPrincipal = "origin.jpg";
+    //Bitmap que contiene el resultado de la imagen generada
+    Bitmap originJpg;
+    //array list que contiene datos de coordenada x e y obtenidos del fichero CONFIG.txt
+    List<PojoCoordenadas> listaCoordenadas;
+    //Boolean para discriminar si la secuencia de imagenes recibida es numerica o alfanumerica
+    boolean booleanSecuenciaNumerica = true;
 
     //Fichero de datos: CONFIG.txt
     //Contiene las coordenadas N1 a N15
@@ -342,7 +348,8 @@ public class MezclarFinal extends AppCompatActivity {
 
 
         //Leer coordenadas y URL del array de lineas obtenido del fichero CONFIG.txt
-        List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
+        //List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
+        listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
 
         //Recorro he imprimo los datos de listaCoordenadas
         for(int i = 0; i < listaCoordenadas.size(); i++){
@@ -392,7 +399,8 @@ public class MezclarFinal extends AppCompatActivity {
         //Obtener la imagen origin.jpg como un bitmap
         //Si la imagen origin.jpg no existe, entonces buscamos con el nombre origin.xjpg, implementado en version 1.0.2
         obtenerImagen = new ObtenerImagen(MezclarFinal.this);
-        Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
+        //Bitmap originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
+        originJpg = obtenerImagen.getImagenMethod(pathCesaralMagicImageC + imagenPrincipal);
         if(originJpg == null){//No encuentra origin.jpg
             //Buscamos origin.xjpg
             Log.d(xxx, "No existe origin.jpg, buscamos origin.xjpg");
@@ -430,97 +438,22 @@ public class MezclarFinal extends AppCompatActivity {
 
         }
 
-        //Loop principal de la aplicacion
-        Bitmap imagenParaSuperponerConOrigin;
 
-
-        for(int i = 0; i < arrayImagesSequence.length; i++) {
-            Log.d(xxx, "mezclando imagen: " +i);
-            enviarNotification("mezclando imagen: " +i);
-            enviarNotificationConNumero("1");
-            //Obtener la imagen a superponer como un bitmap
-            imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                    +arrayImagesSequence[i]+".bmp");
-            if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
-                //Buscamos la imagen a superponer con extension .xbmp
-                Log.d(xxx, "No existe la imagen a superponer: " +i +"con extension .bmp, buscamos con extension .xbmp");
-                imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                        +arrayImagesSequence[i]+".xbmp");
-            }
-            if(imagenParaSuperponerConOrigin == null){
-                //Hay un error, terminamos la ejecucion he informamos con una notificacion
-                enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
-                enviarNotificationConNumero("E1");
-                Log.d(xxx, "En metodoPrincipal_2, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
-
-                //Acabamos la ejecucion
-                return false;
+        if(booleanSecuenciaNumerica){
+            //secuencia numerica recibida, se ejecuta loopPrincipalImagenesTipoN
+            if(loopPrincipalImagenesTipoN()){
+                //Ejecucion correcta, seguimos
             }else{
-                //Continuamos con el procesamiento
-                //Se muestra la imagen pequeña en la UI, solo para pruebas
-                //ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
-                //imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
-
-                //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
-                imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
-                //Leer las coordenadas de prueba
-                //leerCoordenadasDeSuperposicion(i);
-
-
-                //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
-                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
-                //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
-                if(i >= listaCoordenadas.size()){
-                    enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    Log.d(xxx, "En metodoPrincipal_2, Error en indice de coordenadas, salimos de la app");
-                    return false;//Cerrar aplicacion y evitar un null pointer
-                }
-
-
-                //Para corregir fallos de null, OJO OJO OJO
-                /*
-                if(listaCoordenadas.get(i).getCoordX() == null || listaCoordenadas.get(i).getCoordY() == null){
-                    //No lee los valores null
-                }else{
-                    xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
-                    yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
-                } */
-                xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
-                yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
-
-                //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
-                //Float.isNaN retorna true si no es un numero
-                if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
-                    enviarNotification("Error, coordenadas no son un numero valido, saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    Log.d(xxx, "En metodoPrincipal_2, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
-
-                    return false;//Cerrar aplicacion y evitar fallo en el procesamiento
-                }
-
-
-                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
-                mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
-                                        xFloat, yFloat);
-                //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
-                originJpg = mergedImages;
-                if(mergedImages != null) {
-                    //Comando de prueba. Comentar esta linea en la version final
-                    //collageImage.setImageBitmap(mergedImages);
-                }else{
-                    //Ha habido un error al mezclar las imagenes
-                    enviarNotification("Error mezclando imagen: " +i  +", saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    Log.d(xxx, "En metodoPrincipal_2, mergedImages es null, no se ha generado la imagen, salimos de la app");
-
-                    return false;
-
-                }
-                //
+                //Hay un fallo en el loop principal, cerramos la activity
+                return false;
             }
+        }else{
+            //secuencia alfanumerica recibida, se ejecuta loopPrincipalTipoAlfa
 
-        }//Fin del loop principal
+            //TODO: crear metodo
+        }
+
+
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
         GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(MezclarFinal.this, mergedImages);
@@ -547,6 +480,102 @@ public class MezclarFinal extends AppCompatActivity {
         return true;
     }//Fin de metodoPrincipal_2
 
+
+    private boolean loopPrincipalImagenesTipoN(){
+        //Loop principal de la aplicacion
+        Bitmap imagenParaSuperponerConOrigin;
+
+
+        for(int i = 0; i < arrayImagesSequence.length; i++) {
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mezclando imagen: " +i);
+            enviarNotification("mezclando imagen: " +i);
+            enviarNotificationConNumero("1");
+            //Obtener la imagen a superponer como un bitmap
+            imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                    +arrayImagesSequence[i]+".bmp");
+            if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
+                //Buscamos la imagen a superponer con extension .xbmp
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No existe la imagen a superponer: " +i +"con extension .bmp, buscamos con extension .xbmp");
+                imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                        +arrayImagesSequence[i]+".xbmp");
+            }
+            if(imagenParaSuperponerConOrigin == null){
+                //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
+                enviarNotificationConNumero("E1");
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
+
+                //Acabamos la ejecucion
+                return false;
+            }else{
+                //Continuamos con el procesamiento
+                //Se muestra la imagen pequeña en la UI, solo para pruebas
+                //ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
+                //imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
+
+                //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
+                imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
+                //Leer las coordenadas de prueba
+                //leerCoordenadasDeSuperposicion(i);
+
+
+                //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
+                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
+                //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
+                if(i >= listaCoordenadas.size()){
+                    enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en indice de coordenadas, salimos de la app");
+                    return false;//Cerrar aplicacion y evitar un null pointer
+                }
+
+
+                //Para corregir fallos de null, OJO OJO OJO
+                /*
+                if(listaCoordenadas.get(i).getCoordX() == null || listaCoordenadas.get(i).getCoordY() == null){
+                    //No lee los valores null
+                }else{
+                    xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
+                    yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+                } */
+                xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
+                yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+
+                //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
+                //Float.isNaN retorna true si no es un numero
+                if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
+                    enviarNotification("Error, coordenadas no son un numero valido, saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
+
+                    return false;//Cerrar aplicacion y evitar fallo en el procesamiento
+                }
+
+
+                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+                mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
+                        xFloat, yFloat);
+                //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
+                originJpg = mergedImages;
+                if(mergedImages != null) {
+                    //Comando de prueba. Comentar esta linea en la version final
+                    //collageImage.setImageBitmap(mergedImages);
+                }else{
+                    //Ha habido un error al mezclar las imagenes
+                    enviarNotification("Error mezclando imagen: " +i  +", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mergedImages es null, no se ha generado la imagen, salimos de la app");
+
+                    return false;
+
+                }
+                //
+            }
+
+        }//Fin del loop principal
+
+        return true;
+    }//FIN de loopPrincipalImagenesTipoN
 
 
     private boolean ejecutarConParametroSor(){
@@ -821,7 +850,7 @@ public class MezclarFinal extends AppCompatActivity {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(intIdentificadorDelIcon)
-                        .setContentTitle("Cesaral Magic Photo");
+                        .setContentTitle("CUPP Lite");
                         //.setStyle(new NotificationCompat.BigTextStyle().bigText(mensaje));
         //.setContentText(mensaje);
         // Gets an instance of the NotificationManager service//
