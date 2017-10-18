@@ -19,6 +19,8 @@ import android.widget.EditText;
 public class ActivityLauncher extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
     String xxx = this.getClass().getSimpleName();
+    EditText secuenciaDeImagenes;
+    EditText secuenciaDeImagenesAlfanumerica;
 
 
     @Override
@@ -27,6 +29,9 @@ public class ActivityLauncher extends AppCompatActivity {
         setContentView(R.layout.activity_launcher);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        secuenciaDeImagenes   = (EditText)findViewById(R.id.secImagenes);
+        secuenciaDeImagenesAlfanumerica   = (EditText)findViewById(R.id.secImagenesAlfanumerica);
 
 
         /*
@@ -44,7 +49,15 @@ public class ActivityLauncher extends AppCompatActivity {
         final Button button = (Button)findViewById(R.id.button_id);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                sendIntentToAppMezclar();
+
+                if(editTextNumOrAlfa()){
+                    sendIntentToAppMezclar();
+                    sendIntentToAppMezclarAlfanumerico();
+                }else{
+                    //los dos edittext tienen algo o ambos estan vacios
+                    Log.d(xxx, "En metodo onCreate los dos edittext tienen algo o ambos estan vacios");
+
+                }
             }
         });
 
@@ -73,13 +86,23 @@ public class ActivityLauncher extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public boolean editTextNumOrAlfa(){
+        //Chequea si ambos textEdit son vacios o tiene algo simultaneamente
+        if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() != 0)
+                || (secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
+            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Use only one box", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+            return false;
+        }
+
+            return true;
+    }
+
     public void sendIntentToAppMezclar(){
-        //declaro el edittext
-        EditText secuenciaDeImagenes   = (EditText)findViewById(R.id.secImagenes);
+
         //Chequeo que el string no esta vacio
         if(secuenciaDeImagenes.length() != 0) {
-            //Especifico el paquete que quiero lanzar, la app Mezclar
-            //Intent launchMezclarApplication = getPackageManager().getLaunchIntentForPackage("com.juan.mezclar");
+
             Intent intent = new Intent(this, MezclarFinal.class);
 
             //launchMezclarApplication.putExtra("KeyName","Hola, te estoy llamando");
@@ -88,9 +111,40 @@ public class ActivityLauncher extends AppCompatActivity {
             startActivity(intent);
         }else{
             //Mostrar un snakc bar:
-            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Introduce Digits", Snackbar.LENGTH_LONG)
-                   .setAction("Action", null).show();
+            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Type Digits", Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
+    }
+
+    public void sendIntentToAppMezclarAlfanumerico(){
+
+        //Chequeo que el string no esta vacio
+        if(secuenciaDeImagenesAlfanumerica.length() != 0) {
+            //TODO chequea que el string solo tiene letras (mayusculas y minusculas) y digitos.
+            String pruebaRegex = secuenciaDeImagenesAlfanumerica.getText().toString();
+            if(isLettersAndDigits(pruebaRegex)){
+                Log.d(xxx, "En metodo sendIntentToAppMezclarAlfanumerico, regex TRUE para: " +pruebaRegex);
+                //El string es correcto: solo tiene letras en May/min y digitos. No tiene las letras ñ ni Ñ
+                //Intent intent = new Intent(this, MezclarFinal.class);
+                //intent.putExtra("KeyName", secuenciaDeImagenesAlfanumerica.getText().toString());
+                //startActivity(intent);
+            }else{
+                Log.d(xxx, "En metodo sendIntentToAppMezclarAlfanumerico, regex FALSE para: " +pruebaRegex);
+
+            }
+
+            //Intent intent = new Intent(this, MezclarFinal.class);
+            //intent.putExtra("KeyName", secuenciaDeImagenesAlfanumerica.getText().toString());
+            //startActivity(intent);
+        }else{
+            //Mostrar un snakc bar:
+            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Type letters and digits", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        }
+    }
+
+    //devuelve true si el string solo contiene letras, mayusculas o minusculas, digitos
+    // y no tiene la Ñ, para cualquier numero de caracteres
+    public boolean isLettersAndDigits(String s){
+        return s.matches("([\\w&&[^ñÑ]])*");
     }
 
     //Metodo que recupera los datos recibidos en un intent lanzado por otra aplicacion,

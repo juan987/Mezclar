@@ -76,8 +76,12 @@ public class MezclarFinal extends AppCompatActivity {
     Bitmap originJpg;
     //array list que contiene datos de coordenada x e y obtenidos del fichero CONFIG.txt
     List<PojoCoordenadas> listaCoordenadas;
-    //Boolean para discriminar si la secuencia de imagenes recibida es numerica o alfanumerica
+    //Boolean para discriminar si la secuencia de imagenes recibida es numerica
     boolean booleanSecuenciaNumerica = true;
+    //Boolean para discriminar si la secuencia de imagenes recibida es alfanumerica
+    boolean booleanSecuenciaRecibidaAlfanumerica = false;
+
+
 
     //Fichero de datos: CONFIG.txt
     //Contiene las coordenadas N1 a N15
@@ -347,14 +351,14 @@ public class MezclarFinal extends AppCompatActivity {
 
 
 
-        //Leer coordenadas y URL del array de lineas obtenido del fichero CONFIG.txt
+        //Leer coordenadas N y T, URL, user, password y SOR del array de lineas obtenido del fichero CONFIG.txt
         //List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
         listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
 
         //Recorro he imprimo los datos de listaCoordenadas
         for(int i = 0; i < listaCoordenadas.size(); i++){
-            Log.d(xxx, "en metodoPrincipal_2, lista de coordenadas, posicion: " +i + ", CoordX= " +listaCoordenadas.get(i).getCoordX());
-            Log.d(xxx, "en metodoPrincipal_2, lista de coordenadas, posicion: " +i + ", CoordY= " +listaCoordenadas.get(i).getCoordY());
+            Log.d(xxx, "en metodoPrincipal_2, lista de coordenadas N, posicion: " +i + ", CoordX= " +listaCoordenadas.get(i).getCoordX());
+            Log.d(xxx, "en metodoPrincipal_2, lista de coordenadas N, posicion: " +i + ", CoordY= " +listaCoordenadas.get(i).getCoordY());
         }
 
         //Caso de try/ctach para ArrayIndexOutOfBoundsException
@@ -423,9 +427,9 @@ public class MezclarFinal extends AppCompatActivity {
 
         //
 
-        if(stringSOR.equals("")){
-            //NO hay string SOR, seguimos
-            Log.d(xxx, "En metodoPrincipal_2, NO parametro SOR, seguimos");
+        if(stringSOR.equals("") || booleanSecuenciaRecibidaAlfanumerica){
+            //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
+            Log.d(xxx, "En metodoPrincipal_2, NO hay parametro SOR o se ha recibido una secuencia alfanumerica, seguimos");
 
         }else{
             Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR, se ejecuta metodo ejecutarConParametroSor");
@@ -434,6 +438,8 @@ public class MezclarFinal extends AppCompatActivity {
                 //Ha habido un problema con la ordenacion, salir del programa
                 enviarNotificationConNumero("E1");
                 Log.d(xxx, "En metodoPrincipal_2, Error en metodo ejecutarConParametroSor, salimos de la app");
+                //Me faltaba esta linea
+                return false;
             }
 
         }
@@ -444,13 +450,17 @@ public class MezclarFinal extends AppCompatActivity {
             if(loopPrincipalImagenesTipoN()){
                 //Ejecucion correcta, seguimos
             }else{
-                //Hay un fallo en el loop principal, cerramos la activity
+                //Hay un fallo en el loop principal de numerico, cerramos la activity
                 return false;
             }
         }else{
-            //secuencia alfanumerica recibida, se ejecuta loopPrincipalTipoAlfa
-
-            //TODO: crear metodo
+            //secuencia alfanumerica recibida, se ejecuta loopPrincipalImagenesTipoT
+            if(loopPrincipalImagenesTipoT()){
+                //Ejecucion correcta, seguimos
+            }else{
+                //Hay un fallo en el loop principal de alfanumerico, cerramos la activity
+                return false;
+            }
         }
 
 
@@ -576,6 +586,147 @@ public class MezclarFinal extends AppCompatActivity {
 
         return true;
     }//FIN de loopPrincipalImagenesTipoN
+
+
+    private boolean loopPrincipalImagenesTipoT(){
+        //Loop principal de la aplicacion
+        Bitmap imagenParaSuperponerConOrigin;
+        //Los nombres de los ficheros para mezclar seran F1_ +letra o numero del array de secuencia +indice +.bmp o x.bmp
+        //Ejemplos:
+        /*
+        a)    Si la letra es mayúscula, los ficheros gráficos que se utilizarán para la superposición son:
+
+        F1_A1.bmp             o con extensión “xbmp”
+        F1_B1.bmp             o con extensión “xbmp”
+        …
+        F1_Z1.bmp             o con extensión “xbmp”
+
+        b)   Si la letra es minúscula, los ficheros gráficos que se utilizarán para la superposición son:
+
+        F1_A2.bmp            o con extensión “xbmp”
+        F1_B2.bmp             o con extensión “xbmp”
+        …
+        F1_Z2.bmp             o con extensión “xbmp”
+
+        c)    Si el carácter es un número, los ficheros gráficos que se utilizarán para la superposición es el:
+
+        F1_0.bmp              o con extensión “xbmp”
+        F1_1.bmp              o con extensión “xbmp”
+        …
+        F1_9.bmp              o con extensión “xbmp”
+
+
+         */
+        String prefijoNombreFile = "F1_";
+        Character character;
+        String charDeLaSecuenciaRecibida = "";
+
+        for(int i = 0; i < arrayImagesSequence.length; i++) {
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mezclando imagen: " +i);
+            prefijoNombreFile = "F1_";
+
+            //Convertir el caracter de la secuencia alfanumerica para usar el metodo matches con regex de string
+            character = (Character)arrayImagesSequence[i];
+            charDeLaSecuenciaRecibida = character.toString();
+            //Generar el nombre de la imagen a utilizar para la mezcla
+            if(charDeLaSecuenciaRecibida.matches("[a-z]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase() +2;
+            }else if (charDeLaSecuenciaRecibida.matches("[A-Z]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase() +1;
+
+            }else if(charDeLaSecuenciaRecibida.matches("[0-9]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida +i;
+            }
+
+
+            enviarNotification("mezclando imagen: " +i);
+            enviarNotificationConNumero("1");
+            //Obtener la imagen a superponer como un bitmap
+            imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                    +prefijoNombreFile +".bmp");
+            if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
+                //Buscamos la imagen a superponer con extension .xbmp
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, No existe la imagen a superponer: " +i +"con extension .bmp, buscamos con extension .xbmp");
+                imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                        +prefijoNombreFile +".xbmp");
+            }
+            if(imagenParaSuperponerConOrigin == null){
+                //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                enviarNotification("Error al recuperar imagen pequeña alfanumerica numero: " +i +", saliendo de la aplicacion");
+                enviarNotificationConNumero("E1");
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
+
+                //Acabamos la ejecucion
+                return false;
+            }else{
+                //Continuamos con el procesamiento
+                //Se muestra la imagen pequeña en la UI, solo para pruebas
+                //ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
+                //imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
+
+                //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
+                imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
+                //Leer las coordenadas de prueba
+                //leerCoordenadasDeSuperposicion(i);
+
+
+                //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
+                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
+                //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
+                if(i >= listaCoordenadas.size()){
+                    enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
+                    return false;//Cerrar aplicacion y evitar un null pointer
+                }
+
+
+                //Para corregir fallos de null, OJO OJO OJO
+                /*
+                if(listaCoordenadas.get(i).getCoordX() == null || listaCoordenadas.get(i).getCoordY() == null){
+                    //No lee los valores null
+                }else{
+                    xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
+                    yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+                } */
+                xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
+                yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+
+                //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
+                //Float.isNaN retorna true si no es un numero
+                if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
+                    enviarNotification("Error, coordenadas alfanumericas no son un numero valido, saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
+
+                    return false;//Cerrar aplicacion y evitar fallo en el procesamiento
+                }
+
+
+                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+                mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
+                        xFloat, yFloat);
+                //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
+                originJpg = mergedImages;
+                if(mergedImages != null) {
+                    //Comando de prueba. Comentar esta linea en la version final
+                    //collageImage.setImageBitmap(mergedImages);
+                }else{
+                    //Ha habido un error al mezclar las imagenes
+                    enviarNotification("Error mezclando imagen alfanumerica: " +i  +", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mergedImages es null, no se ha generado la imagen, salimos de la app");
+
+                    return false;
+
+                }
+                //
+            }
+
+        }//Fin del loop principal
+
+        return true;
+    }//loopPrincipalImagenesTipoT
 
 
     private boolean ejecutarConParametroSor(){
@@ -902,6 +1053,11 @@ public class MezclarFinal extends AppCompatActivity {
         }
     }
 
+    //ArrayList para guardar las coordenadas alfanumericas, es un variable de la clase
+    ArrayList<PojoCoordenadas> arrayPojoCoordenadasAlfanumerico = new ArrayList<>();
+
+
+
     //Metodo para:
     //Generar array de PojoCoordenadas con las coordenadas x e Y de posicionamiento de imagenes
     //Generar la URL para subir y almacenar la imagen generada a un servidor
@@ -940,9 +1096,55 @@ public class MezclarFinal extends AppCompatActivity {
                     Log.d(xxx, "ArrayIndexOutOfBoundsException:  " + e.getMessage());
                     return null;
                 }
-                //arrayPojoCoordenadas.add(pojoCoordenadas);
-            }//Fion de if(arrayLineasTextoLocal.get(i).startsWith("N"))
-        }
+            }//Fin de if(arrayLineasTextoLocal.get(i).startsWith("N"))
+
+            //***************************************************************************************
+            //***************************************************************************************
+            //***************************************************************************************
+
+            //Solo quiero las lineas que empiezan con T
+            if(arrayLineasTextoLocal.get(i).startsWith("T")) {
+
+                //Extrae las coordenadas x e y de cada linea con regex y genera pojo de
+                //coordenadas por cada linea y lo guarda en el array de coordenadas
+                String[] str = arrayLineasTextoLocal.get(i).split(regex);
+                //Recorro y muestro con Log.d el array str
+                for (int i2 = 0; i2 < str.length; i2++) {
+                    Log.d(xxx, "En metodo generarPojoGenerarUrl, despues del split con regex" + "\n"
+                            + "Linea " + i + "\n"
+                            + "posicion " + i2 + " tiene: " + str[i2]);
+                }
+                //Si la linea no tiene digitos, hago un break y continua el loop
+                //if(str.length == 0) break;
+                PojoCoordenadas pojoCoordenadas = new PojoCoordenadas();
+                try {
+                    if (str.length > 2) {//Para evitar las lineas blancas y las que no tienen coordenadas y que de ArrayIndexOutOfBoundsException
+                        pojoCoordenadas.setCoordX(str[2]);
+                        pojoCoordenadas.setCoordY(str[3]);
+                        arrayPojoCoordenadasAlfanumerico.add(pojoCoordenadas);
+
+                    } else {
+                        Log.d(xxx, "En generarPojoGenerarUrl, la linea " + i + " esta vacia o no tiene coordenadas: "
+                                + arrayLineasTextoLocal.get(i));
+
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Log.d(xxx, "ArrayIndexOutOfBoundsException:  " + e.getMessage());
+                    return null;
+                }
+            }//Fin de if(arrayLineasTextoLocal.get(i).startsWith("T"))
+
+
+
+            //***************************************************************************************
+            //***************************************************************************************
+            //***************************************************************************************
+
+
+
+
+
+        }//FIN de for(int i = 0; i < arrayLineasTextoLocal.size(); i++)
 
         //Este for extrae la URL del servidor, el user y el password que estan en CONFIG.txt
         String[] stringURLFinal = null;
