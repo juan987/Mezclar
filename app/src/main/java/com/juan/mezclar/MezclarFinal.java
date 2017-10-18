@@ -228,9 +228,40 @@ public class MezclarFinal extends AppCompatActivity {
                 sizearrayImagesSequence = arrayImagesSequence.length;
                 Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, numero de digitos recibidos: " +sizearrayImagesSequence);
 
-                //OK, la app continua
+                booleanSecuenciaNumerica = true;
+                booleanSecuenciaRecibidaAlfanumerica = false;
+                //OK, la app continua con la secuencia numerica
 
-            }else{//Salta aqui si no hay datos en el intent
+            }else if(data.getString("KeyAlfanumerico")!=null && !data.getString("KeyAlfanumerico").isEmpty()) {
+                //Seha recibido una secuencia de imagenes alfanumerica
+                myString = data.getString("KeyAlfanumerico");
+                //Copiamos la secuencia de imagenes recibidas
+                stringImagesSecuence = null;
+                stringImagesSecuence = myString;
+                //Toast.makeText(this, myString, Toast.LENGTH_SHORT).show();
+
+                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar alfanumericos: " + stringImagesSecuence);
+                //Muestro el string character a character
+                for(int i = 0; i < stringImagesSecuence.length(); i++) {
+                    Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Caracter alfanumerico" +i +":" + stringImagesSecuence.charAt(i));
+                }
+
+                //Convertir el string de secuencia de imagenes en un array de secuencia de imagenes, character a character
+                arrayImagesSequence = stringImagesSecuence.toCharArray();
+                //Lo muestro con
+                for (char temp : arrayImagesSequence) {
+                    Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Caracter alfanumerico" +temp);
+                }
+
+                sizearrayImagesSequence = arrayImagesSequence.length;
+                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, numero de digitos recibidos: " +sizearrayImagesSequence);
+
+                booleanSecuenciaNumerica = false;
+                booleanSecuenciaRecibidaAlfanumerica = true;
+
+                //OK, la app continua con la secuencia alfanumerica
+
+            } else{//Salta aqui si no hay datos en el intent
                 Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: No hay datos");
                 //Datos fake para probar
                 //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
@@ -635,7 +666,7 @@ public class MezclarFinal extends AppCompatActivity {
                 prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase() +1;
 
             }else if(charDeLaSecuenciaRecibida.matches("[0-9]")){
-                prefijoNombreFile += charDeLaSecuenciaRecibida +i;
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase();
             }
 
 

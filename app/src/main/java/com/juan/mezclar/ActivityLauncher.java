@@ -51,8 +51,14 @@ public class ActivityLauncher extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(editTextNumOrAlfa()){
-                    sendIntentToAppMezclar();
-                    sendIntentToAppMezclarAlfanumerico();
+                    if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
+
+                        sendIntentToAppMezclar();
+                    }
+                    if((secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() != 0)) {
+
+                        sendIntentToAppMezclarAlfanumerico();
+                    }
                 }else{
                     //los dos edittext tienen algo o ambos estan vacios
                     Log.d(xxx, "En metodo onCreate los dos edittext tienen algo o ambos estan vacios");
@@ -86,13 +92,21 @@ public class ActivityLauncher extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+          //  if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() != 0)
+           //         || (secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
     public boolean editTextNumOrAlfa(){
         //Chequea si ambos textEdit son vacios o tiene algo simultaneamente
-        if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() != 0)
-                || (secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
-            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Use only one box", Snackbar.LENGTH_LONG)
+        if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() != 0)) {
+            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Click only one box", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
+            secuenciaDeImagenesAlfanumerica.setText("");
+            secuenciaDeImagenes.setText("");
             return false;
+        }else if((secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
+                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Enter data in one of the boxes", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                return false;
         }
 
             return true;
@@ -111,7 +125,6 @@ public class ActivityLauncher extends AppCompatActivity {
 
             startActivity(intent);
         }else{
-            //Mostrar un snakc bar:
             Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Type Digits", Snackbar.LENGTH_LONG).setAction("Action", null).show();
         }
     }
@@ -127,10 +140,12 @@ public class ActivityLauncher extends AppCompatActivity {
                 Log.d(xxx, "En metodo sendIntentToAppMezclarAlfanumerico, regex TRUE para: " +pruebaRegex);
                 //El string es correcto: solo tiene letras en May/min y digitos. No tiene las letras ñ ni Ñ
                 Intent intent = new Intent(this, MezclarFinal.class);
-                intent.putExtra("Alfanumerico", secuenciaDeImagenesAlfanumerica.getText().toString());
+                intent.putExtra("KeyAlfanumerico", secuenciaDeImagenesAlfanumerica.getText().toString());
                 startActivity(intent);
             }else{
                 Log.d(xxx, "En metodo sendIntentToAppMezclarAlfanumerico, regex FALSE para: " +pruebaRegex);
+                secuenciaDeImagenesAlfanumerica.setText("");
+                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Type only letters and numbers", Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
             }
 
@@ -145,6 +160,7 @@ public class ActivityLauncher extends AppCompatActivity {
 
     //devuelve true si el string solo contiene letras, mayusculas o minusculas, digitos
     // y no tiene la Ñ, para cualquier numero de caracteres
+    //Ver http://www.vogella.com/tutorials/JavaRegularExpressions/article.html#regular-expressions
     public boolean isLettersAndDigits(String s){
         return s.matches("([\\w&&[^ñÑ]])*");
     }
