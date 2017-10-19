@@ -162,7 +162,10 @@ public class ActivityLauncher extends AppCompatActivity {
     // y no tiene la Ñ, para cualquier numero de caracteres
     //Ver http://www.vogella.com/tutorials/JavaRegularExpressions/article.html#regular-expressions
     public boolean isLettersAndDigits(String s){
-        return s.matches("([\\w&&[^ñÑ]])*");
+
+        //Requerimiento de Cesar: que se trague todo el string, sin importar los caracteres que tenga.
+        return true;
+        //return s.matches("([\\w&&[^ñÑ]])*");
     }
 
     //Metodo que recupera los datos recibidos en un intent lanzado por otra aplicacion,

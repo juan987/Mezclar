@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.juan.mezclar.ftpClases.FtpClient;
 
@@ -62,6 +63,9 @@ public class MezclarFinal extends AppCompatActivity {
 
     private ImageView collageImage;
     private ImageView finalImage;
+
+    TextView textViewErrores;
+
     //Array para almacenar la secuencia de imagenes a superponer
     char[] arrayImagesSequence;
     int sizearrayImagesSequence;
@@ -183,10 +187,13 @@ public class MezclarFinal extends AppCompatActivity {
 
 
         collageImage = (ImageView)findViewById(R.id.imageView3);
+        textViewErrores = (TextView)findViewById(R.id.textView);
+
         //progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
         //No mostramos la progress bar
         //progressBar.setVisibility(View.INVISIBLE);
+
 
 
 
@@ -332,6 +339,7 @@ public class MezclarFinal extends AppCompatActivity {
         {
             enviarNotification("Error: el array de imagenes es null, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "Sequence of images is NULL");
             Log.d(xxx, "En metodoPrincipal_2, arrayImagesSequence es null, salimos de la app");
 
             return false;
@@ -345,6 +353,7 @@ public class MezclarFinal extends AppCompatActivity {
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "Error reading file: CONFIG.txt");
             Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto es null, salimos de la app");
 
             return false;
@@ -354,6 +363,7 @@ public class MezclarFinal extends AppCompatActivity {
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "File: CONFIG.txt is empty");
             Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto esta vacio, salimos de la app");
 
             return false;
@@ -398,6 +408,7 @@ public class MezclarFinal extends AppCompatActivity {
             //un error tipografico, como poner una letra en vez de un digito.
             enviarNotification("Error ArrayIndexOutOfBoundsException, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "Error reading coordinates type N");
             Log.d(xxx, "En metodoPrincipal_2, listaCoordenadas == null, salimos de la app");
             return false;
         }
@@ -405,10 +416,16 @@ public class MezclarFinal extends AppCompatActivity {
         if(listaCoordenadas.isEmpty()){
             //Hay un fallo en CONFIG text y no se han leido las coordenadas
             //Enviar notificacion de error y cerrar programa
-            enviarNotification("Error al recuperar coordenadas, saliendo de la aplicacion");
-            enviarNotificationConNumero("E1");
-            Log.d(xxx, "En metodoPrincipal_2, listaCoordenadas es Empty, salimos de la app");
-            return false;
+            //enviarNotification("Error al recuperar coordenadas, saliendo de la aplicacion");
+            //enviarNotificationConNumero("E1");
+            Log.d(xxx, "En metodoPrincipal_2, listaCoordenadas N es Empty, seguimos, la lista es opcional");
+            //Como todos los parametro son opcionales, seguimos aunque No haya coordenadas tipo N
+            //NO devolvemos nada, seguimos con la ejecucion.
+            //Lo hice el 19 oct 17, para cumplimentar el req: todos los parametros de
+            // CONFIG.txt son opcionales
+            //return false;
+
+
         }
 
         //Chequear si la url de CONFIG.txt es valida
@@ -445,6 +462,7 @@ public class MezclarFinal extends AppCompatActivity {
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error al recuperar origin.jpg, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "File origin does not exist");
             Log.d(xxx, "En metodoPrincipal_2, originJpg == null, salimos de la app");
             return false;
         }
@@ -458,6 +476,7 @@ public class MezclarFinal extends AppCompatActivity {
 
         //
 
+
         if(stringSOR.equals("") || booleanSecuenciaRecibidaAlfanumerica){
             //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
             Log.d(xxx, "En metodoPrincipal_2, NO hay parametro SOR o se ha recibido una secuencia alfanumerica, seguimos");
@@ -468,6 +487,7 @@ public class MezclarFinal extends AppCompatActivity {
             if(!ejecutarConParametroSor()){
                 //Ha habido un problema con la ordenacion, salir del programa
                 enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
                 Log.d(xxx, "En metodoPrincipal_2, Error en metodo ejecutarConParametroSor, salimos de la app");
                 //Me faltaba esta linea
                 return false;
@@ -512,12 +532,14 @@ public class MezclarFinal extends AppCompatActivity {
             //Ha habido un error al guardar la imagen, devolver false
             enviarNotification("Error guardando imagen predict" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "Error when saving image predict to external storage");
             Log.d(xxx, "En metodoPrincipal_2, Ha habido un error al guardar la imagen compuesta, salimos de la app");
 
             return false;
         }
 
         //Hemos terminado
+        enviarNotificationConNumero("2");
         return true;
     }//Fin de metodoPrincipal_2
 
@@ -544,6 +566,7 @@ public class MezclarFinal extends AppCompatActivity {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
                 enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Error when getting image file from external storage");
                 Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
 
                 //Acabamos la ejecucion
@@ -566,6 +589,7 @@ public class MezclarFinal extends AppCompatActivity {
                 if(i >= listaCoordenadas.size()){
                     enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error with index in array of coordenates N");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en indice de coordenadas, salimos de la app");
                     return false;//Cerrar aplicacion y evitar un null pointer
                 }
@@ -587,6 +611,7 @@ public class MezclarFinal extends AppCompatActivity {
                 if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
                     enviarNotification("Error, coordenadas no son un numero valido, saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error with coordenates N: some coordenate is not a number");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
 
                     return false;//Cerrar aplicacion y evitar fallo en el procesamiento
@@ -605,6 +630,7 @@ public class MezclarFinal extends AppCompatActivity {
                     //Ha habido un error al mezclar las imagenes
                     enviarNotification("Error mezclando imagen: " +i  +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error mixing images");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mergedImages es null, no se ha generado la imagen, salimos de la app");
 
                     return false;
@@ -621,6 +647,55 @@ public class MezclarFinal extends AppCompatActivity {
 
     private boolean loopPrincipalImagenesTipoT(){
         //Loop principal de la aplicacion
+
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence inicial tiene: " +arrayImagesSequence.toString());
+
+        Character character;
+        String charDeLaSecuenciaRecibida = "";
+        String soloCaracteresValidos = "";
+        //*******************************************************************************
+        //Revisamos la secuencia alphanumerica para descartar caracteres prohibidos.
+        //En esta version solo se aceptan letras, menos la ñ, en mayusculas y minusculas, y digitos 0-9.
+        for(int i = 0; i < arrayImagesSequence.length; i++) {
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, revisando el array de secuencia alfanumerica");
+
+            //Convertir el caracter de la secuencia alfanumerica para usar el metodo matches con regex de string
+            character = (Character) arrayImagesSequence[i];
+            charDeLaSecuenciaRecibida = character.toString();
+            //Generar el nombre de la imagen a utilizar para la mezcla
+            if (charDeLaSecuenciaRecibida.matches("[a-z]")) {
+                soloCaracteresValidos += charDeLaSecuenciaRecibida;
+            } else if (charDeLaSecuenciaRecibida.matches("[A-Z]")) {
+                soloCaracteresValidos += charDeLaSecuenciaRecibida;
+
+            } else if (charDeLaSecuenciaRecibida.matches("[0-9]")) {
+                soloCaracteresValidos += charDeLaSecuenciaRecibida;
+
+            }
+        }
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, soloCaracteresValidos tiene: " +soloCaracteresValidos);
+        arrayImagesSequence = soloCaracteresValidos.toCharArray();
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence final tiene: " +arrayImagesSequence.toString());
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence final tiene una longitud de: " +arrayImagesSequence.length);
+        if(arrayImagesSequence.length == 0){
+            enviarNotification("Error en la secuencia de imagenes alfanumerica: caracteres NO validos");
+            enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "Not valid characters in alphanumeric array");
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en la secuencia de imagenes alfanumerica: caracteres NO validos");
+
+            //Acabamos la ejecucion
+            return false;
+        }
+
+
+
+
+        //*******************************************************************************
+
+
+
+
+
         Bitmap imagenParaSuperponerConOrigin;
         //Los nombres de los ficheros para mezclar seran F1_ +letra o numero del array de secuencia +indice +.bmp o x.bmp
         //Ejemplos:
@@ -649,8 +724,8 @@ public class MezclarFinal extends AppCompatActivity {
 
          */
         String prefijoNombreFile = "F1_";
-        Character character;
-        String charDeLaSecuenciaRecibida = "";
+
+        charDeLaSecuenciaRecibida = "";
 
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mezclando imagen: " +i);
@@ -667,6 +742,10 @@ public class MezclarFinal extends AppCompatActivity {
 
             }else if(charDeLaSecuenciaRecibida.matches("[0-9]")){
                 prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase();
+            }else{
+                //Si llega aqui, es por que hay algun character que
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia numerica");
+
             }
 
 
@@ -685,11 +764,25 @@ public class MezclarFinal extends AppCompatActivity {
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error al recuperar imagen pequeña alfanumerica numero: " +i +", saliendo de la aplicacion");
                 enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Error in recovering alphanumeric image from external storage");
                 Log.d(xxx, "metodo loopPrincipalImagenesTipoT, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
 
                 //Acabamos la ejecucion
                 return false;
             }else{
+
+                //Como todos los parametro son opcionales, seguimos aunque No haya coordenadas tipo T
+                //Lo hice el 19 oct 17, para cumplimentar el req: todos los parametros de
+                // CONFIG.txt son opcionales
+                //Chequeo si arrayPojoCoordenadasAlfanumerico tiene coordenadas o no
+                if(arrayPojoCoordenadasAlfanumerico != null){
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico tiene: "
+                            +arrayPojoCoordenadasAlfanumerico.size() +" coordenadas");
+
+                }else{
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico es null");
+
+                }
 
                 //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
                 imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
@@ -700,6 +793,7 @@ public class MezclarFinal extends AppCompatActivity {
                 if(i >= arrayPojoCoordenadasAlfanumerico.size()){
                     enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error in index of T coordenates");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
                     return false;//Cerrar aplicacion y evitar un null pointer
                 }
@@ -713,6 +807,9 @@ public class MezclarFinal extends AppCompatActivity {
                     xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
                     yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
                 } */
+
+
+
                 xFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordX());
                 yFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordY());
 
@@ -721,6 +818,7 @@ public class MezclarFinal extends AppCompatActivity {
                 if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
                     enviarNotification("Error, coordenadas alfanumericas no son un numero valido, saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error: some coordenate T is not a number");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
 
                     return false;//Cerrar aplicacion y evitar fallo en el procesamiento
@@ -739,6 +837,7 @@ public class MezclarFinal extends AppCompatActivity {
                     //Ha habido un error al mezclar las imagenes
                     enviarNotification("Error mezclando imagen alfanumerica: " +i  +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error when mixing alphanumeric images");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mergedImages es null, no se ha generado la imagen, salimos de la app");
 
                     return false;
@@ -781,7 +880,7 @@ public class MezclarFinal extends AppCompatActivity {
         //int a = Integer.parseInt(String.valueOf('3');
         for (int i = 0; i < arrayImagesSequence.length; i++){
             gOrigen[i] = Character.getNumericValue(arrayImagesSequence[i]);
-            Log.d(xxx, "secuencia de imagenes en gOrigen recibida del lanzador, digito: " +i +" es: " +gOrigen[i]);
+            Log.d(xxx, "en ejecutarConParametroSor secuencia de imagenes en gOrigen recibida del lanzador, digito: " +i +" es: " +gOrigen[i]);
         }
 
         //Prueba 1: ORDENACION 1, tipo de ordenacion: 1, 2, o 4:, input: 10 digitos
@@ -792,10 +891,49 @@ public class MezclarFinal extends AppCompatActivity {
             //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error, SOR esta fuera de rango, debe estar entre 1 y 6" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
-            Log.d(xxx, "En metodoPrincipal_2, Error, SOR esta fuera de rango, debe estar entre 1 y 6, salimos de la app");
+            metodoMostrarError("E1", "SOR parameter out of range, value should be 1-6");
+            Log.d(xxx, "En ejecutarConParametroSor, Error, SOR esta fuera de rango, debe estar entre 1 y 6, salimos de la app");
             return false;
 
         }
+
+        //**************************************************************************
+        //Chequeo de errores: verificar el numero de digitos segun el valor de SOR. Cada numero son dos digitos
+        //Numeracion final
+        // ORDENACION 1= LOS 5 PRIMEROS NUMEROS SE ORDENAN
+        if ((integerSOR==1)||(integerSOR==2)||(integerSOR==4)) {
+            if(sizearrayImagesSequence < 10){
+                enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Number of alphanumeric digits is < 10, should be at least 10 digits");
+                Log.d(xxx, "En ejecutarConParametroSor, SOR= " +integerSOR  +", ERROR: el numero de digitos debe ser minimo 10");
+                return false;
+            }
+
+        }
+        // ORDENACION 2 = LOS 6 PRIMEROS NUMEROS SE ORDENAN
+        else if ((integerSOR==3)||(integerSOR==6)) {
+            if(sizearrayImagesSequence < 12){
+                enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Number of alphanumeric digits is < 12, should be at least 12 digits");
+                Log.d(xxx, "En ejecutarConParametroSor, SOR= " +integerSOR  +", ERROR: el numero de digitos debe ser minimo 12");
+                return false;
+            }
+        }
+        // ORDENACION 3 = LOS 7 PRIMEROS NUMEROS SE ORDENAN
+        else if (integerSOR==5) {
+            if(sizearrayImagesSequence < 14){
+                enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Number of alphanumeric digits is < 14, should be at least 14 digits");
+                Log.d(xxx, "En ejecutarConParametroSor, SOR= " +integerSOR  +", ERROR: el numero de digitos debe ser minimo 14");
+                return false;
+            }
+        }
+
+        //**************************************************************************
+
+
+
+
         //Llamamos a la rutina de ordenar
         ordenaNumeros(integerSOR); //Coloca en gOrigin[] el resultado ordenado
 
@@ -827,16 +965,17 @@ public class MezclarFinal extends AppCompatActivity {
             //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Fallo al ordenar el array de imagenes" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
-            Log.d(xxx, "En metodoPrincipal_2, Fallo al ordenar el array de imagenesl, salimos de la app");
+            metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
+            Log.d(xxx, "En ejecutarConParametroSor, Fallo al ordenar el array de imagenesl, salimos de la app");
             return false;
         }
 
         String stringSecuenciaOrdenada = "";
         for (int i = 0; i < gOriginFinal.length; i++){
-            Log.d(xxx, "En metodoPrincipal_2, req SOR secuencia de imagenes en gOrigen ordenada, digito: " +i +" es: " +gOrigen[i]);
+            Log.d(xxx, "En ejecutarConParametroSor, req SOR secuencia de imagenes en gOrigen ordenada, digito: " +i +" es: " +gOrigen[i]);
             stringSecuenciaOrdenada = stringSecuenciaOrdenada + gOrigen[i];
         }
-        Log.d(xxx, "En metodoPrincipal_2, req SOR stringSecuenciaOrdenada: " +stringSecuenciaOrdenada);
+        Log.d(xxx, "En ejecutarConParametroSor, req SOR stringSecuenciaOrdenada: " +stringSecuenciaOrdenada);
 
 
 
@@ -847,7 +986,7 @@ public class MezclarFinal extends AppCompatActivity {
         //Verificamos el nuevo array ordenado
         for (char temp : arrayImagesSequence) {
             //AQUI AQUI AQUI AQUOI
-            Log.d(xxx, "En metodo metodoPrincipal_2, secuencia de imagenes ordenada " +temp);
+            Log.d(xxx, "En metodo ejecutarConParametroSor, secuencia de imagenes ordenada " +temp);
         }//OK, la app continua
 
         return true;
@@ -1384,11 +1523,21 @@ public class MezclarFinal extends AppCompatActivity {
         //password = "test.2017";
 
 
+        //Chequear si obtenerImagen es null
+        if(obtenerImagen == null){
+            Log.d(xxx, "En metodoSubirImagenConFtp, obtenerImagen == null");
+
+        }else{
+            Log.d(xxx, "En metodoSubirImagenConFtp, obtenerImagen No es null null");
+
+        }
+
         File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
 
         if(filePathDePredictJpg == null){
             enviarNotificationFtp("Error al obtener el file de predict.jpg para upload ftp" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E2");
+            metodoMostrarError("E2", "Error recovering compoised image predict.jpg from external storage");
             Log.d(xxx, "En metodoSubirImagenConFtp, Error al obtener el file de predict.jpg para upload ftp");
 
             return false;
@@ -1410,6 +1559,7 @@ public class MezclarFinal extends AppCompatActivity {
                 }else{
                     enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
+                    metodoMostrarError("E2", "Error with fto connect or login");
                     Log.d(xxx, "En metodoSubirImagenConFtp, Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     return false;
                 }
@@ -1417,6 +1567,7 @@ public class MezclarFinal extends AppCompatActivity {
                 //e.printStackTrace();
                 enviarNotificationFtp("Error Socket Exception en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
                 enviarNotificationConNumero("E2");
+                metodoMostrarError("E2", "Error Socket Exception in ftp login: ");
                 Log.d(xxx, "En metodoSubirImagenConFtp, Error Socket Exception en ftp login: " +e.getMessage());
 
                 return false;
@@ -1424,6 +1575,7 @@ public class MezclarFinal extends AppCompatActivity {
                 //e.printStackTrace();
                 enviarNotificationFtp("Error IOException en ftp login: " +e.getMessage() +", saliendo de la aplicacion");
                 enviarNotificationConNumero("E2");
+                metodoMostrarError("E2", "Error IOException in ftp login ");
                 Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp login: " +e.getMessage());
 
                 return false;
@@ -1444,6 +1596,7 @@ public class MezclarFinal extends AppCompatActivity {
                 }else{
                     enviarNotificationFtp("Error: Fallo al enviar el fichero predict.jpg al servidor" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
+                    metodoMostrarError("E2", "Error upload file to ftp server ");
                     Log.d(xxx, "En metodoSubirImagenConFtp, Error: Fallo al enviar el fichero predict.jpg al servidor");
                     return false;
                 }
@@ -1451,6 +1604,7 @@ public class MezclarFinal extends AppCompatActivity {
                 //e.printStackTrace();
                 enviarNotificationFtp("Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage() +", saliendo de la aplicacion");
                 enviarNotificationConNumero("E2");
+                metodoMostrarError("E2", "ErrorIOException  upload file to ftp server ");
                 Log.d(xxx, "En metodoSubirImagenConFtp, Error IOException en ftp al enviar el fichero al servidor: " +e.getMessage());
 
                 return false;
@@ -1499,6 +1653,9 @@ public class MezclarFinal extends AppCompatActivity {
                 //fabOnPostExecute = (FloatingActionButton) findViewById(R.id.fab);
                 //fabOnPostExecute.setVisibility(View.INVISIBLE);
 
+                //Exito
+                finish();
+
             }else{
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen NO enviada al servidor ftp, saliendo de la app");
                 //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
@@ -1506,7 +1663,7 @@ public class MezclarFinal extends AppCompatActivity {
                 //finish();
             }
             //Tanto si hay fallo como si se ejecuta correctamente, se cierra la app
-            finish();
+            //finish();
         }
 
         protected void onProgressUpdate(Integer[] values) {
@@ -1556,7 +1713,7 @@ public class MezclarFinal extends AppCompatActivity {
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen jpg NO generada, saliendo de la app");
                 //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
-                finish();
+                //finish();
             }
         }
 
@@ -1655,10 +1812,17 @@ public class MezclarFinal extends AppCompatActivity {
             gOrigen[12]=numc2/10;
             gOrigen[13]=numc2%10;
         }
+    }//Fin del algoritmo de ordenacion proporcionado por cesar
+
+
+
+    //Metodo para mostrar mensajes de error E1 y E2 por pantalla
+    private void metodoMostrarError(String tipoDeError, String mensaje){
+        Log.d(xxx, "estoy en metodoMostrarError, mensaje: " +mensaje);
+        textViewErrores.setText(tipoDeError +": " +mensaje);
+
     }
 
-
-    //Fin del algoritmo de ordenacion proporcionado por cesar
 
 
 }//Fin del activity
