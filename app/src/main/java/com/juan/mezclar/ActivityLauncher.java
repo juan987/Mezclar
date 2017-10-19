@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 //Notas del 6 oct 2017
 //Ver como limitar la entrada a 16 digitos
@@ -26,6 +27,21 @@ public class ActivityLauncher extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //**********************************************************************
+        //De esta manera lanzo el servicio IntentServiceMagic, como tengo transparent en stile, la UI no se ve
+        //Toast.makeText(getApplicationContext(), "hola soy un toast", Toast.LENGTH_SHORT).show();
+        recuperarIntentConDatosInicialesServicio();
+        //Toast.makeText(getApplicationContext(), "hola ya me voy", Toast.LENGTH_SHORT).show();
+        //
+        finish();
+
+
+        //***********************************************************************
+
+
+
+
         setContentView(R.layout.activity_launcher);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,7 +83,8 @@ public class ActivityLauncher extends AppCompatActivity {
             }
         });
 
-        recuperarIntentConDatosIniciales();
+        //Lo comento para la chapuza del service que quiere cesar
+        //recuperarIntentConDatosIniciales();
     }
 
     @Override
@@ -216,5 +233,56 @@ public class ActivityLauncher extends AppCompatActivity {
             //finish();
 
         }
-    }
+    }//Fin de recuperarIntentConDatosIniciales
+
+
+    private void recuperarIntentConDatosInicialesServicio() {
+        //Recibir datos de la app Launh Mezclar
+        //String myString;
+        Bundle data = getIntent().getExtras();
+        if (data != null) {
+            String myString = data.getString("KeyName");
+            //Hay que chequear myString para que no lanze el toast with null cuando lanzo la app desde el movil
+            if (myString != null && !myString.isEmpty()) {
+                //Copiamos la secuencia de imagenes recibidas
+                stringImagesSecuence = null;
+                stringImagesSecuence = myString;
+                //Toast.makeText(this, myString, Toast.LENGTH_SHORT).show();
+
+
+                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: " + stringImagesSecuence);
+                //Muestro el string character a character
+                for (int i = 0; i < stringImagesSecuence.length(); i++) {
+                    Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Caracter " + i + ":" + stringImagesSecuence.charAt(i));
+                }
+
+                /*
+                if(!stringImagesSecuence.isEmpty()){
+                    Intent intent = new Intent(this, MezclarFinal.class);
+
+                    //launchMezclarApplication.putExtra("KeyName","Hola, te estoy llamando");
+                    intent.putExtra("KeyName", stringImagesSecuence);
+
+                    startActivity(intent);
+                    this.finish();
+                }  */
+
+                Intent mServiceIntent = new Intent(this, IntentServiceMagic.class);
+                mServiceIntent.putExtra("KeyName", stringImagesSecuence);
+                startService(mServiceIntent);
+
+            } else {//Salta aqui si no hay datos en el intent
+                Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Datos de Launch Mezclar: No hay datos");
+                //La app sigue
+
+            }
+
+        } else {//Salta aqui si recibe nulo en el intent
+            Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Datos de Launch Mezclar: NULL 2 del else");
+            //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
+            //this.finish();
+            //finish();
+
+        }
+    }//Fin de recuperarIntentConDatosInicialesServicio
 }//Fin de la clase
