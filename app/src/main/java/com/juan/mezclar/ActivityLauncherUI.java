@@ -9,16 +9,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-//19 OCT 17: ESTA ACTIVIDAD ESTA PREPARADA PARA: NO MOSTRAR LA UI,
-//lANZAR UN INTENT SERVICE EN SEGUNDO PLANO CUANDO EL INTENT VIENE DEL LANZADOR,
-//lANZAR LA UI ActivityLauncher cuando se hace click en el icono.
+//19 OCT 17: ESTA ACTIVIDAD se muestra cuando se hace click en el icono y es llamada desde
+//la actividad ActivityLauncher con un intent.
+//Esta actividad tiene una UI para introducir secuencias numericas y secuencias alfanumericas.
 
-public class ActivityLauncher extends AppCompatActivity {
+public class ActivityLauncherUI extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
     String xxx = this.getClass().getSimpleName();
     EditText secuenciaDeImagenes;
@@ -28,21 +26,6 @@ public class ActivityLauncher extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //**********************************************************************
-        //De esta manera lanzo el servicio IntentServiceMagic, como tengo transparent en stile, la UI no se ve
-        //Toast.makeText(getApplicationContext(), "hola soy un toast", Toast.LENGTH_SHORT).show();
-        recuperarIntentConDatosInicialesServicio();
-        //Toast.makeText(getApplicationContext(), "hola ya me voy", Toast.LENGTH_SHORT).show();
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-        //
-        finish();
-
-
-        //***********************************************************************
-
 
 
 
@@ -239,51 +222,4 @@ public class ActivityLauncher extends AppCompatActivity {
         }
     }//Fin de recuperarIntentConDatosIniciales
 
-
-    private void recuperarIntentConDatosInicialesServicio() {
-        //Recibir datos de la app Launh Mezclar
-        //String myString;
-        Bundle data = getIntent().getExtras();
-        if (data != null) {
-            String myString = data.getString("KeyName");
-            //Hay que chequear myString para que no lanze el toast with null cuando lanzo la app desde el movil
-            if (myString != null && !myString.isEmpty()) {
-                //Copiamos la secuencia de imagenes recibidas
-                stringImagesSecuence = null;
-                stringImagesSecuence = myString;
-                //Toast.makeText(this, myString, Toast.LENGTH_SHORT).show();
-
-
-                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: " + stringImagesSecuence);
-                Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, La aplicacion ha sido lanzada desde el lanzador o launch ");
-                //Muestro el string character a character
-                for (int i = 0; i < stringImagesSecuence.length(); i++) {
-                    Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Caracter " + i + ":" + stringImagesSecuence.charAt(i));
-                }
-
-
-
-                Intent mServiceIntent = new Intent(this, IntentServiceMagic.class);
-                mServiceIntent.putExtra("KeyName", stringImagesSecuence);
-                startService(mServiceIntent);
-
-            } else {//Salta aqui si no hay datos en el intent
-                Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Datos de Launch Mezclar: No hay datos");
-                Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Click en el icono, lanzar ");
-                Intent intent = new Intent(this, ActivityLauncherUI.class);
-
-                //launchMezclarApplication.putExtra("KeyName","Hola, te estoy llamando");
-
-                startActivity(intent);
-                this.finish();
-            }
-
-        } else {//Salta aqui si recibe nulo en el intent
-            Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Datos de Launch Mezclar: NULL 2 del else");
-            //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
-            //this.finish();
-            //finish();
-
-        }
-    }//Fin de recuperarIntentConDatosInicialesServicio
 }//Fin de la clase

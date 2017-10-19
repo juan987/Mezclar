@@ -1675,6 +1675,7 @@ public class IntentServiceMagic extends IntentService {
 
 
     //Metodo para mostrar mensajes de error E1 y E2 por pantalla
+    //Desde el service no puedo tocar componenetes de la UI
     private void metodoMostrarError(String tipoDeError, String mensaje){
         Log.d(xxx, "estoy en metodoMostrarError, mensaje: " +mensaje);
         //textViewErrores.setText(tipoDeError +": " +mensaje);

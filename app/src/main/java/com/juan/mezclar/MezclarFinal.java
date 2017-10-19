@@ -8,6 +8,8 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
@@ -486,8 +488,8 @@ public class MezclarFinal extends AppCompatActivity {
 
             if(!ejecutarConParametroSor()){
                 //Ha habido un problema con la ordenacion, salir del programa
-                enviarNotificationConNumero("E1");
-                metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
+                //enviarNotificationConNumero("E1");
+                //metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
                 Log.d(xxx, "En metodoPrincipal_2, Error en metodo ejecutarConParametroSor, salimos de la app");
                 //Me faltaba esta linea
                 return false;
@@ -1554,12 +1556,14 @@ public class MezclarFinal extends AppCompatActivity {
             //Realiza login en el servidor
 
             try {
+                //Prueba de fallo de user
+                //user="";
                 if(ftp.login(user, password)){
                     //Login correcto, enviamos el fichero con el try catch de abajo
                 }else{
                     enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
-                    metodoMostrarError("E2", "Error with fto connect or login");
+                    metodoMostrarError("E2", "Error with ftp connect or login");
                     Log.d(xxx, "En metodoSubirImagenConFtp, Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     return false;
                 }
@@ -1661,6 +1665,11 @@ public class MezclarFinal extends AppCompatActivity {
                 //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
                 //finish();
+
+                //Lanzo el error al texview desde aqui, No me funciona desde el doInBackground
+                //por que desde el otro thread o proceso de doInBackground no se pueden tocar
+                //componentes de la UI
+                metodoMostrarErrorDesdeOnPostExecute();
             }
             //Tanto si hay fallo como si se ejecuta correctamente, se cierra la app
             //finish();
@@ -1705,15 +1714,22 @@ public class MezclarFinal extends AppCompatActivity {
 
                 //Mostramos la imagen compuesta en pantalla, no se puede manipular un componente grafico desde el thread
                 collageImage.setImageBitmap(mergedImages);
+                collageImage.setVisibility(View.VISIBLE);
 
                 //Lanzamos el asynctask de enviar imagen al servidor con ftp
                 new FtpAsyncTask().execute("string1", "string2", "string3");
 
-            }else{
+            }else{//Ha habido un fallo
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen jpg NO generada, saliendo de la app");
                 //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
                 //finish();
+
+                //Lanzo el error al texview desde aqui, No me funciona desde el doInBackground
+                //por que desde el otro thread o proceso de doInBackground no se pueden tocar
+                //componentes de la UI
+                metodoMostrarErrorDesdeOnPostExecute();
+
             }
         }
 
@@ -1817,11 +1833,41 @@ public class MezclarFinal extends AppCompatActivity {
 
 
     //Metodo para mostrar mensajes de error E1 y E2 por pantalla
+    String stringTipoDeError = "";
+    String stringMensajeDeError = "";
     private void metodoMostrarError(String tipoDeError, String mensaje){
         Log.d(xxx, "estoy en metodoMostrarError, mensaje: " +mensaje);
-        textViewErrores.setText(tipoDeError +": " +mensaje);
 
-    }
+        //************************************************************************************
+        //Esta parte no funciona
+
+        //textViewErrores.setText(tipoDeError +": " +mensaje);
+
+        //Para mostrar el textview hay que hacerlo a traves de un handler, por que no estamos en el proceso de la UI
+        //Estamos en doInBackground del asynctask, y no podemos tocar cosas de la UI, como las vistas
+       /* Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                textViewErrores.setText(tipoDeError +": " +mensaje);
+
+
+            }
+        });  */
+        //****************************************************************************************
+
+        //Truco; asigno dos variables globales y las uso en el onPostExecute
+        stringTipoDeError = tipoDeError;
+        stringMensajeDeError = mensaje;
+    }//Fin de metodoMostrarError
+
+    private void metodoMostrarErrorDesdeOnPostExecute(){
+        Log.d(xxx, "estoy en metodoMostrarErrorDesdeOnPostExecute, tipo de error: " +stringTipoDeError);
+        Log.d(xxx, "estoy en metodoMostrarErrorDesdeOnPostExecute, mensaje: " +stringMensajeDeError);
+        textViewErrores.setText(stringTipoDeError +": " +stringMensajeDeError, null);
+
+    }//Fin de metodoMostrarErrorDesdeOnPostExecute
 
 
 
