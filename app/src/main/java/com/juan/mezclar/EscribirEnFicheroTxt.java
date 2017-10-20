@@ -59,7 +59,7 @@ public class EscribirEnFicheroTxt {
                 directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt);
                 directorio = directorioMain.getAbsolutePath();
 
-                FileWriter fw = new FileWriter(directorio, false);
+                FileWriter fw = new FileWriter(directorio, true);
                 fw.write(charData);
                 fw.close();
 

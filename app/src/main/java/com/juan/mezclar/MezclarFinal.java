@@ -118,6 +118,41 @@ public class MezclarFinal extends AppCompatActivity {
     //Almacena el param de config overwrite. Nuevo req el 20oct17.
     String stringOverwrite = "";
 
+/*
+
+    20oct17: nuevo requerimiento
+    Fichero de registro de llamadas
+
+    La App, debe registrar en el fichero log.txt que estará en el directorio ImageC, todo el registro de actividad:
+
+    Fecha / hora / cadena numérica empleada / cadena alfanumérica empleada / “OK” o “detalle del error encontrado”
+
+    Por ejemplo, con solo dato numéricos:
+
+            17/10/2017 / 10:24 / 012345678 / /  OK
+
+    Por ejemplo, con solo dato alfanuméricos:
+
+            17/10/2017 / 10:24 / / test /  OK
+
+    Por ejemplo, con datos de ambos tipo, pero dando error:
+
+            17/10/2017 / 10:27 / 123456 / test /  Upload Server “ftp.cesaral.com” not found
+
+    Todas las condiciones de error que puedas localizar, que vayan al fichero de registro
+    */
+//Variables para el requerimiento del log
+    String subDirLogFile = "/CesaralMagic/ImageC/";
+    String fechaLog = "";
+    String horaLog = "";
+    String cadenaNumericaEmpleada = "";
+    String cadenaAlphaumericaEmpleada = "";
+    String mensaje = "";
+    String separador = " / ";
+    String indiceCoordNmenor = "";
+    String indiceCoordTmenor = "";
+
+
 
     //No se usa la progress bar
     //ProgressBar progressBar;
@@ -250,9 +285,11 @@ public class MezclarFinal extends AppCompatActivity {
             if(arrayImagesSequence.length !=0){
                 booleanSecuenciaNumerica = true;
                 sizearrayImagesSequence = arrayImagesSequence.length;
+                cadenaNumericaEmpleada = stringNumeric;
             }
             if(arrayImagesSequenceAlphanumeric.length !=0){
                 booleanSecuenciaRecibidaAlfanumerica = true;
+                cadenaAlphaumericaEmpleada = stringAlphanumeric;
             }
             Log.d(xxx, "En metodo recuperarAmbasSecuencias, booleanSecuenciaNumerica: " +booleanSecuenciaNumerica);
             Log.d(xxx, "En metodo recuperarAmbasSecuencias, booleanSecuenciaRecibidaAlfanumerica: " +booleanSecuenciaRecibidaAlfanumerica);
@@ -732,6 +769,9 @@ public class MezclarFinal extends AppCompatActivity {
                     //No se lanza error, se hace el loop hasta esta condicion, si existe,
                     //y solo se superponen las imagenes hasta que no se cumpla esta condicion,
                     //cuando indice del array de numeros sea mayor que el de coordenadas N
+                    //Nuevo req 28oct17: fichero de log
+                    //informar cuando esto ocurre al log
+                    escribirDatosEnLog("index of numeric string > index of N coordenates");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No hay fallo, fin del loop tipo N debido a");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, ........./index of nemeric string > index of N coordenates....,");
                     break;//finaliza el loop
@@ -948,8 +988,11 @@ public class MezclarFinal extends AppCompatActivity {
                         //No se lanza error, se hace el loop hasta esta condicion, si existe,
                         //y solo se superponen las imagenes hasta que no se cumpla esta condicion,
                         //cuando indice del array de numeros sea mayor que el de coordenadas T
+                        //Nuevo req 28oct17: fichero de log
+                        //informar cuando esto ocurre al log
+                        escribirDatosEnLog("index of alphanumeric string > index of T coordenates");
                         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, No hay fallo, fin del loop tipo T debido a");
-                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, ........./index of nemeric string > index of T coordenates....,");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, ........./index of alphanumeric string > index of T coordenates....,");
                         break;//termina el loop
 
 
@@ -1753,7 +1796,9 @@ public class MezclarFinal extends AppCompatActivity {
             try {
                 //if(ftp.enviarFile(nombreArhivo)){
                 //if(ftp.enviarFile("predict.jpg")){
-                if(ftp.enviarFileFinalFinal(filePathDePredictJpg, nombreFicheroJpg)){
+                //if(ftp.enviarFileFinalFinal(filePathDePredictJpg, nombreFicheroJpg)){
+                //Envio el fichero al server con el nombre predict.jpg siempre
+                if(ftp.enviarFileFinalFinal(filePathDePredictJpg, "predict.jpg")){
                     enviarNotificationFtp("Fichero predict.jpg enviado al servidor");
 
                     //Lanzar notificacion de que el proceso ha terminado de forma correcta
@@ -1821,6 +1866,10 @@ public class MezclarFinal extends AppCompatActivity {
                 //fabOnPostExecute = (FloatingActionButton) findViewById(R.id.fab);
                 //fabOnPostExecute.setVisibility(View.INVISIBLE);
 
+                //Nuevo req 28oct17: fichero de log
+                escribirDatosEnLog("OK");
+
+
                 //Exito
                 finish();
 
@@ -1834,6 +1883,8 @@ public class MezclarFinal extends AppCompatActivity {
                 //por que desde el otro thread o proceso de doInBackground no se pueden tocar
                 //componentes de la UI
                 metodoMostrarErrorDesdeOnPostExecute();
+                //Nuevo req 28oct17: fichero de log
+                escribirDatosEnLog(stringTipoDeError +separador +stringMensajeDeError);
             }
             //Tanto si hay fallo como si se ejecuta correctamente, se cierra la app
             //finish();
@@ -1845,6 +1896,51 @@ public class MezclarFinal extends AppCompatActivity {
         protected void onCancelled() {
         }
     }//FIN de la clase FtpAsyncTask
+
+    //Variables para el requerimiento del log
+    /*
+    String subDirLogFile = "/CesaralMagic/ImageC/";
+    String fechaLog = "";
+    String horaLog = "";
+    String cadenaNumericaEmpleada = "";
+    String cadenaAlphaumericaEmpleada = "";
+    String mensaje = "";  */
+
+
+    //Nuevo req 28oct17: fichero de log
+    private void escribirDatosEnLog(String mensajeError){
+        Date date = new Date();
+        //Fecha / hora / cadena numérica empleada / cadena alfanumérica empleada / “OK” o “detalle del error encontrado”
+
+        /*Por ejemplo, con solo dato numéricos:
+        17/10/2017 / 10:24 / 012345678 / /  OK
+        Por ejemplo, con solo dato alfanuméricos:
+        17/10/2017 / 10:24 / / test /  OK
+        Por ejemplo, con datos de ambos tipo, pero dando error:
+        17/10/2017 / 10:27 / 123456 / test /  Upload Server “ftp.cesaral.com” not found */
+
+
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
+        fechaLog = sdf2.format(date);
+        SimpleDateFormat sdf3 = new SimpleDateFormat("HH:mm");
+        horaLog = sdf3.format(date);
+        String mensajeLog = "//" +fechaLog +separador +horaLog +separador
+                +cadenaNumericaEmpleada +separador +cadenaAlphaumericaEmpleada +separador +mensajeError +"\r\n";
+        Log.d(xxx, "escribirDatosEnLog el mensaje del log es: " +mensajeLog);
+
+
+        EscribirEnFicheroTxt escribirEnFicheroTxt = new EscribirEnFicheroTxt(MezclarFinal.this);
+        if(escribirEnFicheroTxt.appendDateEnFichero(pathCesaralMagicImageC + "log.txt", mensajeLog)){
+
+            Log.d(xxx, "escribirDatosEnLog fichero escrito correctamente");
+
+        }else{
+            Log.d(xxx, "escribirDatosEnLog fichero NO escrito correctamente");
+
+
+        }
+    }
+
 
 
     //Asynctask para componer la imagen
@@ -1893,6 +1989,8 @@ public class MezclarFinal extends AppCompatActivity {
                 //por que desde el otro thread o proceso de doInBackground no se pueden tocar
                 //componentes de la UI
                 metodoMostrarErrorDesdeOnPostExecute();
+                escribirDatosEnLog(stringTipoDeError +separador +stringMensajeDeError);
+
 
             }
         }
@@ -2030,6 +2128,7 @@ public class MezclarFinal extends AppCompatActivity {
         Log.d(xxx, "estoy en metodoMostrarErrorDesdeOnPostExecute, tipo de error: " +stringTipoDeError);
         Log.d(xxx, "estoy en metodoMostrarErrorDesdeOnPostExecute, mensaje: " +stringMensajeDeError);
         textViewErrores.setText(stringTipoDeError +": " +stringMensajeDeError, null);
+
 
     }//Fin de metodoMostrarErrorDesdeOnPostExecute
 
