@@ -115,6 +115,9 @@ public class MezclarFinal extends AppCompatActivity {
     //Almacena el SOR a partir de version 1.0.2
     String stringSOR = "";
 
+    //Almacena el param de config overwrite. Nuevo req el 20oct17.
+    String stringOverwrite = "";
+
 
     //No se usa la progress bar
     //ProgressBar progressBar;
@@ -636,6 +639,25 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
         GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(MezclarFinal.this, mergedImages);
+
+
+        //Nuevo req el 20oct17: parametro overwrite en fichero CONFIG
+        if(stringOverwrite.equals("overwrite")){
+            //la imagen generada se llama: predict.jpg, comportamiento por defecto
+
+        }else{//Componemos el nombre de la foto incluyendo dia y hora
+            Date date = new Date();
+            //El formato de la fecha para el fichero sera como aparece aqui:
+            //predict_ddhhmmss.jpg
+
+            SimpleDateFormat sdf2 = new SimpleDateFormat("ddHHmmss");
+            String fechaDeLaFoto = sdf2.format(date);
+            Log.d(xxx, "metodoPrincipal_2 La fecha del fichero predict es: " +fechaDeLaFoto);
+            nombreFicheroJpg = "predict_" +fechaDeLaFoto +".jpg";
+            Log.d(xxx, "metodoPrincipal_2 hay parametro overwrite, nombre del fichero predict es: " +nombreFicheroJpg);
+        }
+
+
         //Guardar imagen el directorio pictures/predict
         //No hace falta, guardo directamente en DCIM/predict
         /*
@@ -646,7 +668,7 @@ public class MezclarFinal extends AppCompatActivity {
         } */
 
         //Guardar imagen en el directorio DCIM/predict
-        if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg")){
+        if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", nombreFicheroJpg)){
             //Ha habido un error al guardar la imagen, devolver false
             enviarNotification("Error guardando imagen predict" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
@@ -660,6 +682,8 @@ public class MezclarFinal extends AppCompatActivity {
         enviarNotificationConNumero("2");
         return true;
     }//Fin de metodoPrincipal_2
+    //Nombre de la imagen compuesta a guardar y a enviar con ftp
+    String nombreFicheroJpg = "predict.jpg";
 
 
     private boolean loopPrincipalImagenesTipoN(){
@@ -1460,16 +1484,21 @@ public class MezclarFinal extends AppCompatActivity {
                 stringURLFinal = arrayLineasTextoLocal.get(i).split(regexUrl);
             }
             if(arrayLineasTextoLocal.get(i).startsWith("user")){
-                Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTextoLocal.get(i));
+                Log.d(xxx, "xxx, Hay una linea que empieza con user y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringUser = arrayLineasTextoLocal.get(i).split(regexUser);
             }
             if(arrayLineasTextoLocal.get(i).startsWith("password")){
-                Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTextoLocal.get(i));
+                Log.d(xxx, "xxx, Hay una linea que empieza con password y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringPass = arrayLineasTextoLocal.get(i).split(regexPass);
             }
             if(arrayLineasTextoLocal.get(i).startsWith("SOR")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con SOR y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringSOR = arrayLineasTextoLocal.get(i).split(regexSOR);
+            }
+            if(arrayLineasTextoLocal.get(i).startsWith("overwrite")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con overwrite y tiene: " +arrayLineasTextoLocal.get(i));
+                //Asignamos la linea directamente, no hay que hacer regex como en las otras
+                stringOverwrite = arrayLineasTextoLocal.get(i);
             }
         }
 
@@ -1535,11 +1564,11 @@ public class MezclarFinal extends AppCompatActivity {
         }
 
 
-
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
-                +"\n"  +"xxx Variable SOR: " +stringSOR);
+                +"\n"  +"xxx Variable SOR: " +stringSOR
+                +"\n"  +"xxx Variable overwrite: " +stringOverwrite);
 
 
 
@@ -1669,7 +1698,7 @@ public class MezclarFinal extends AppCompatActivity {
 
         }
 
-        File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
+        File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", nombreFicheroJpg);
 
         if(filePathDePredictJpg == null){
             enviarNotificationFtp("Error al obtener el file de predict.jpg para upload ftp" +", saliendo de la aplicacion");
@@ -1724,7 +1753,7 @@ public class MezclarFinal extends AppCompatActivity {
             try {
                 //if(ftp.enviarFile(nombreArhivo)){
                 //if(ftp.enviarFile("predict.jpg")){
-                if(ftp.enviarFileFinalFinal(filePathDePredictJpg, "predict.jpg")){
+                if(ftp.enviarFileFinalFinal(filePathDePredictJpg, nombreFicheroJpg)){
                     enviarNotificationFtp("Fichero predict.jpg enviado al servidor");
 
                     //Lanzar notificacion de que el proceso ha terminado de forma correcta

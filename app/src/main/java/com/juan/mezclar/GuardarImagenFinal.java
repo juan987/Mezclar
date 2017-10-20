@@ -50,7 +50,9 @@ public class GuardarImagenFinal {
         if(isExternalStorageWritable()) {
             File picturesDir = Environment.getExternalStoragePublicDirectory(environmentDir);
             String directorio = picturesDir.getAbsolutePath() ;
-            Log.d(xxx, "El directorio es: " + directorio);
+            Log.d(xxx, "guardarImagenMethod, El directorio es: " + directorio);
+            Log.d(xxx, "guardarImagenMethod, El sub directorio es: " + subDir);
+            Log.d(xxx, "guardarImagenMethod, El nombre del archivo es: " + imageName);
             //Toast.makeText(context,
                     //directorio, Toast.LENGTH_SHORT).show();
             if(saveImageToExternalPublicStorage(directorio, subDir, imageName)){
