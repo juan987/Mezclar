@@ -70,9 +70,11 @@ public class MezclarFinal extends AppCompatActivity {
 
     //Array para almacenar la secuencia de imagenes a superponer
     char[] arrayImagesSequence;
+    char[] arrayImagesSequenceAlphanumeric;
     int sizearrayImagesSequence;
-    //String de secuencia de imagenes inicializada con la imagen 0.
-    String stringImagesSecuence; //Para prueba con el array vacio
+    //String de secuencia numerica de imagenes inicializada con la imagen 0.
+    String stringImagesSecuence;
+    //Para prueba con el array vacio
     //String stringImagesSecuence = "0";
     //Path a agregar al dir raiz del telefono
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
@@ -80,8 +82,10 @@ public class MezclarFinal extends AppCompatActivity {
     String imagenPrincipal = "origin.jpg";
     //Bitmap que contiene el resultado de la imagen generada
     Bitmap originJpg;
-    //array list que contiene datos de coordenada x e y obtenidos del fichero CONFIG.txt
+    //array list que contiene datos de coordenada x e y de tipo N obtenidos del fichero CONFIG.txt
     List<PojoCoordenadas> listaCoordenadas;
+    //ArrayList para guardar las coordenadas alfanumericas tipo T del fichero CONFIG.txt, es un variable de la clase
+    ArrayList<PojoCoordenadas> arrayPojoCoordenadasAlfanumerico = new ArrayList<>();
     //Boolean para discriminar si la secuencia de imagenes recibida es numerica
     boolean booleanSecuenciaNumerica = true;
     //Boolean para discriminar si la secuencia de imagenes recibida es alfanumerica
@@ -136,7 +140,9 @@ public class MezclarFinal extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         //Obtener datos iniciales. Si no hay datos, cerrar la app
-        recuperarIntentConDatosIniciales();
+        //recuperarIntentConDatosIniciales();
+
+        recuperarAmbasSecuencias();
 
 
         //Si no pongo esto, entonces se cuelga la app cuando subo el fichero al servidor ftp. Tendria que usar un asynctask!!!!!
@@ -204,13 +210,62 @@ public class MezclarFinal extends AppCompatActivity {
 
     }//Fin del onCreate
 
+    //Nuevo requerimiento el 20 oct 2017:
+    //Recuperar a la vez el string de secuencia de numeros y
+    //el string de secuencia alphanumerica, y seguir el procesamiento,
+    //independientemente de que la longitud de los strings de secuencia sea cero o mayor que cero.
+    //Al final, la imagen compuesta seria la superposicion con coordenadas N y T caso de existir
+    //las dos secuencias: numerica y alfanumerica.
+    //Este req no aplica al intent service, que solo coje secuencias numericas
+    //ESte metodo recoje ambas secuencias que vienen de la activity ActivityLauncherUI
+    private void recuperarAmbasSecuencias(){
+        Bundle data = getIntent().getExtras();
+        if(data!=null) {
+            String stringNumeric = data.getString("KeyName");
+            String stringAlphanumeric = data.getString("KeyAlfanumerico");
+            arrayImagesSequence = null;
+            arrayImagesSequence = stringNumeric.toCharArray();
+            arrayImagesSequenceAlphanumeric = null;
+            arrayImagesSequenceAlphanumeric = stringAlphanumeric.toCharArray();
+            //Muestro lo que he recibido
+            Log.d(xxx, "En metodo recuperarAmbasSecuencias, secuencia numerica recibida: ");
+            for (char temp : arrayImagesSequence) {
+                Log.d(xxx, "En metodo recuperarAmbasSecuencias, numero " +temp);
+            }
+            Log.d(xxx, "En metodo recuperarAmbasSecuencias, secuencia alphanumerica recibida: ");
+            for (char temp : arrayImagesSequenceAlphanumeric) {
+                Log.d(xxx, "En metodo recuperarAmbasSecuencias, numero " +temp);
+            }
+            Log.d(xxx, "En metodo recuperarAmbasSecuencias, longitud de la secuencia numerica recibida: "
+                                +arrayImagesSequence.length);
+            Log.d(xxx, "En metodo recuperarAmbasSecuencias, longitud de la secuencia alphanumerica recibida: "
+                                +arrayImagesSequenceAlphanumeric.length);
+            //Inicializar a cero
+            booleanSecuenciaNumerica = false;
+            booleanSecuenciaRecibidaAlfanumerica = false;
+
+            if(arrayImagesSequence.length !=0){
+                booleanSecuenciaNumerica = true;
+                sizearrayImagesSequence = arrayImagesSequence.length;
+            }
+            if(arrayImagesSequenceAlphanumeric.length !=0){
+                booleanSecuenciaRecibidaAlfanumerica = true;
+            }
+            Log.d(xxx, "En metodo recuperarAmbasSecuencias, booleanSecuenciaNumerica: " +booleanSecuenciaNumerica);
+            Log.d(xxx, "En metodo recuperarAmbasSecuencias, booleanSecuenciaRecibidaAlfanumerica: " +booleanSecuenciaRecibidaAlfanumerica);
+
+
+        }else{
+            //No hay datos, finish
+            finish();
+        }
+    }
+
     //Metodo que recupera los datos recibidos en un intent lanzado por otra aplicacion,
     //por ejemplo, Launch Mezclar.
     //Si el intent es nulo, o no hay datos, la app se cierra automaticamente
-    public String textoSnackBarInicial;
+    //public String textoSnackBarInicial;
     private void recuperarIntentConDatosIniciales(){
-        //Recibir datos de la app Launh Mezclar
-        //String myString;
         Bundle data = getIntent().getExtras();
         if(data!=null){
             String myString = data.getString("KeyName");
@@ -395,7 +450,6 @@ public class MezclarFinal extends AppCompatActivity {
 
 
         //Leer coordenadas N y T, URL, user, password y SOR del array de lineas obtenido del fichero CONFIG.txt
-        //List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
         listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
 
         //Recorro he imprimo los datos de listaCoordenadas
@@ -478,7 +532,10 @@ public class MezclarFinal extends AppCompatActivity {
 
         //
 
-
+        //***************************************************************************************
+        //Codigo viejo, antes del 12 de octubre: o se ejecutaba solo la secuencia numerica
+        //o la alphanumerica, pero no las dos
+        /*
         if(stringSOR.equals("") || booleanSecuenciaRecibidaAlfanumerica){
             //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
             Log.d(xxx, "En metodoPrincipal_2, NO hay parametro SOR o se ha recibido una secuencia alfanumerica, seguimos");
@@ -515,7 +572,66 @@ public class MezclarFinal extends AppCompatActivity {
                 return false;
             }
         }
+        */
+        //***************************************************************************************
 
+
+
+
+        //Nuevo requerimiento el 20 oct 2017:
+        //Recuperar a la vez el string de secuencia de numeros y
+        //el string de secuencia alphanumerica, y seguir el procesamiento,
+        //independientemente de que la longitud de los strings de secuencia sea cero o mayor que cero.
+        //Al final, la imagen compuesta seria la superposicion con coordenadas N y T caso de existir
+        //las dos secuencias: numerica y alfanumerica.
+
+        //Chequeamos si hay que hacer ordenacion con el parametro SOR
+        if(stringSOR.equals("")){
+            //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
+            Log.d(xxx, "En metodoPrincipal_2, NO hay parametro SOR o se ha recibido una secuencia alfanumerica, seguimos");
+
+        }else{
+            Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR, se ejecuta metodo ejecutarConParametroSor");
+            if(booleanSecuenciaNumerica) {
+                Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR y booleanSecuenciaNumerica=true, " +
+                        "se ejecuta metodo ejecutarConParametroSor");
+                if (!ejecutarConParametroSor()) {
+                    //Ha habido un problema con la ordenacion, salir del programa
+                    //enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
+                    Log.d(xxx, "En metodoPrincipal_2, Error en metodo ejecutarConParametroSor, salimos de la app");
+                    //Me faltaba esta linea
+                    return false;
+                }
+            }
+
+        }
+
+        //Ejecutamos los loops
+        if(booleanSecuenciaNumerica){
+            //secuencia numerica recibida, se ejecuta loopPrincipalImagenesTipoN
+            if(loopPrincipalImagenesTipoN()){
+                //Ejecucion correcta, seguimos
+            }else{
+                //Hay un fallo en el loop principal de numerico, cerramos la activity
+                return false;
+            }
+        }
+        if(booleanSecuenciaRecibidaAlfanumerica){
+            //cambiamos la variable para ejecutar con arrayImagesSequence el loopPrincipalImagenesTipoT
+            arrayImagesSequence = arrayImagesSequenceAlphanumeric;
+            //secuencia alfanumerica recibida, se ejecuta loopPrincipalImagenesTipoT
+            if(loopPrincipalImagenesTipoT()){
+                //Ejecucion correcta, seguimos
+            }else{
+                //Hay un fallo en el loop principal de alfanumerico, cerramos la activity
+                return false;
+            }
+        }
+
+
+        //FIN Nuevo requerimiento el 20 oct 2017:
+        //**************************************************************************************
 
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
@@ -574,10 +690,6 @@ public class MezclarFinal extends AppCompatActivity {
                 //Acabamos la ejecucion
                 return false;
             }else{
-                //Continuamos con el procesamiento
-                //Se muestra la imagen pequeña en la UI, solo para pruebas
-                //ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
-                //imageView2.setImageBitmap(imagenParaSuperponerConOrigin);
 
                 //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
                 imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
@@ -585,15 +697,28 @@ public class MezclarFinal extends AppCompatActivity {
                 //leerCoordenadasDeSuperposicion(i);
 
 
+
                 //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
-                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
-                //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
+                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas N, por si acaso
+                //el fichero CONFIG.txt no tiene las 16 coordenadas N sino un numero menor.
                 if(i >= listaCoordenadas.size()){
-                    enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error with index in array of coordenates N");
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en indice de coordenadas, salimos de la app");
-                    return false;//Cerrar aplicacion y evitar un null pointer
+                    //Modificacion el 20 oct 2017:
+                    //Nuevo requerimiento: ahora se admite que el indice del array de numeros sea mayor
+                    //que el de coordenadas N.
+                    //No se lanza error, se hace el loop hasta esta condicion, si existe,
+                    //y solo se superponen las imagenes hasta que no se cumpla esta condicion,
+                    //cuando indice del array de numeros sea mayor que el de coordenadas N
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No hay fallo, fin del loop tipo N debido a");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, ........./index of nemeric string > index of N coordenates....,");
+                    break;//finaliza el loop
+
+
+                    //Dejo el codigo original comentado
+                    //enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
+                    //enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error with index in array of coordenates N");
+                    //Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en indice de coordenadas, salimos de la app");
+                    //return false;//Cerrar aplicacion y evitar un null pointer
                 }
 
 
@@ -790,14 +915,26 @@ public class MezclarFinal extends AppCompatActivity {
                 imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
 
                 //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
-                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
-                //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
+                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas T, por si acaso
+                //el fichero CONFIG.txt no tiene las 16 coordenadas T sino un numero menor.
                 if(i >= arrayPojoCoordenadasAlfanumerico.size()){
-                    enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error in index of T coordenates");
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
-                    return false;//Cerrar aplicacion y evitar un null pointer
+                        //Modificacion el 20 oct 2017:
+                        //Nuevo requerimiento: ahora se admite que el indice del array de alphanumeric sea mayor
+                        //que el de coordenadas T.
+                        //No se lanza error, se hace el loop hasta esta condicion, si existe,
+                        //y solo se superponen las imagenes hasta que no se cumpla esta condicion,
+                        //cuando indice del array de numeros sea mayor que el de coordenadas T
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, No hay fallo, fin del loop tipo T debido a");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, ........./index of nemeric string > index of T coordenates....,");
+                        break;//termina el loop
+
+
+                        //Dejo el codigo original comentado
+                    //enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
+                    //enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error in index of T coordenates");
+                    //Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
+                    //return false;//Cerrar aplicacion y evitar un null pointer
                 }
 
 
@@ -1218,10 +1355,6 @@ public class MezclarFinal extends AppCompatActivity {
         }
     }
 
-    //ArrayList para guardar las coordenadas alfanumericas, es un variable de la clase
-    ArrayList<PojoCoordenadas> arrayPojoCoordenadasAlfanumerico = new ArrayList<>();
-
-
 
     //Metodo para:
     //Generar array de PojoCoordenadas con las coordenadas x e Y de posicionamiento de imagenes
@@ -1400,6 +1533,8 @@ public class MezclarFinal extends AppCompatActivity {
                 i++;
             }
         }
+
+
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user

@@ -38,6 +38,7 @@ import java.util.List;
  */
 public class IntentServiceMagic extends IntentService {
     String xxx = this.getClass().getSimpleName();
+    //ESTE SERVICIO SOLO MANEJA COORDENADAS N
     //Variables de UI, las comento. El servicio no tiene UI
     //private ImageView collageImage;
     //private ImageView finalImage;
@@ -442,14 +443,26 @@ public class IntentServiceMagic extends IntentService {
 
 
                 //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
-                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas, por si acaso
-                //el fichero CONFIG.txt no tiene las 16 coordenadas sino un numero menor.
+                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas N, por si acaso
+                //el fichero CONFIG.txt no tiene las 16 coordenadas N sino un numero menor.
                 if(i >= listaCoordenadas.size()){
-                    enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error with index in array of coordenates N");
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en indice de coordenadas, salimos de la app");
-                    return false;//Cerrar aplicacion y evitar un null pointer
+                    //Modificacion el 20 oct 2017:
+                    //Nuevo requerimiento: ahora se admite que el indice del array de numeros sea mayor
+                    //que el de coordenadas N.
+                    //No se lanza error, se hace el loop hasta esta condicion, si existe,
+                    //y solo se superponen las imagenes hasta que no se cumpla esta condicion,
+                    //cuando indice del array de numeros sea mayor que el de coordenadas N
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No hay fallo, fin del loop tipo N debido a");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, ........./index of nemeric string > index of N coordenates....,");
+                    break;//finaliza el loop
+
+
+                    //Dejo el codigo original comentado
+                    //enviarNotification("Error en indice de coordenadas, saliendo de la aplicacion");
+                    //enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error with index in array of coordenates N");
+                    //Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error en indice de coordenadas, salimos de la app");
+                    //return false;//Cerrar aplicacion y evitar un null pointer
                 }
 
 

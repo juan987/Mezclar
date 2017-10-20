@@ -49,6 +49,29 @@ public class ActivityLauncherUI extends AppCompatActivity {
             }
         });  */
 
+
+        //Nuevo req el 20 oct 2017: se envia directamente los dos editText a MezclarFinal,
+        //tengan o no tengan datos, de eso se ocupa la act MezclarFinal
+        final Button button = (Button)findViewById(R.id.button_id);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if((secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
+                    Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Enter data in one of the boxes or both", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }else {
+                    //Uno o ambos campos tienen datos, enviamos el intent a MezclarFinal
+                    Intent intent = new Intent(ActivityLauncherUI.this, MezclarFinal.class);
+                    intent.putExtra("KeyName", secuenciaDeImagenes.getText().toString());
+                    intent.putExtra("KeyAlfanumerico", secuenciaDeImagenesAlfanumerica.getText().toString());
+                    startActivity(intent);
+                }
+
+            }
+        });
+
+        //Codigo original para el boton,
+        //a partir del 20 oct ya no lo uso
+        /*
         final Button button = (Button)findViewById(R.id.button_id);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -69,10 +92,9 @@ public class ActivityLauncherUI extends AppCompatActivity {
                 }
             }
         });
+        */
 
-        //Lo comento para la chapuza del service que quiere cesar
-        //recuperarIntentConDatosIniciales();
-    }
+    }//Fin del onCreate
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -96,9 +118,21 @@ public class ActivityLauncherUI extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //Nuevo req el 20 oct 2017: se envia directamente los dos editText a MezclarFinal,
+    //tengan o no tengan datos, de eso se ocupa la act MezclarFinal
 
-          //  if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() != 0)
-           //         || (secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
+
+    //*************************************************************************************************************
+    //*************************************************************************************************************
+    //*************************************************************************************************************
+    //*************************************************************************************************************
+    //*************************************************************************************************************
+    //*************************************************************************************************************
+
+    //DE aqui para abajo es el codigo original
+
+
+
     public boolean editTextNumOrAlfa(){
         //Chequea si ambos textEdit son vacios o tiene algo simultaneamente
         if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() != 0)) {
@@ -176,6 +210,9 @@ public class ActivityLauncherUI extends AppCompatActivity {
     //por ejemplo, Launch Mezclar.
     //Si el intent es nulo, o no hay datos, la app se cierra automaticamente
     String stringImagesSecuence; //Para prueba con el array vacio
+
+    //En esta version de la activity, NO hay que recojer datos del intent.
+    /*
     private void recuperarIntentConDatosIniciales() {
         //Recibir datos de la app Launh Mezclar
         //String myString;
@@ -221,5 +258,6 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
         }
     }//Fin de recuperarIntentConDatosIniciales
+    */
 
 }//Fin de la clase
