@@ -14,7 +14,7 @@ import java.io.OutputStream;
 /**
  * Created by Juan on 04/10/2017.
  *
- * Clase deprecada el 6 oct 17.  Usar la clase GuardarImagenFinal
+ * Clase deprecada el 6 oct 17.  Usar la clase GuardarImagenFinal. Esta clase esta deprecated
  */
 
 /*

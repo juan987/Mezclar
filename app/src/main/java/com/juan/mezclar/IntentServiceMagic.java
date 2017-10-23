@@ -210,17 +210,32 @@ public class IntentServiceMagic extends IntentService {
             return false;
         }
 
+        //**************************************************************************************************
+        //REQ: Gestion de configuraciones multiples recibido el 23-10-17
+        //TODO obtener getActiveDirectory de la clase ConfiguracionesMultiples
+        ConfiguracionesMultiples configuracionesMultiples = new ConfiguracionesMultiples(IntentServiceMagic.this);
+        pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        //El directorio activo de la app es:
+        Log.d(xxx, "En metodoPrincipal_2, el directorio activo es: " +pathCesaralMagicImageC);
+
+
+        //**************************************************************************************************
+
+
         //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
         LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(IntentServiceMagic.this);
         //arrayLineasTexto contiene todas las lineas de CONFIG.txt
         List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
         if(arrayLineasTexto == null){
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
-            enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            enviarNotification("Error 1 al recuperar CONFIG.txt del dir:  +" +pathCesaralMagicImageC +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
-            metodoMostrarError("E1", "Error reading file: CONFIG.txt");
+            metodoMostrarError("E1", "Error reading file: CONFIG.txt from dir: " +pathCesaralMagicImageC);
             Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto es null, salimos de la app");
 
+            //No sabemos si el error es por que no existe un dir diferente a "/CesaralMagic/ImageC/".
+            //En cualquier caso, volvemos al dir por defecto para poder escribir algo en el log.txt del dir por defecto
+            pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
             return false;
         }
 

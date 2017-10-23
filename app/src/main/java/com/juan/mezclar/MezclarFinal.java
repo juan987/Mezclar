@@ -444,16 +444,54 @@ public class MezclarFinal extends AppCompatActivity {
             return false;
         }
 
+
+
+        //**************************************************************************************************
+        //REQ: Gestion de configuraciones multiples recibido el 23-10-17
+        //obtener getActiveDirectory de la clase ConfiguracionesMultiples
+        ConfiguracionesMultiples configuracionesMultiples = new ConfiguracionesMultiples(MezclarFinal.this);
+        //Prueba, leer los sub directorios que cuelgan de, Prueba OK
+        /*
+        List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
+        for (int i=0; i < subDirs.size(); i++){
+            Log.d(xxx, "metodoPrincipal_2, sub directorio es: " +subDirs.get(i));
+        }
+        */
+
+        //Leer el directorio activo del share preferences, tb en IntentServiceMagic
+        pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        //El directorio activo de la app es:
+        Log.d(xxx, "En metodoPrincipal_2, el directorio activo es: " +pathCesaralMagicImageC);
+
+
+
+
+        //**************************************************************************************************
+
         //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
         LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(MezclarFinal.this);
         //arrayLineasTexto contiene todas las lineas de CONFIG.txt
         List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
+
+
         if(arrayLineasTexto == null){
+            //Original
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
-            enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            //enviarNotification("Error 1 al recuperar CONFIG.txt, saliendo de la aplicacion");
+            //enviarNotificationConNumero("E1");
+            //metodoMostrarError("E1", "Error reading file: CONFIG.txt");
+            //Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto es null, salimos de la app");
+
+            //Con el nuevo req:
+            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+            enviarNotification("Error 1 al recuperar CONFIG.txt del dir:  +" +pathCesaralMagicImageC +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
-            metodoMostrarError("E1", "Error reading file: CONFIG.txt");
+            metodoMostrarError("E1", "Error reading file: CONFIG.txt from dir: " +pathCesaralMagicImageC);
             Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto es null, salimos de la app");
+
+            //No sabemos si el error es por que no existe un dir diferente a "/CesaralMagic/ImageC/".
+            //En cualquier caso, volvemos al dir por defecto para poder escribir algo en el log.txt del dir por defecto
+            pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
 
             return false;
         }
