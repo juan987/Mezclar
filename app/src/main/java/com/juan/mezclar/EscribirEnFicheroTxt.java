@@ -40,9 +40,8 @@ public class EscribirEnFicheroTxt {
         File directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt);
         String directorio = directorioMain.getAbsolutePath();
 
-
-
         Log.d(xxx, "El directorio es: " + directorioMain);
+
         if(isExternalStorageWritable()) {
 
             try {
@@ -57,9 +56,32 @@ public class EscribirEnFicheroTxt {
                 */
 
                 directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt);
+                Log.d(xxx, "El directorio es: " + directorioMain);
+
+
+                //Por defecto se sobreescribe el log
+                boolean sobreescribirLog = true;
+
+                //Chequear el tamaño del fichero txt.log
+                long filesize = directorioMain.length();
+                Log.d(xxx, "Tamaño de log.txt en bytes es: " + filesize);
+                long filesizeInKB = filesize / 1024;
+                Log.d(xxx, "Tamaño de log.txt en KB es: " + filesizeInKB);
+                long filesizeinMB=filesizeInKB/1024;
+                Log.d(xxx, "Tamaño de log.txt en MB es: " + filesizeinMB);
+
+                //Prueba, cada linea nueva son menos de 100 bytes, unos 50 bytes de media
+                //if(filesize >= 2330) sobreescribirLog = false;
+                //Cuando el tamaño supere 1MB, el log.txt empieza de nuevo.
+                if(filesizeinMB >= 1) sobreescribirLog = false;
+                //Si sobreescribirLog es false, el log empieza de nuevo
+                Log.d(xxx, "boolean sobreescribirLog es: " + sobreescribirLog);
+                //FIN de Chequear el tamaño del fichero txt.log
+
                 directorio = directorioMain.getAbsolutePath();
 
-                FileWriter fw = new FileWriter(directorio, true);
+                //Cuando sobreescribirLog es true (valor por defecto), significa append.
+                FileWriter fw = new FileWriter(directorio, sobreescribirLog);
                 fw.write(charData);
                 fw.close();
 

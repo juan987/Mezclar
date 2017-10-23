@@ -199,8 +199,8 @@ public class MezclarFinal extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Muestr snakbar con lo que ha mandado la app Launch Mezclar
-        Snackbar.make(findViewById(R.id.coordinatorlayout_1), "received: " +stringImagesSecuence, Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
+        //Snackbar.make(findViewById(R.id.coordinatorlayout_1), "received: " +stringImagesSecuence, Snackbar.LENGTH_LONG)
+                //.setAction("Action", null).show();
 
         //Llamo al metodo desde el Floating button
         //En la ultima version, funciona automaticamente
@@ -291,6 +291,8 @@ public class MezclarFinal extends AppCompatActivity {
                 booleanSecuenciaRecibidaAlfanumerica = true;
                 cadenaAlphaumericaEmpleada = stringAlphanumeric;
             }
+            if(!booleanSecuenciaNumerica) cadenaNumericaEmpleada = "No data";
+            if(!booleanSecuenciaRecibidaAlfanumerica) cadenaAlphaumericaEmpleada = "No data";
             Log.d(xxx, "En metodo recuperarAmbasSecuencias, booleanSecuenciaNumerica: " +booleanSecuenciaNumerica);
             Log.d(xxx, "En metodo recuperarAmbasSecuencias, booleanSecuenciaRecibidaAlfanumerica: " +booleanSecuenciaRecibidaAlfanumerica);
 

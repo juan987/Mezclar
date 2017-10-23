@@ -53,6 +53,8 @@ public class IntentServiceMagic extends IntentService {
     String pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
     //Nombre de la imagen principal sobre la que se superponen las imagenes de o a 9.
     String imagenPrincipal = "origin.jpg";
+    //para prueba de fallo
+    //String imagenPrincipal = "origin.xxjpg";
     //Bitmap que contiene el resultado de la imagen generada
     Bitmap originJpg;
     //array list que contiene datos de coordenada x e y obtenidos del fichero CONFIG.txt
@@ -86,6 +88,9 @@ public class IntentServiceMagic extends IntentService {
     //Almacena el SOR a partir de version 1.0.2
     String stringSOR = "";
 
+    //Almacena el param de config overwrite. Nuevo req el 20oct17.
+    String stringOverwrite = "";
+
 
     public IntentServiceMagic() {
         super("IntentServiceMagic");
@@ -102,6 +107,7 @@ public class IntentServiceMagic extends IntentService {
             if (data != null) {
                 String myString = data.getString("KeyName");
                 stringImagesSecuence = myString;
+                cadenaNumericaEmpleada = myString;
                 Log.d(xxx, "En onHandleIntent, stringImagesSecuence tiene: " +stringImagesSecuence);
                 Log.d(xxx, "En metodo recuperarIntentConDatosIniciales, Datos de Launch Mezclar: " + stringImagesSecuence);
                 //Muestro el string character a character
@@ -378,16 +384,26 @@ public class IntentServiceMagic extends IntentService {
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
         GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(IntentServiceMagic.this, mergedImages);
         //Guardar imagen el directorio pictures/predict
-        //No hace falta, guardo directamente en DCIM/predict
-        /*
-        if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_PICTURES, "/predict/", "predict.jpg")){
-            //Ha habido un error al guardar la imagen, devolver false
-            enviarNotification("Error guardando imagen predict" +" ,saliendo de la aplicacion");
-            return false;
-        } */
+
+        //Nuevo req el 20oct17: parametro overwrite en fichero CONFIG
+        if(stringOverwrite.equals("overwrite")){
+            //la imagen generada se llama: predict.jpg, comportamiento por defecto
+
+        }else{//Componemos el nombre de la foto incluyendo dia y hora
+            Date date = new Date();
+            //El formato de la fecha para el fichero sera como aparece aqui:
+            //predict_ddhhmmss.jpg
+
+            SimpleDateFormat sdf2 = new SimpleDateFormat("ddHHmmss");
+            String fechaDeLaFoto = sdf2.format(date);
+            Log.d(xxx, "metodoPrincipal_2 La fecha del fichero predict es: " +fechaDeLaFoto);
+            nombreFicheroJpg = "predict_" +fechaDeLaFoto +".jpg";
+            Log.d(xxx, "metodoPrincipal_2 hay parametro overwrite, nombre del fichero predict es: " +nombreFicheroJpg);
+        }
 
         //Guardar imagen en el directorio DCIM/predict
-        if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg")){
+        //if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg")){
+        if (!guardarImagenFinal.guardarImagenMethod(Environment.DIRECTORY_DCIM, "/predict/", nombreFicheroJpg)){
             //Ha habido un error al guardar la imagen, devolver false
             enviarNotification("Error guardando imagen predict" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
@@ -401,6 +417,8 @@ public class IntentServiceMagic extends IntentService {
         enviarNotificationConNumero("2");
         return true;
     }//Fin de metodoPrincipal_2
+    //Nombre de la imagen compuesta a guardar y a enviar con ftp
+    String nombreFicheroJpg = "predict.jpg";
 
 
     private boolean loopPrincipalImagenesTipoN(){
@@ -452,6 +470,7 @@ public class IntentServiceMagic extends IntentService {
                     //No se lanza error, se hace el loop hasta esta condicion, si existe,
                     //y solo se superponen las imagenes hasta que no se cumpla esta condicion,
                     //cuando indice del array de numeros sea mayor que el de coordenadas N
+                    escribirDatosEnLog("index of numeric string > index of N coordenates");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No hay fallo, fin del loop tipo N debido a");
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, ........./index of nemeric string > index of N coordenates....,");
                     break;//finaliza el loop
@@ -1207,6 +1226,11 @@ public class IntentServiceMagic extends IntentService {
                 Log.d(xxx, "xxx, Hay una linea que empieza con SOR y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringSOR = arrayLineasTextoLocal.get(i).split(regexSOR);
             }
+            if(arrayLineasTextoLocal.get(i).startsWith("overwrite")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con overwrite y tiene: " +arrayLineasTextoLocal.get(i));
+                //Asignamos la linea directamente, no hay que hacer regex como en las otras
+                stringOverwrite = arrayLineasTextoLocal.get(i);
+            }
         }
 
 
@@ -1273,8 +1297,8 @@ public class IntentServiceMagic extends IntentService {
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
-                +"\n"  +"xxx Variable SOR: " +stringSOR);
-
+                +"\n"  +"xxx Variable SOR: " +stringSOR
+                +"\n"  +"xxx Variable overwrite: " +stringOverwrite);
 
 
         return arrayPojoCoordenadas;
@@ -1403,7 +1427,9 @@ public class IntentServiceMagic extends IntentService {
 
         }
 
-        File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", "predict.jpg");
+
+        File filePathDePredictJpg = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, "/predict/", nombreFicheroJpg);
+
 
         if(filePathDePredictJpg == null){
             enviarNotificationFtp("Error al obtener el file de predict.jpg para upload ftp" +", saliendo de la aplicacion");
@@ -1527,11 +1553,18 @@ public class IntentServiceMagic extends IntentService {
                 //Exito
                 //finish();
 
+                //Nuevo req 28oct17: fichero de log
+                escribirDatosEnLog("OK");
+
             }else{
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen NO enviada al servidor ftp, saliendo de la app");
                 //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
                 //finish();
+
+                //Nuevo req 28oct17: fichero de log
+                escribirDatosEnLog(stringTipoDeError +separador +stringMensajeDeError);
+
             }
             //Tanto si hay fallo como si se ejecuta correctamente, se cierra la app
             //finish();
@@ -1585,6 +1618,10 @@ public class IntentServiceMagic extends IntentService {
                 //progressBar.setVisibility(View.INVISIBLE); //To Hide ProgressBar
                 //Cerrar aplicacion, ha habido un fallo
                 //finish();
+
+                //Nuevo req 28oct17: fichero de log
+                escribirDatosEnLog(stringTipoDeError +separador +stringMensajeDeError);
+
             }
         }
 
@@ -1684,18 +1721,103 @@ public class IntentServiceMagic extends IntentService {
             gOrigen[13]=numc2%10;
         }
     }//Fin del algoritmo de ordenacion proporcionado por cesar
+    //       Final         Copia de todo lo que esta fuera del onCreate de MezclarFinal
 
 
-
+    //*************************************************************************************
+    //*************************************************************************************
+    //*************************************************************************************
+    //Nuevo req 28oct17: fichero de log
+    //Metodo para mostrar mensajes de error E1 y E2 por pantalla
+    String stringTipoDeError = "";//Tb se envia a txt.log
+    String stringMensajeDeError = "";//Tb se envia a txt.log
     //Metodo para mostrar mensajes de error E1 y E2 por pantalla
     //Desde el service no puedo tocar componenetes de la UI
     private void metodoMostrarError(String tipoDeError, String mensaje){
         Log.d(xxx, "estoy en metodoMostrarError, mensaje: " +mensaje);
         //textViewErrores.setText(tipoDeError +": " +mensaje);
 
+
+        //Mensajes a poner en el log.txt
+        stringTipoDeError = tipoDeError;
+        stringMensajeDeError = mensaje;
+
     }
 
-    //       Final         Copia de todo lo que esta fuera del onCreate de MezclarFinal
+    //Variables para el requerimiento del log
+    String subDirLogFile = "/CesaralMagic/ImageC/";
+    String fechaLog = "";
+    String horaLog = "";
+    String cadenaNumericaEmpleada = "";
+    String cadenaAlphaumericaEmpleada = "";
+    String mensaje = "";
+    String separador = " / ";
+    String indiceCoordNmenor = "";
+    String indiceCoordTmenor = "";
+
+
+    String  mensajeLog2="";
+    //Nuevo req 28oct17: fichero de log
+    private void escribirDatosEnLog(String  mensajeError){
+        Date date = new Date();
+        //Fecha / hora / cadena numérica empleada / cadena alfanumérica empleada / “OK” o “detalle del error encontrado”
+
+        /*Por ejemplo, con solo dato numéricos:
+        17/10/2017 / 10:24 / 012345678 / /  OK
+        Por ejemplo, con solo dato alfanuméricos:
+        17/10/2017 / 10:24 / / test /  OK
+        Por ejemplo, con datos de ambos tipo, pero dando error:
+        17/10/2017 / 10:27 / 123456 / test /  Upload Server “ftp.cesaral.com” not found */
+
+
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yy");
+        fechaLog = sdf2.format(date);
+        SimpleDateFormat sdf3 = new SimpleDateFormat("HH:mm");
+        horaLog = sdf3.format(date);
+        String mensajeLog = "//" +fechaLog +separador +horaLog +separador
+                +cadenaNumericaEmpleada +separador +"No data" +separador +mensajeError +"\r\n";
+        Log.d(xxx, "escribirDatosEnLog el mensaje del log es: " +mensajeLog);
+
+        mensajeLog2 = mensajeLog;
+
+        //Asi no funcione, hay que hacerlo con looper
+        /*
+        EscribirEnFicheroTxt escribirEnFicheroTxt = new EscribirEnFicheroTxt(IntentServiceMagic.this);
+        if(escribirEnFicheroTxt.appendDateEnFichero(pathCesaralMagicImageC + "log.txt", mensajeLog)){
+
+            Log.d(xxx, "escribirDatosEnLog fichero escrito correctamente");
+
+        }else{
+            Log.d(xxx, "escribirDatosEnLog fichero NO escrito correctamente");
+
+
+        }
+        */
+
+        //Escribir en el fichero log.txt hay que hacerlo con looper
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+
+            @Override
+            public void run() {
+                EscribirEnFicheroTxt escribirEnFicheroTxt = new EscribirEnFicheroTxt(IntentServiceMagic.this);
+                if(escribirEnFicheroTxt.appendDateEnFichero(pathCesaralMagicImageC + "log.txt", mensajeLog2)){
+
+                    Log.d(xxx, "escribirDatosEnLog fichero escrito correctamente");
+
+                }else{
+                    Log.d(xxx, "escribirDatosEnLog fichero NO escrito correctamente");
+
+
+                }
+
+            }
+        });
+    }
+    //*************************************************************************************
+    //*************************************************************************************
+    //*************************************************************************************
+    //FIN Nuevo req 28oct17: fichero de log
 
 //FINAL de la clase *****************************************************************************************
 }//Fin de IntentServiceMagic
