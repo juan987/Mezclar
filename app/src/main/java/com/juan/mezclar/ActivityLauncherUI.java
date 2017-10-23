@@ -117,8 +117,7 @@ public class ActivityLauncherUI extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id)
             //public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id)
             {
-                Toast.makeText(adapterView.getContext(),
-                        (String) adapterView.getItemAtPosition(pos), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(adapterView.getContext(), (String) adapterView.getItemAtPosition(pos), Toast.LENGTH_SHORT).show();
                 if(pos == 0){
                     //Si la posicion es cero, tiewne none, no hacemos nada
                     Log.d(xxx, "spinner, onItemSelected default, sub directorio es: " +(String) adapterView.getItemAtPosition(pos));
@@ -202,10 +201,12 @@ public class ActivityLauncherUI extends AppCompatActivity {
             //Volver a leer los sub directorios que cuelgan de, Prueba OK
             List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
                 dir = null;
-                dir = new String[subDirs.size()];
+                //dir = new String[subDirs.size()];
+                dir = new String[subDirs.size()+1];
+                dir[0] = "none";
                 for (int i=0; i < subDirs.size(); i++){
                     Log.d(xxx, "onCreatwe, sub directorio es: " +subDirs.get(i));
-                    dir[i] = subDirs.get(i);
+                    dir[i+1] = subDirs.get(i);
                 }
 
                 // Initializing an ArrayAdapter
