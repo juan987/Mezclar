@@ -445,28 +445,39 @@ public class MezclarFinal extends AppCompatActivity {
         }
 
 
-
+        /*
         //**************************************************************************************************
         //REQ: Gestion de configuraciones multiples recibido el 23-10-17
         //obtener getActiveDirectory de la clase ConfiguracionesMultiples
         ConfiguracionesMultiples configuracionesMultiples = new ConfiguracionesMultiples(MezclarFinal.this);
+
+        //Prueba crear nuevo subdir
+        configuracionesMultiples.createSubDirDeDirCesaralMagicImageC("nuevo_dir_2");
+
+
         //Prueba, leer los sub directorios que cuelgan de, Prueba OK
-        /*
+
         List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
         for (int i=0; i < subDirs.size(); i++){
             Log.d(xxx, "metodoPrincipal_2, sub directorio es: " +subDirs.get(i));
         }
+
+
+        //Leer el directorio activo del share preferences, tb en IntentServiceMagic
+        pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        //El directorio activo de la app es:
+        Log.d(xxx, "En metodoPrincipal_2, el directorio activo es: " +pathCesaralMagicImageC);
+        //**************************************************************************************************
         */
+
+        //REQ: Gestion de configuraciones multiples recibido el 23-10-17
+        ConfiguracionesMultiples configuracionesMultiples = new ConfiguracionesMultiples(MezclarFinal.this);
 
         //Leer el directorio activo del share preferences, tb en IntentServiceMagic
         pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
         //El directorio activo de la app es:
         Log.d(xxx, "En metodoPrincipal_2, el directorio activo es: " +pathCesaralMagicImageC);
 
-
-
-
-        //**************************************************************************************************
 
         //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
         LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(MezclarFinal.this);

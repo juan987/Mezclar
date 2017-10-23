@@ -35,12 +35,12 @@ public class ConfiguracionesDeDirectoriosApp {
         //Nota 2: subDir es un string sin barras: my_nuevo_directorio
         //subDir es el nuevo directorio que vamos a crear
         if(isExternalStorageWritable()) {
-            File picturesDir = Environment.getExternalStoragePublicDirectory(environmentDir);
-            String directorio = picturesDir.getAbsolutePath() ;
+            File dir = Environment.getExternalStoragePublicDirectory(environmentDir);
+            String directorio = dir.getAbsolutePath() ;
             Log.d(xxx, "crearSubDirMethod, El directorio es: " + directorio);
             Log.d(xxx, "crearSubDirMethod, El sub directorio es: " + subDir);
 
-            if(crearSubDirMethod2(directorio, subDir)){
+            if(crearSubDirMethod2(directorio +"/", subDir)){
                 Log.d(xxx, "crearSubDirMethod, Sub directorio creado");
             }else{
                 //Toast.makeText(context,
@@ -95,11 +95,36 @@ public class ConfiguracionesDeDirectoriosApp {
         //File directorioMain = new File(Environment.getExternalStorageDirectory() + pathToFileTxt);
         File dir = new File(Environment.getExternalStorageDirectory() +directorio);
         ArrayList<String> inDir = new ArrayList<String>();
+        //Siempre pongo el defaul delante:
+        inDir.add("default directory");
         File[] files = dir.listFiles();
         for (File file : files) {
             if (file.isDirectory()) {
-                Log.d(xxx, "getListaDirectorios, sub directorio en \"/CesaralMagic/ImageC/\": "  +file.getAbsolutePath());
-                inDir.add(file.getAbsolutePath());
+                //Log.d(xxx, "getListaDirectorios, sub directorio en \"/CesaralMagic/ImageC/\": "  +file.getAbsolutePath());
+                Log.d(xxx, "getListaDirectorios, sub directorio en /CesaralMagic/ImageC/: "  +file.getAbsolutePath());
+                Log.d(xxx, "getListaDirectorios, SOLO sub directorio en /CesaralMagic/ImageC/: "  +file.getName());
+                //inDir.add(file.getAbsolutePath());
+
+                //Solo pongo el nombre del dir, NO todo el path
+                //Solo da el nombre sin /
+                inDir.add(file.getName());
+
+                //Si es muy grande la lista, funciona el scroll, probado con estas lineas
+                /*
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName());
+                inDir.add(file.getName()); */
             }
         }
 

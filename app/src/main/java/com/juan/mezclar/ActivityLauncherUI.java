@@ -9,8 +9,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import java.util.List;
 
 //19 OCT 17: ESTA ACTIVIDAD se muestra cuando se hace click en el icono y es llamada desde
 //la actividad ActivityLauncher con un intent.
@@ -18,9 +24,18 @@ import android.widget.EditText;
 
 public class ActivityLauncherUI extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
+    Button button = null;
+    Button buttonCrearDir = null;
     String xxx = this.getClass().getSimpleName();
     EditText secuenciaDeImagenes;
     EditText secuenciaDeImagenesAlfanumerica;
+    Spinner spinner;
+    EditText nuevoDir;
+    ConfiguracionesMultiples configuracionesMultiples = null;
+    //Array con los nombres de los directorios opcionales
+    String[] dir = null;
+    ArrayAdapter<String> spinnerArrayAdapter = null;
+
 
 
     @Override
@@ -35,6 +50,99 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
         secuenciaDeImagenes   = (EditText)findViewById(R.id.secImagenes);
         secuenciaDeImagenesAlfanumerica   = (EditText)findViewById(R.id.secImagenesAlfanumerica);
+        nuevoDir   = (EditText)findViewById(R.id.nuevo_dir);
+
+
+
+
+
+        //Nuevo requerimiento, spinner, el 23 oct 2017
+
+        spinner   = (Spinner) findViewById(R.id.spinner);
+        //String[] dir = {"A","B","C","D","E"};
+
+        //**************************************************************************************************
+        //REQ: Gestion de configuraciones multiples recibido el 23-10-17
+        //obtener getActiveDirectory de la clase ConfiguracionesMultiples
+        configuracionesMultiples = new ConfiguracionesMultiples(ActivityLauncherUI.this);
+
+        //Prueba crear nuevo subdir
+        //configuracionesMultiples.createSubDirDeDirCesaralMagicImageC("nuevo_dir_2");
+
+        String pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        //El directorio activo de la app es:
+        Log.d(xxx, "En onCreate, al inicio de la app  el directorio activo es: " +pathCesaralMagicImageC);
+
+        //Leer los sub directorios que cuelgan de, Prueba OK
+
+        List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
+
+        //String[] dir = new String[subDirs.size()];
+        //dir = new String[subDirs.size()];
+        dir = new String[subDirs.size()+1];
+        dir[0] = "none";
+
+        for (int i=0; i < subDirs.size(); i++){
+            Log.d(xxx, "onCreatwe, sub directorio es: " +subDirs.get(i));
+            dir[i+1] = subDirs.get(i);
+        }
+
+        //Leer el directorio activo del share preferences, tb en IntentServiceMagic
+        //pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        //El directorio activo de la app es:
+        //Log.d(xxx, "En metodoPrincipal_2, el directorio activo es: " +pathCesaralMagicImageC);
+
+        //**************************************************************************************************
+
+
+
+        //spinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, letra));
+        //Como en:
+        //https://android--code.blogspot.com.es/2015/08/android-spinner-text-size.html
+        // Initializing an ArrayAdapter
+        //ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+        spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,dir);
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinner.setAdapter(spinnerArrayAdapter);
+
+        //Como alternativa mas limpia ver aqui:
+        //https://stackoverflow.com/questions/10409871/how-to-increase-spinner-item-font-size
+
+        //Coger el click del spinner
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        //spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id)
+            //public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id)
+            {
+                Toast.makeText(adapterView.getContext(),
+                        (String) adapterView.getItemAtPosition(pos), Toast.LENGTH_SHORT).show();
+                if(pos == 0){
+                    //Si la posicion es cero, tiewne none, no hacemos nada
+                    Log.d(xxx, "spinner, onItemSelected default, sub directorio es: " +(String) adapterView.getItemAtPosition(pos));
+
+
+                }else{
+                    Log.d(xxx, "spinner, onItemSelected cualquiera, sub directorio es: " +(String) adapterView.getItemAtPosition(pos));
+                    //Guardamos el dir seleccionado en shared preferences
+                    configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(pos));
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+                Log.d(xxx, "spinner, onNothingSelected ");
+
+
+            }
+        });
+
+
+
 
 
         /*
@@ -52,19 +160,62 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
         //Nuevo req el 20 oct 2017: se envia directamente los dos editText a MezclarFinal,
         //tengan o no tengan datos, de eso se ocupa la act MezclarFinal
-        final Button button = (Button)findViewById(R.id.button_id);
+        button = (Button)findViewById(R.id.button_id);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if((secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
                     Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Enter data in one of the boxes or both", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }else {
+                    //Antes del intent, mostrar el directorio activo
+                    //Leer el directorio activo del share preferences, tb en IntentServiceMagic
+                    String pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+                    //El directorio activo de la app es:
+                    Log.d(xxx, "En setOnClickListener,despues del boton,  el directorio activo es: " +pathCesaralMagicImageC);
                     //Uno o ambos campos tienen datos, enviamos el intent a MezclarFinal
                     Intent intent = new Intent(ActivityLauncherUI.this, MezclarFinal.class);
                     intent.putExtra("KeyName", secuenciaDeImagenes.getText().toString());
                     intent.putExtra("KeyAlfanumerico", secuenciaDeImagenesAlfanumerica.getText().toString());
                     startActivity(intent);
                 }
+
+            }
+        });
+
+        //nuevo req para crear un nuevo dir
+        buttonCrearDir = (Button)findViewById(R.id.button_crear_dir);
+        buttonCrearDir.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            String stringNuevoDirectorio = nuevoDir.getText().toString();
+            //Crear nuevo subdir
+            configuracionesMultiples.createSubDirDeDirCesaralMagicImageC(stringNuevoDirectorio);
+            button.setVisibility(View.VISIBLE);
+            secuenciaDeImagenes.setVisibility(View.VISIBLE);
+            secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
+            spinner.setVisibility(View.VISIBLE);
+            nuevoDir.setVisibility(View.GONE);
+            buttonCrearDir.setVisibility(View.GONE);
+
+
+
+
+            //Volver a leer los sub directorios que cuelgan de, Prueba OK
+            List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
+                dir = null;
+                dir = new String[subDirs.size()];
+                for (int i=0; i < subDirs.size(); i++){
+                    Log.d(xxx, "onCreatwe, sub directorio es: " +subDirs.get(i));
+                    dir[i] = subDirs.get(i);
+                }
+
+                // Initializing an ArrayAdapter
+                spinnerArrayAdapter = null;
+                spinnerArrayAdapter = new ArrayAdapter<String>(
+                        ActivityLauncherUI.this,R.layout.spinner_item,dir);
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+                spinner.setAdapter(spinnerArrayAdapter);
+
+
 
             }
         });
@@ -112,6 +263,20 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            //**************************************************************
+            //Button button = null;
+            //String xxx = this.getClass().getSimpleName();
+            //EditText secuenciaDeImagenes;
+            //EditText secuenciaDeImagenesAlfanumerica;
+            //Spinner spinner;
+            //EditText nuevoDir;
+            button.setVisibility(View.GONE);
+            secuenciaDeImagenes.setVisibility(View.GONE);
+            secuenciaDeImagenesAlfanumerica.setVisibility(View.GONE);
+            spinner.setVisibility(View.GONE);
+            nuevoDir.setVisibility(View.VISIBLE);
+            buttonCrearDir.setVisibility(View.VISIBLE);
+            //**************************************************************
             return true;
         }
 

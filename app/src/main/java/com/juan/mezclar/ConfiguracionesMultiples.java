@@ -35,7 +35,13 @@ public class ConfiguracionesMultiples{
         //alguno que cuelga de /CesaralMagic/ImageC/ introducido a traves de la UI
         SharedPreferences pref = context.getSharedPreferences(PREFS_NAME_1, 0); // 0 - for private mode
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(prefName, string); // Storing string
+        if(string.equals("default directory")){
+            editor.putString(prefName, null); // Storing string
+
+        }else{
+            editor.putString(prefName, string); // Storing string
+
+        }
         editor.commit(); // commit changes
     }
 
@@ -74,11 +80,11 @@ public class ConfiguracionesMultiples{
         return listDirectories;
     }
 
-    public void createSubDirDeDirCesaralMagicImageC(){
+    public void createSubDirDeDirCesaralMagicImageC(String newDir){
         //TODO crear un nuevo sub directorio con el nombre que el usuario ha introducido en
         //el edit text, No uno que haya seleccionado del drop down menu
         ConfiguracionesDeDirectoriosApp configuracionesDeDirectoriosApp = new ConfiguracionesDeDirectoriosApp(context);
-        boolean boolDirCreado = configuracionesDeDirectoriosApp.crearSubDirMethod(pathCesaralMagicImageC, "nuevo_dir_2");
+        boolean boolDirCreado = configuracionesDeDirectoriosApp.crearSubDirMethod(pathCesaralMagicImageC, newDir);
 
     }
 
