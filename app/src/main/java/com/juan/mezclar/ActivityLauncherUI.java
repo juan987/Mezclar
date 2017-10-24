@@ -85,12 +85,14 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
 
         //El array del spinner es dir, que tiene none en la posicion cero
-        dir = new String[subDirs.size()+1];
-        dir[0] = "";
+        //dir = new String[subDirs.size()+1];
+        dir = new String[subDirs.size()];
+        //dir[0] = "";
 
         for (int i=0; i < subDirs.size(); i++){
             //Log.d(xxx, "onCreatwe, sub directorio es: " +subDirs.get(i));
-            dir[i+1] = subDirs.get(i);
+            //dir[i+1] = subDirs.get(i);
+            dir[i] = subDirs.get(i);
         }
 
         //Averiguar cual es el indice del spinner ha presentar al entrar en la app
@@ -137,8 +139,10 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
                     //Forzamos a que sea el default
 
-                    spinner.setSelection(1);
-                    configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(1));
+                    //spinner.setSelection(1);
+                    spinner.setSelection(0);
+                    //configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(1));
+                    configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(0));
 
 
 
@@ -238,12 +242,13 @@ public class ActivityLauncherUI extends AppCompatActivity {
                     //Volver a leer los sub directorios que cuelgan de, Prueba OK
                     List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
                     dir = null;
-                    //dir = new String[subDirs.size()];
-                    dir = new String[subDirs.size() + 1];
-                    dir[0] = "none";
+                    dir = new String[subDirs.size()];
+                    //dir = new String[subDirs.size() + 1];
+                    //dir[0] = "";
                     for (int i = 0; i < subDirs.size(); i++) {
                         Log.d(xxx, "onCreatwe, sub directorio es: " + subDirs.get(i));
-                        dir[i + 1] = subDirs.get(i);
+                        //dir[i + 1] = subDirs.get(i);
+                        dir[i] = subDirs.get(i);
                     }
 
                     // Initializing an ArrayAdapter
@@ -319,7 +324,8 @@ public class ActivityLauncherUI extends AppCompatActivity {
         int indice = -1;
 
         if(actdir.equals("ImageC")){
-            indice=1;
+            //indice=1;
+            indice=0;
         }else {
             for (int i = 0; i < subDirs.length; i++) {
                 if (actdir.equals(subDirs[i])) {

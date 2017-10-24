@@ -32,16 +32,12 @@
         app:layout_constraintVertical_bias="0.114"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:background="@drawable/border"
+        android:background="@drawable/border2"
         />
 
     <!--
             android:background="@drawable/border"
 
-
-android:backgroundTint="@color/color_gray"
-
-                    android:popupBackground="@drawable/border"
 
 
     -->
