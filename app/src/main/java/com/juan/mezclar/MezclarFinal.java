@@ -896,6 +896,7 @@ public class MezclarFinal extends AppCompatActivity {
         //*******************************************************************************
         //Revisamos la secuencia alphanumerica para descartar caracteres prohibidos.
         //En esta version solo se aceptan letras, menos la ñ, en mayusculas y minusculas, y digitos 0-9.
+        /*
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoT, revisando el array de secuencia alfanumerica");
 
@@ -914,7 +915,12 @@ public class MezclarFinal extends AppCompatActivity {
             }
         }
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, soloCaracteresValidos tiene: " +soloCaracteresValidos);
-        arrayImagesSequence = soloCaracteresValidos.toCharArray();
+        */
+
+
+        //arrayImagesSequence = soloCaracteresValidos.toCharArray();
+
+
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence final tiene: " +arrayImagesSequence.toString());
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence final tiene una longitud de: " +arrayImagesSequence.length);
         if(arrayImagesSequence.length == 0){
@@ -970,6 +976,7 @@ public class MezclarFinal extends AppCompatActivity {
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mezclando imagen: " +i);
             prefijoNombreFile = "F1_";
+            boolean boolSeguirEjecutando = true;
 
             //Convertir el caracter de la secuencia alfanumerica para usar el metodo matches con regex de string
             character = (Character)arrayImagesSequence[i];
@@ -983,54 +990,59 @@ public class MezclarFinal extends AppCompatActivity {
             }else if(charDeLaSecuenciaRecibida.matches("[0-9]")){
                 prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase();
             }else{
-                //Si llega aqui, es por que hay algun character que
+                //Si llega aqui, es por que hay algun character que no es valido
                 Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia numerica");
-
+                //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
+                boolSeguirEjecutando = false;
             }
 
+            //************************************************************************************************
+            //Si el caracter no es valido, por que llega al else anterior,
+            //No ejecutar nada de lo que sigue
+            if(boolSeguirEjecutando) {
 
-            enviarNotification("mezclando imagen: " +i);
-            enviarNotificationConNumero("1");
-            //Obtener la imagen a superponer como un bitmap
-            imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                    +prefijoNombreFile +".bmp");
-            if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
-                //Buscamos la imagen a superponer con extension .xbmp
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, No existe la imagen a superponer: " +i +"con extension .bmp, buscamos con extension .xbmp");
+                enviarNotification("mezclando imagen: " + i);
+                enviarNotificationConNumero("1");
+                //Obtener la imagen a superponer como un bitmap
                 imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                        +prefijoNombreFile +".xbmp");
-            }
-            if(imagenParaSuperponerConOrigin == null){
-                //Hay un error, terminamos la ejecucion he informamos con una notificacion
-                enviarNotification("Error al recuperar imagen pequeña alfanumerica numero: " +i +", saliendo de la aplicacion");
-                enviarNotificationConNumero("E1");
-                metodoMostrarError("E1", "Error in recovering alphanumeric image from external storage");
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
-
-                //Acabamos la ejecucion
-                return false;
-            }else{
-
-                //Como todos los parametro son opcionales, seguimos aunque No haya coordenadas tipo T
-                //Lo hice el 19 oct 17, para cumplimentar el req: todos los parametros de
-                // CONFIG.txt son opcionales
-                //Chequeo si arrayPojoCoordenadasAlfanumerico tiene coordenadas o no
-                if(arrayPojoCoordenadasAlfanumerico != null){
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico tiene: "
-                            +arrayPojoCoordenadasAlfanumerico.size() +" coordenadas");
-
-                }else{
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico es null");
-
+                        + prefijoNombreFile + ".bmp");
+                if (imagenParaSuperponerConOrigin == null) {//No encuentra la imagen con extension .bmp
+                    //Buscamos la imagen a superponer con extension .xbmp
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, No existe la imagen a superponer: " + i + "con extension .bmp, buscamos con extension .xbmp");
+                    imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                            + prefijoNombreFile + ".xbmp");
                 }
+                if (imagenParaSuperponerConOrigin == null) {
+                    //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                    enviarNotification("Error al recuperar imagen pequeña alfanumerica numero: " + i + ", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error in recovering alphanumeric image from external storage");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
 
-                //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
-                imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
+                    //Acabamos la ejecucion
+                    return false;
+                } else {
 
-                //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
-                //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas T, por si acaso
-                //el fichero CONFIG.txt no tiene las 16 coordenadas T sino un numero menor.
-                if(i >= arrayPojoCoordenadasAlfanumerico.size()){
+                    //Como todos los parametro son opcionales, seguimos aunque No haya coordenadas tipo T
+                    //Lo hice el 19 oct 17, para cumplimentar el req: todos los parametros de
+                    // CONFIG.txt son opcionales
+                    //Chequeo si arrayPojoCoordenadasAlfanumerico tiene coordenadas o no
+                    if (arrayPojoCoordenadasAlfanumerico != null) {
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico tiene: "
+                                + arrayPojoCoordenadasAlfanumerico.size() + " coordenadas");
+
+                    } else {
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico es null");
+
+                    }
+
+                    //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
+                    imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
+
+                    //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
+                    //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas T, por si acaso
+                    //el fichero CONFIG.txt no tiene las 16 coordenadas T sino un numero menor.
+                    if (i >= arrayPojoCoordenadasAlfanumerico.size()) {
                         //Modificacion el 20 oct 2017:
                         //Nuevo requerimiento: ahora se admite que el indice del array de alphanumeric sea mayor
                         //que el de coordenadas T.
@@ -1046,15 +1058,15 @@ public class MezclarFinal extends AppCompatActivity {
 
 
                         //Dejo el codigo original comentado
-                    //enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
-                    //enviarNotificationConNumero("E1");
-                    //metodoMostrarError("E1", "Error in index of T coordenates");
-                    //Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
-                    //return false;//Cerrar aplicacion y evitar un null pointer
-                }
+                        //enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
+                        //enviarNotificationConNumero("E1");
+                        //metodoMostrarError("E1", "Error in index of T coordenates");
+                        //Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
+                        //return false;//Cerrar aplicacion y evitar un null pointer
+                    }
 
 
-                //Para corregir fallos de null, OJO OJO OJO
+                    //Para corregir fallos de null, OJO OJO OJO
                 /*
                 if(listaCoordenadas.get(i).getCoordX() == null || listaCoordenadas.get(i).getCoordY() == null){
                     //No lee los valores null
@@ -1064,42 +1076,45 @@ public class MezclarFinal extends AppCompatActivity {
                 } */
 
 
+                    xFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordX());
+                    yFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordY());
 
-                xFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordX());
-                yFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordY());
+                    //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
+                    //Float.isNaN retorna true si no es un numero
+                    if (Float.isNaN(xFloat) || Float.isNaN(yFloat)) {
+                        enviarNotification("Error, coordenadas alfanumericas no son un numero valido, saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error: some coordenate T is not a number");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
 
-                //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
-                //Float.isNaN retorna true si no es un numero
-                if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
-                    enviarNotification("Error, coordenadas alfanumericas no son un numero valido, saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error: some coordenate T is not a number");
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
+                        return false;//Cerrar aplicacion y evitar fallo en el procesamiento
+                    }
 
-                    return false;//Cerrar aplicacion y evitar fallo en el procesamiento
+
+                    //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+                    mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
+                            xFloat, yFloat);
+                    //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
+                    originJpg = mergedImages;
+                    if (mergedImages != null) {
+                        //Comando de prueba. Comentar esta linea en la version final
+                        //collageImage.setImageBitmap(mergedImages);
+                    } else {
+                        //Ha habido un error al mezclar las imagenes
+                        enviarNotification("Error mezclando imagen alfanumerica: " + i + ", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error when mixing alphanumeric images");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mergedImages es null, no se ha generado la imagen, salimos de la app");
+
+                        return false;
+
+                    }
+                    //
                 }
-
-
-                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
-                mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
-                        xFloat, yFloat);
-                //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
-                originJpg = mergedImages;
-                if(mergedImages != null) {
-                    //Comando de prueba. Comentar esta linea en la version final
-                    //collageImage.setImageBitmap(mergedImages);
-                }else{
-                    //Ha habido un error al mezclar las imagenes
-                    enviarNotification("Error mezclando imagen alfanumerica: " +i  +", saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error when mixing alphanumeric images");
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mergedImages es null, no se ha generado la imagen, salimos de la app");
-
-                    return false;
-
-                }
-                //
             }
+            //************************************************************************************************
+            //FIN  Si el caracter no es valido, por que llega al else anterior,
+            //No ejecutar nada de lo que sigue
 
         }//Fin del loop principal
 

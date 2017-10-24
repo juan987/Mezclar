@@ -39,6 +39,8 @@ public class ActivityLauncherUI extends AppCompatActivity {
     //Este boolean es para manejar el backpressed cuando estoy en la pantalla de crear un nuevo directorio
     boolean boolCreandoNuevoDirectorio = false;
 
+    int indiceInicial=0;
+
 
 
     @Override
@@ -80,15 +82,20 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
         List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
 
-        //String[] dir = new String[subDirs.size()];
-        //dir = new String[subDirs.size()];
+
+
+        //El array del spinner es dir, que tiene none en la posicion cero
         dir = new String[subDirs.size()+1];
-        dir[0] = "none";
+        dir[0] = "";
 
         for (int i=0; i < subDirs.size(); i++){
-            Log.d(xxx, "onCreatwe, sub directorio es: " +subDirs.get(i));
+            //Log.d(xxx, "onCreatwe, sub directorio es: " +subDirs.get(i));
             dir[i+1] = subDirs.get(i);
         }
+
+        //Averiguar cual es el indice del spinner ha presentar al entrar en la app
+        indiceInicial = spinnerSetSeleccion(dir, pathCesaralMagicImageC);
+
 
         //Leer el directorio activo del share preferences, tb en IntentServiceMagic
         //pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
@@ -109,6 +116,9 @@ public class ActivityLauncherUI extends AppCompatActivity {
         spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
         spinner.setAdapter(spinnerArrayAdapter);
 
+        spinner.setSelection(indiceInicial);
+
+
         //Como alternativa mas limpia ver aqui:
         //https://stackoverflow.com/questions/10409871/how-to-increase-spinner-item-font-size
 
@@ -125,11 +135,18 @@ public class ActivityLauncherUI extends AppCompatActivity {
                     //Si la posicion es cero, tiewne none, no hacemos nada
                     Log.d(xxx, "spinner, onItemSelected default, sub directorio es: " +(String) adapterView.getItemAtPosition(pos));
 
+                    //Forzamos a que sea el default
+
+                    spinner.setSelection(1);
+                    configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(1));
+
+
 
                 }else{
                     Log.d(xxx, "spinner, onItemSelected cualquiera, sub directorio es: " +(String) adapterView.getItemAtPosition(pos));
                     //Guardamos el dir seleccionado en shared preferences
                     configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(pos));
+                    //Le decimos al spinner que muestre este valor:
                 }
 
             }
@@ -191,42 +208,64 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
             String stringNuevoDirectorio = nuevoDir.getText().toString();
 
-            //Chequear si el nombre del nuevo directorio contiene solo letras (may y min) y numeros
-            if(isLettersAndDigits(stringNuevoDirectorio)){
-                //Cambio a false para que el back button pressed funcione de modo normal
-                boolCreandoNuevoDirectorio = false;
-                //Crear nuevo subdir
-                configuracionesMultiples.createSubDirDeDirCesaralMagicImageC(stringNuevoDirectorio);
-                button.setVisibility(View.VISIBLE);
-                secuenciaDeImagenes.setVisibility(View.VISIBLE);
-                secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
-                spinner.setVisibility(View.VISIBLE);
-                nuevoDir.setVisibility(View.GONE);
-                buttonCrearDir.setVisibility(View.GONE);
+            //boolean que indica si este nombre ya existe
+                boolean boolDirYaExiste = false;
 
-                //Volver a leer los sub directorios que cuelgan de, Prueba OK
-                List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
-                dir = null;
-                //dir = new String[subDirs.size()];
-                dir = new String[subDirs.size()+1];
-                dir[0] = "none";
-                for (int i=0; i < subDirs.size(); i++){
-                    Log.d(xxx, "onCreatwe, sub directorio es: " +subDirs.get(i));
-                    dir[i+1] = subDirs.get(i);
+            //Chequeamos si el nombre del nuevo directorio ya existe en el array dir
+            for(int i = 0; i < dir.length; i++){
+                if(dir[i].equals(stringNuevoDirectorio)){
+
+                    //Salimos del loop
+                    boolDirYaExiste = true;
+                    break;
                 }
-
-                // Initializing an ArrayAdapter
-                spinnerArrayAdapter = null;
-                spinnerArrayAdapter = new ArrayAdapter<String>(
-                        ActivityLauncherUI.this,R.layout.spinner_item,dir);
-                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
-                spinner.setAdapter(spinnerArrayAdapter);
-
-            }else{
-                Log.d(xxx, "En setOnClickListener del boton crear nuevo directorio");
-                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Type only letters and numbers",
-                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
+
+            if(!boolDirYaExiste) {
+                //Chequear si el nombre del nuevo directorio contiene solo letras (may y min) y numeros
+                if (isLettersAndDigits(stringNuevoDirectorio)) {
+                    //Cambio a false para que el back button pressed funcione de modo normal
+                    boolCreandoNuevoDirectorio = false;
+                    //Crear nuevo subdir
+                    configuracionesMultiples.createSubDirDeDirCesaralMagicImageC(stringNuevoDirectorio);
+                    button.setVisibility(View.VISIBLE);
+                    secuenciaDeImagenes.setVisibility(View.VISIBLE);
+                    secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
+                    spinner.setVisibility(View.VISIBLE);
+                    nuevoDir.setVisibility(View.GONE);
+                    buttonCrearDir.setVisibility(View.GONE);
+
+                    //Volver a leer los sub directorios que cuelgan de, Prueba OK
+                    List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
+                    dir = null;
+                    //dir = new String[subDirs.size()];
+                    dir = new String[subDirs.size() + 1];
+                    dir[0] = "none";
+                    for (int i = 0; i < subDirs.size(); i++) {
+                        Log.d(xxx, "onCreatwe, sub directorio es: " + subDirs.get(i));
+                        dir[i + 1] = subDirs.get(i);
+                    }
+
+                    // Initializing an ArrayAdapter
+                    spinnerArrayAdapter = null;
+                    spinnerArrayAdapter = new ArrayAdapter<String>(
+                            ActivityLauncherUI.this, R.layout.spinner_item, dir);
+                    spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+                    spinner.setAdapter(spinnerArrayAdapter);
+
+                } else {
+                    Log.d(xxx, "En setOnClickListener del boton crear nuevo directorio");
+                    Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Type only letters and numbers",
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                }
+            }else{
+                //Lanzamos un snack bar con mensaje de que este dir ya existe
+                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Directory already exists", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+
+            //Mostramos el string del spinner que habia antes de ir a crear nuevo dir
+                spinner.setSelection(indiceInicial);
 
             }
         });
@@ -257,6 +296,48 @@ public class ActivityLauncherUI extends AppCompatActivity {
         */
 
     }//Fin del onCreate
+
+    //Find out cual es el directorio activo y muesstralo en el spinner
+    public int spinnerSetSeleccion(String[] subDirs, String directorioActivo){
+
+        String[] arrayStringDirActivo = directorioActivo.split("/");
+        //Solo para pruebas
+        /*
+        for (int i = 0; i < arrayStringDirActivo.length; i++){
+            Log.d(xxx, "En metodo spinnerSetSeleccion, la cadena de directorio activo tiene en el indice: "
+                    +i +": " +arrayStringDirActivo[i] );
+        } */
+
+        //El string del subdir que busco siempre esta en el ultimo indice de actdir
+        //Puede ser ImageC o cualquiera de los que cuelgan de ImageC
+        String actdir = arrayStringDirActivo[arrayStringDirActivo.length - 1];
+
+
+
+        Log.d(xxx, "En metodo spinnerSetSeleccion, el dir activo es: " +actdir);
+
+        int indice = -1;
+
+        if(actdir.equals("ImageC")){
+            indice=1;
+        }else {
+            for (int i = 0; i < subDirs.length; i++) {
+                if (actdir.equals(subDirs[i])) {
+                    Log.d(xxx, "En metodo spinnerSetSeleccion, el directorio activo: "
+                            + actdir + " es igual a: " + subDirs[i]);
+                    indice=i;
+                    break;
+
+                } else {
+                    Log.d(xxx, "En metodo spinnerSetSeleccion, el directorio activo: "
+                            + actdir + " NO es igual a: " + subDirs[i]);
+                }
+            }
+        }
+        return indice;
+        //return 3;
+
+    }
 
     @Override
     public void onBackPressed() {
@@ -313,6 +394,16 @@ public class ActivityLauncherUI extends AppCompatActivity {
             //**************************************************************
             return true;
         }
+
+        if (id == R.id.finalizar_app) {
+            //**************************************************************
+            // finalizar la aplicacion
+            finish();
+            //**************************************************************
+            return true;
+        }
+
+
 
         return super.onOptionsItemSelected(item);
     }

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">CUPP Lite</string>
     <string name="action_settings">Create new directory</string>
+    <string name="finalizar">End program</string>
     <string name="title_activity_mezclar">CUPP Lite</string>
     <string name="combine">Cesaral Magic Photo</string>
 </resources>
