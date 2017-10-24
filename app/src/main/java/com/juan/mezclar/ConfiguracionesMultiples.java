@@ -39,7 +39,9 @@ public class ConfiguracionesMultiples{
             editor.putString(prefName, null); // Storing string
 
         }else{
-            editor.putString(prefName, string); // Storing string
+            //editor.putString(prefName, string); // Storing string
+            //Corregido
+            editor.putString(prefName, string+"/"); // Storing string
 
         }
         editor.commit(); // commit changes
@@ -81,7 +83,7 @@ public class ConfiguracionesMultiples{
     }
 
     public void createSubDirDeDirCesaralMagicImageC(String newDir){
-        //TODO crear un nuevo sub directorio con el nombre que el usuario ha introducido en
+        //crea del menu create directory un nuevo sub directorio con el nombre que el usuario ha introducido en
         //el edit text, No uno que haya seleccionado del drop down menu
         ConfiguracionesDeDirectoriosApp configuracionesDeDirectoriosApp = new ConfiguracionesDeDirectoriosApp(context);
         boolean boolDirCreado = configuracionesDeDirectoriosApp.crearSubDirMethod(pathCesaralMagicImageC, newDir);

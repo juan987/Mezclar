@@ -233,9 +233,7 @@ public class IntentServiceMagic extends IntentService {
             metodoMostrarError("E1", "Error reading file: CONFIG.txt from dir: " +pathCesaralMagicImageC);
             Log.d(xxx, "En metodoPrincipal_2, arrayLineasTexto es null, salimos de la app");
 
-            //No sabemos si el error es por que no existe un dir diferente a "/CesaralMagic/ImageC/".
-            //En cualquier caso, volvemos al dir por defecto para poder escribir algo en el log.txt del dir por defecto
-            pathCesaralMagicImageC = "/CesaralMagic/ImageC/";
+
             return false;
         }
 

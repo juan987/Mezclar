@@ -36,6 +36,9 @@ public class ActivityLauncherUI extends AppCompatActivity {
     String[] dir = null;
     ArrayAdapter<String> spinnerArrayAdapter = null;
 
+    //Este boolean es para manejar el backpressed cuando estoy en la pantalla de crear un nuevo directorio
+    boolean boolCreandoNuevoDirectorio = false;
+
 
 
     @Override
@@ -185,21 +188,24 @@ public class ActivityLauncherUI extends AppCompatActivity {
         buttonCrearDir = (Button)findViewById(R.id.button_crear_dir);
         buttonCrearDir.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
             String stringNuevoDirectorio = nuevoDir.getText().toString();
-            //Crear nuevo subdir
-            configuracionesMultiples.createSubDirDeDirCesaralMagicImageC(stringNuevoDirectorio);
-            button.setVisibility(View.VISIBLE);
-            secuenciaDeImagenes.setVisibility(View.VISIBLE);
-            secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
-            spinner.setVisibility(View.VISIBLE);
-            nuevoDir.setVisibility(View.GONE);
-            buttonCrearDir.setVisibility(View.GONE);
 
+            //Chequear si el nombre del nuevo directorio contiene solo letras (may y min) y numeros
+            if(isLettersAndDigits(stringNuevoDirectorio)){
+                //Cambio a false para que el back button pressed funcione de modo normal
+                boolCreandoNuevoDirectorio = false;
+                //Crear nuevo subdir
+                configuracionesMultiples.createSubDirDeDirCesaralMagicImageC(stringNuevoDirectorio);
+                button.setVisibility(View.VISIBLE);
+                secuenciaDeImagenes.setVisibility(View.VISIBLE);
+                secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
+                spinner.setVisibility(View.VISIBLE);
+                nuevoDir.setVisibility(View.GONE);
+                buttonCrearDir.setVisibility(View.GONE);
 
-
-
-            //Volver a leer los sub directorios que cuelgan de, Prueba OK
-            List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
+                //Volver a leer los sub directorios que cuelgan de, Prueba OK
+                List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
                 dir = null;
                 //dir = new String[subDirs.size()];
                 dir = new String[subDirs.size()+1];
@@ -216,7 +222,11 @@ public class ActivityLauncherUI extends AppCompatActivity {
                 spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
                 spinner.setAdapter(spinnerArrayAdapter);
 
-
+            }else{
+                Log.d(xxx, "En setOnClickListener del boton crear nuevo directorio");
+                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Type only letters and numbers",
+                        Snackbar.LENGTH_LONG).setAction("Action", null).show();
+            }
 
             }
         });
@@ -249,6 +259,24 @@ public class ActivityLauncherUI extends AppCompatActivity {
     }//Fin del onCreate
 
     @Override
+    public void onBackPressed() {
+        //Hay que detectar si estamos en la pantalla de crear un nuevo directorio al presionar el back button
+        if(boolCreandoNuevoDirectorio){
+            //Volvemos a presentar la pantalla inicial, NO hemos creado un directorio nuevo
+            button.setVisibility(View.VISIBLE);
+            secuenciaDeImagenes.setVisibility(View.VISIBLE);
+            secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
+            spinner.setVisibility(View.VISIBLE);
+            nuevoDir.setVisibility(View.GONE);
+            buttonCrearDir.setVisibility(View.GONE);
+
+            boolCreandoNuevoDirectorio = false;
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -276,7 +304,12 @@ public class ActivityLauncherUI extends AppCompatActivity {
             secuenciaDeImagenesAlfanumerica.setVisibility(View.GONE);
             spinner.setVisibility(View.GONE);
             nuevoDir.setVisibility(View.VISIBLE);
+            //Se presenta el campo vacio
+            nuevoDir.setText("");
             buttonCrearDir.setVisibility(View.VISIBLE);
+
+            //Cambio a true para detectar el back button pressed
+            boolCreandoNuevoDirectorio = true;
             //**************************************************************
             return true;
         }
@@ -366,10 +399,10 @@ public class ActivityLauncherUI extends AppCompatActivity {
     // y no tiene la Ñ, para cualquier numero de caracteres
     //Ver http://www.vogella.com/tutorials/JavaRegularExpressions/article.html#regular-expressions
     public boolean isLettersAndDigits(String s){
-
+        Log.d(xxx, "En metodo isLettersAndDigits: " +s.matches("([\\w&&[^ñÑ]])*"));
         //Requerimiento de Cesar: que se trague todo el string, sin importar los caracteres que tenga.
-        return true;
-        //return s.matches("([\\w&&[^ñÑ]])*");
+        //return true;
+        return s.matches("([\\w&&[^ñÑ]])*");
     }
 
     //Metodo que recupera los datos recibidos en un intent lanzado por otra aplicacion,
