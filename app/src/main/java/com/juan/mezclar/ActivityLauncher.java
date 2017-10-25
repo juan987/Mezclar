@@ -266,6 +266,9 @@ public class ActivityLauncher extends AppCompatActivity {
                 Intent mServiceIntent = new Intent(this, IntentServiceMagic.class);
                 mServiceIntent.putExtra("KeyName", stringImagesSecuence);
                 startService(mServiceIntent);
+                //agregue el finish el 25 oct 2017
+                finish();
+
 
             } else {//Salta aqui si no hay datos en el intent
                 Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Datos de Launch Mezclar: No hay datos");
@@ -275,14 +278,15 @@ public class ActivityLauncher extends AppCompatActivity {
                 //launchMezclarApplication.putExtra("KeyName","Hola, te estoy llamando");
 
                 startActivity(intent);
-                this.finish();
+                finish();
             }
 
         } else {//Salta aqui si recibe nulo en el intent
             Log.d(xxx, "En metodo recuperarIntentConDatosInicialesServicio, Datos de Launch Mezclar: NULL 2 del else");
             //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
+            //agregue el finish el 25 oct 2017
             //this.finish();
-            //finish();
+            finish();
 
         }
     }//Fin de recuperarIntentConDatosInicialesServicio

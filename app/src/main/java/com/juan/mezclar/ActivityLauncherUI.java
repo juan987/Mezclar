@@ -3,6 +3,7 @@ package com.juan.mezclar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,7 +23,8 @@ import java.util.List;
 //la actividad ActivityLauncher con un intent.
 //Esta actividad tiene una UI para introducir secuencias numericas y secuencias alfanumericas.
 
-public class ActivityLauncherUI extends AppCompatActivity {
+public class ActivityLauncherUI extends AppCompatActivity  {
+    //public class ActivityLauncherUI extends AppCompatActivity implements NoticeDialogFragment.NoticeDialogListener {
     //String para usar en log.d con el nombre de la clase
     Button button = null;
     Button buttonCrearDir = null;
@@ -397,6 +399,18 @@ public class ActivityLauncherUI extends AppCompatActivity {
 
             //Cambio a true para detectar el back button pressed
             boolCreandoNuevoDirectorio = true;
+            //**************************************************************
+            return true;
+        }
+
+        if (id == R.id.actio_borrar_configuracion) {
+            //**************************************************************
+            // Lanzar actividad para borrar la configuracion activa
+            Intent intent = new Intent(ActivityLauncherUI.this, BorrarConfiguracion.class);
+            //intent.putExtra("KeyName", secuenciaDeImagenes.getText().toString());
+
+            startActivity(intent);
+
             //**************************************************************
             return true;
         }

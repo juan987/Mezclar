@@ -323,7 +323,8 @@ public class DatosConfigTxt {
             }else if (stringOverwrite.equals("0")){
                 stringOverwrite = "";
             }else{
-                //No hace nada, se usa el valor por defecto
+                //No hace nada, se usa el valor por defecto, que reescribimos aqui:
+                stringOverwrite = "overwrite";
             }
         }
 
