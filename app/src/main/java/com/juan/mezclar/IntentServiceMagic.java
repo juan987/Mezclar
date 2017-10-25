@@ -272,7 +272,36 @@ public class IntentServiceMagic extends IntentService {
 
         //Leer coordenadas N y T, URL, user, password y SOR del array de lineas obtenido del fichero CONFIG.txt
         //List<PojoCoordenadas> listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
-        listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
+        //listaCoordenadas = generarPojoGenerarUrl(arrayLineasTexto);
+
+        //*****************************************************************************
+        //*****************************************************************************
+        //*****************************************************************************
+        //Usar clase DatosConfigTxt
+        //Juan, 25-10-17, paso el metodo generarPojoGenerarUrl a la clase DatosConfigTxt
+
+        DatosConfigTxt datosConfigTxt = new DatosConfigTxt(IntentServiceMagic.this);
+        //Leer coordenadas N y T, URL, user, password,SOR, overwrite del array de lineas obtenido del fichero CONFIG.txt
+        listaCoordenadas = datosConfigTxt.getCoordenadasN(arrayLineasTexto);
+
+        arrayPojoCoordenadasAlfanumerico = datosConfigTxt.getArrayPojoCoordenadasAlfanumerico();
+        urlServidor = datosConfigTxt.getUrlServidor();
+        user = datosConfigTxt.getUser();
+        password = datosConfigTxt.getPassword();
+        stringSOR = datosConfigTxt.getStringSOR();
+        stringOverwrite = datosConfigTxt.getStringOverwrite();
+
+        Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
+                +"\n"  +"xxx Variable user: " +user
+                +"\n"  +"xxx Variable password: " +password
+                +"\n"  +"xxx Variable SOR: " +stringSOR
+                +"\n"  +"xxx Variable overwrite: " +stringOverwrite);
+
+
+        //FIN Usar clase DatosConfigTxt
+        //*****************************************************************************
+        //*****************************************************************************
+        //*****************************************************************************
 
         //Recorro he imprimo los datos de listaCoordenadas
         for(int i = 0; i < listaCoordenadas.size(); i++){
