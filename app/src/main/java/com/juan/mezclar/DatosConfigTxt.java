@@ -25,7 +25,11 @@ public class DatosConfigTxt {
     String stringSOR = "";
 
     //Almacena el param de config overwrite. Nuevo req el 20oct17.
-    String stringOverwrite = "";
+    //25oct17: Cambio de requerimiento en mail apk 1.0.12:
+    //Si el parametro "OVERWRITE" de CONFIG.txt no existe o es OVERWRITE=1, se sobbreescribe predict.jpg
+    //Entonces se envia stringOverwrite = "overwrite" para sobreescribir
+    //Para generar un nombre distinto cada vez, tiene que estra el parametro con valor 0: OVERWRITE=1
+    String stringOverwrite = "overwrite";
 
     //Parametrros de offset y scale como strings para recuperarlos del CONFIX.txt
     String stringOffset_x="";
@@ -181,6 +185,7 @@ public class DatosConfigTxt {
         String[] array_intOffset_x = null;
         String[] array_intOffset_y = null;
         String[] array_doubleScale_x = null;
+        String[] arrayStringOverwrite = null;
 
         String regexUrl = "=";
         String regexUser = "=";
@@ -189,6 +194,7 @@ public class DatosConfigTxt {
         String regex_intOffset_x = "=";
         String regex_intOffset_y = "=";
         String regex_doubleScale_x = "=";
+        String regexOverwrite = "=";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
             //Obtener URL del Servidor para almacenar imagen generada
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("web")){
@@ -208,10 +214,21 @@ public class DatosConfigTxt {
                 Log.d(xxx, "xxx, Hay una linea que empieza con SOR y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringSOR = arrayLineasTextoLocal.get(i).split(regexSOR);
             }
+
+            /*  ORIGINAL, CAMBIO DE REQ, VER DEFINICION DE VARIABLES AL PRINCIPIO DE LA CLASE
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("overwrite")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con overwrite y tiene: " +arrayLineasTextoLocal.get(i));
                 //Asignamos la linea directamente, no hay que hacer regex como en las otras
                 stringOverwrite = arrayLineasTextoLocal.get(i);
+            }  */
+
+            //CON EL NUEVO REQ 25OCT17
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("overwrite")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con overwrite y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayStringOverwrite = arrayLineasTextoLocal.get(i).split(regexOverwrite);
+
+            }else{
+                //No hacemos nada, envia el valor por defecto de stringOverwrite
             }
 
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("offset_x")){
@@ -293,6 +310,23 @@ public class DatosConfigTxt {
             }
         }
 
+        //Imprime el overwrite y lo asigna a la variable global
+        if(arrayStringOverwrite != null) {
+            int i = 0;
+            for (String overwrite : arrayStringOverwrite) {
+                Log.d(xxx, "xxx Dato de user en arrayStringOverwrite " + i + " es: " + overwrite);
+                stringOverwrite = arrayStringOverwrite[i];
+                i++;
+            }
+            if(stringOverwrite.equals("1")){
+                stringOverwrite = "overwrite";
+            }else if (stringOverwrite.equals("0")){
+                stringOverwrite = "";
+            }else{
+                //No hace nada, se usa el valor por defecto
+            }
+        }
+
         //Imprime el offset_x y lo asigna a la variable global como integer
         if(array_intOffset_x != null) {
             int i = 0;
@@ -325,7 +359,7 @@ public class DatosConfigTxt {
                 Log.d(xxx, "Error de formato de  stringOffset_y, no puede ser tipo int " + stringOffset_y);            }
         }
 
-        //Imprime el scale_x y lo asigna a la variable global como integer
+        //Imprime el scale_x y lo asigna a la variable global como double
         if(array_doubleScale_x != null) {
             int i = 0;
             for (String scale : array_doubleScale_x) {
