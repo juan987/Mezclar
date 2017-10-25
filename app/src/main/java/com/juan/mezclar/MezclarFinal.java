@@ -118,6 +118,11 @@ public class MezclarFinal extends AppCompatActivity {
     //Almacena el param de config overwrite. Nuevo req el 20oct17.
     String stringOverwrite = "";
 
+    //Parametro offset y scale para modificar coordenadas N y T
+    int intOffset_x=0;
+    int intOffset_y=0;
+    Double doubleScale_x=1.0;
+
 /*
 
     20oct17: nuevo requerimiento
@@ -558,12 +563,19 @@ public class MezclarFinal extends AppCompatActivity {
         password = datosConfigTxt.getPassword();
         stringSOR = datosConfigTxt.getStringSOR();
         stringOverwrite = datosConfigTxt.getStringOverwrite();
+        //Parametro offset y scale para modificar coordenadas N y T
+        intOffset_x = datosConfigTxt.getIntOffset_x();
+        intOffset_y = datosConfigTxt.getIntOffset_y();
+        doubleScale_x = datosConfigTxt.getDoubleScale_x();
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
                 +"\n"  +"xxx Variable SOR: " +stringSOR
-                +"\n"  +"xxx Variable overwrite: " +stringOverwrite);
+                +"\n"  +"xxx Variable overwrite: " +stringOverwrite
+                +"\n"  +"xxx Variable intOffset_x: " +intOffset_x
+                +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
+                +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x);
 
 
         //FIN Usar clase DatosConfigTxt
@@ -877,6 +889,9 @@ public class MezclarFinal extends AppCompatActivity {
                 xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
                 yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
 
+
+
+
                 //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
                 //Float.isNaN retorna true si no es un numero
                 if(Float.isNaN(xFloat) || Float.isNaN(yFloat)){
@@ -887,6 +902,20 @@ public class MezclarFinal extends AppCompatActivity {
 
                     return false;//Cerrar aplicacion y evitar fallo en el procesamiento
                 }
+
+                //**************************************************************************************
+                //**************************************************************************************
+                //**************************************************************************************
+                //req de offset el 25 oct 2017, modificar coordenadas de acuerdo a offset_x, offset_y y sacale_x
+                DatosConfigTxt datosConfigTxt = new DatosConfigTxt(MezclarFinal.this);
+                xFloat = datosConfigTxt.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
+                yFloat = datosConfigTxt.modificarCoordenadaY(yFloat, intOffset_y);
+
+                //FIN req de offset el 25 oct 2017
+                //**************************************************************************************
+                //**************************************************************************************
+                //**************************************************************************************
+
 
 
                 //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
@@ -1121,7 +1150,18 @@ public class MezclarFinal extends AppCompatActivity {
                         return false;//Cerrar aplicacion y evitar fallo en el procesamiento
                     }
 
+                    //**************************************************************************************
+                    //**************************************************************************************
+                    //**************************************************************************************
+                    //req de offset el 25 oct 2017, modificar coordenadas de acuerdo a offset_x, offset_y y sacale_x
+                    DatosConfigTxt datosConfigTxt = new DatosConfigTxt(MezclarFinal.this);
+                    xFloat = datosConfigTxt.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
+                    yFloat = datosConfigTxt.modificarCoordenadaY(yFloat, intOffset_y);
 
+                    //FIN req de offset el 25 oct 2017
+                    //**************************************************************************************
+                    //**************************************************************************************
+                    //**************************************************************************************
                     //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
                     mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
                             xFloat, yFloat);

@@ -27,6 +27,28 @@ public class DatosConfigTxt {
     //Almacena el param de config overwrite. Nuevo req el 20oct17.
     String stringOverwrite = "";
 
+    //Parametrros de offset y scale como strings para recuperarlos del CONFIX.txt
+    String stringOffset_x="";
+    String stringOffset_y="";
+    String stringScale_x="";
+
+    //Parametro offset y scale para modificar coordenadas N y T
+    int intOffset_x=0;
+    int intOffset_y=0;
+    Double doubleScale_x=1.0;
+
+    public int getIntOffset_x() {
+        return intOffset_x;
+    }
+
+    public int getIntOffset_y() {
+        return intOffset_y;
+    }
+
+    public Double getDoubleScale_x() {
+        return doubleScale_x;
+    }
+
 
     public DatosConfigTxt(Context context){
         this.context = context;
@@ -106,7 +128,7 @@ public class DatosConfigTxt {
             //***************************************************************************************
 
             //Solo quiero las lineas que empiezan con T
-            if(arrayLineasTextoLocal.get(i).startsWith("T")) {
+            if(arrayLineasTextoLocal.get(i).toUpperCase().startsWith("T")) {
 
                 //Extrae las coordenadas x e y de cada linea con regex y genera pojo de
                 //coordenadas por cada linea y lo guarda en el array de coordenadas
@@ -149,38 +171,65 @@ public class DatosConfigTxt {
 
         }//FIN de for(int i = 0; i < arrayLineasTextoLocal.size(); i++)
 
+
+
         //Este for extrae la URL del servidor, el user y el password que estan en CONFIG.txt
         String[] stringURLFinal = null;
         String[] arrayStringUser = null;
         String[] arrayStringPass = null;
         String[] arrayStringSOR = null;
-        String regexUrl = "web=";
-        String regexUser = "user=";
-        String regexPass = "password=";
-        String regexSOR = "SOR=";
+        String[] array_intOffset_x = null;
+        String[] array_intOffset_y = null;
+        String[] array_doubleScale_x = null;
+
+        String regexUrl = "=";
+        String regexUser = "=";
+        String regexPass = "=";
+        String regexSOR = "=";
+        String regex_intOffset_x = "=";
+        String regex_intOffset_y = "=";
+        String regex_doubleScale_x = "=";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
             //Obtener URL del Servidor para almacenar imagen generada
-            if(arrayLineasTextoLocal.get(i).startsWith("web")){
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("web")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTextoLocal.get(i));
                 stringURLFinal = arrayLineasTextoLocal.get(i).split(regexUrl);
             }
-            if(arrayLineasTextoLocal.get(i).startsWith("user")){
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("user")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con user y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringUser = arrayLineasTextoLocal.get(i).split(regexUser);
             }
-            if(arrayLineasTextoLocal.get(i).startsWith("password")){
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("password")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con password y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringPass = arrayLineasTextoLocal.get(i).split(regexPass);
             }
-            if(arrayLineasTextoLocal.get(i).startsWith("SOR")){
+            //if(arrayLineasTextoLocal.get(i).startsWith("SOR")){
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("sor")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con SOR y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayStringSOR = arrayLineasTextoLocal.get(i).split(regexSOR);
             }
-            if(arrayLineasTextoLocal.get(i).startsWith("overwrite")){
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("overwrite")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con overwrite y tiene: " +arrayLineasTextoLocal.get(i));
                 //Asignamos la linea directamente, no hay que hacer regex como en las otras
                 stringOverwrite = arrayLineasTextoLocal.get(i);
             }
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("offset_x")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con offset_x, y tiene: " +arrayLineasTextoLocal.get(i));
+                array_intOffset_x = arrayLineasTextoLocal.get(i).split(regex_intOffset_x);
+            }
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("offset_y")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con offset_y, y tiene: " +arrayLineasTextoLocal.get(i));
+                array_intOffset_y = arrayLineasTextoLocal.get(i).split(regex_intOffset_y);
+            }
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("scale_x")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con scale_x, y tiene: " +arrayLineasTextoLocal.get(i));
+                array_doubleScale_x = arrayLineasTextoLocal.get(i).split(regex_doubleScale_x);
+            }
+
+
         }
 
 
@@ -244,17 +293,91 @@ public class DatosConfigTxt {
             }
         }
 
+        //Imprime el offset_x y lo asigna a la variable global como integer
+        if(array_intOffset_x != null) {
+            int i = 0;
+            for (String offset_x : array_intOffset_x) {
+                Log.d(xxx, "xxx Dato de user en array_intOffset_x " + i + " es: " + offset_x);
+                stringOffset_x = array_intOffset_x[i];
+                i++;
+            }
+
+            try {
+                intOffset_x = Integer.parseInt(stringOffset_x);
+            } catch (NumberFormatException e) {
+                //e.printStackTrace();
+                Log.d(xxx, "Error de formato de  stringOffset_x, no puede ser tipo int " + stringOffset_x);            }
+        }
+
+        //Imprime el offset_y y lo asigna a la variable global como integer
+        if(array_intOffset_y != null) {
+            int i = 0;
+            for (String offset : array_intOffset_y) {
+                Log.d(xxx, "xxx Dato de user en array_intOffset_y " + i + " es: " + offset);
+                stringOffset_y = array_intOffset_y[i];
+                i++;
+            }
+
+            try {
+                intOffset_y = Integer.parseInt(stringOffset_y);
+            } catch (NumberFormatException e) {
+                //e.printStackTrace();
+                Log.d(xxx, "Error de formato de  stringOffset_y, no puede ser tipo int " + stringOffset_y);            }
+        }
+
+        //Imprime el scale_x y lo asigna a la variable global como integer
+        if(array_doubleScale_x != null) {
+            int i = 0;
+            for (String scale : array_doubleScale_x) {
+                Log.d(xxx, "xxx Dato de user en array_doubleScale_x " + i + " es: " + scale);
+                stringScale_x = array_doubleScale_x[i];
+                i++;
+            }
+
+            try {
+                doubleScale_x = Double.valueOf(stringScale_x);
+            } catch (NumberFormatException e) {
+                //e.printStackTrace();
+                Log.d(xxx, "Error de formato de  stringScale_x, no puede ser tipo double " + stringScale_x);
+            }
+        }
+
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
                 +"\n"  +"xxx Variable SOR: " +stringSOR
-                +"\n"  +"xxx Variable overwrite: " +stringOverwrite);
+                +"\n"  +"xxx Variable overwrite: " +stringOverwrite
+                +"\n"  +"xxx Variable intOffset_x: " +intOffset_x
+                +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
+                +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x);
 
-
+        //Modificar siempre arrayPojoCoordenadas y arrayPojoCoordenadasAlfanumerico con offset y scale
 
         return arrayPojoCoordenadas;
     }//Fin de getCoordenadasN y obtener user y password
+
+
+    //Metodo para modificar las coordenadas X originales de acuerdo a offset_x, y scale_x)
+    public float modificarCoordenadaX(float coordInicial, double doubleScale_x, int intOffset_x){
+        Log.d(xxx, "En metodo modificarCoordenadaX, coordInicial: " +coordInicial);
+        float coordFinal = 0;
+        //Math.round(f - 32 / 1.8f)
+        coordFinal = Math.round(coordInicial * doubleScale_x);
+        coordFinal = coordFinal + intOffset_x;
+        Log.d(xxx, "En metodo modificarCoordenadaX, coordFinal: " +coordFinal);
+        return coordFinal;
+    }
+
+    //Metodo para modificar las coordenadas X originales de acuerdo a offset_x, y scale_x)
+    public float modificarCoordenadaY(float coordInicial, int intOffset_y ){
+        Log.d(xxx, "En metodo modificarCoordenadaY, coordInicial: " +coordInicial);
+        float coordFinal = 0;
+        //Math.round(f - 32 / 1.8f)
+        coordFinal = coordInicial + intOffset_y;
+        Log.d(xxx, "En metodo modificarCoordenadaY, coordFinal: " +coordFinal);
+        return coordFinal;
+    }
 
 
     private void imprimirLineasConfigTxt(List<String> arrayLineasTexto) {
