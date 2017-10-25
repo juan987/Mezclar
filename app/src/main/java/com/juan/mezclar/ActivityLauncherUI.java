@@ -329,6 +329,7 @@ public class ActivityLauncherUI extends AppCompatActivity  {
 
 
             //Averiguar cual es el indice del spinner ha presentar al entrar en la app
+            pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
             indiceInicial = spinnerSetSeleccion(dir, pathCesaralMagicImageC);
             // Initializing an ArrayAdapter
             spinnerArrayAdapter = null;

@@ -131,9 +131,13 @@ public class ConfiguracionesDeDirectoriosApp {
             File dir = new File(directorio + subDir);
             if (dir.exists()) {
                 //directorioBorrado = dir.delete();
-                FileUtils.deleteDirectory(dir);
+                FileUtils.deleteDirectory(dir);//devuelve void o exception
                 if(directorioBorrado)
                 Log.d(xxx, "borrarSubDirMethod2,  directorio borrado");
+            }else{
+                Log.d(xxx, "borrarSubDirMethod2,  directorio NO borrado");
+                directorioBorrado = false;
+
             }
 
 
