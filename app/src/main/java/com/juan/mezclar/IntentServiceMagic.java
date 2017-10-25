@@ -405,8 +405,8 @@ public class IntentServiceMagic extends IntentService {
 
             if(!ejecutarConParametroSor()){
                 //Ha habido un problema con la ordenacion, salir del programa
-                enviarNotificationConNumero("E1");
-                metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
+                //enviarNotificationConNumero("E1");
+                //metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
                 Log.d(xxx, "En metodoPrincipal_2, Error en metodo ejecutarConParametroSor, salimos de la app");
                 //Me faltaba esta linea
                 return false;
@@ -843,7 +843,14 @@ public class IntentServiceMagic extends IntentService {
         //Prueba 1: ORDENACION 1, tipo de ordenacion: 1, 2, o 4:, input: 10 digitos
         //ordenaNumeros(6);
 
-        int integerSOR = Integer.parseInt(stringSOR);
+        int integerSOR = 0;
+        try {
+            integerSOR = Integer.parseInt(stringSOR);
+        } catch (NumberFormatException e) {
+            Log.d(xxx, "En ejecutarConParametroSor, SOR= " +integerSOR  +", ERROR: el sor No es un numero");
+            //Si da este fallo, asignamos el valor de SOR a cualquier valor fuera del rango 1-6
+            integerSOR=0;
+        }
         if(integerSOR < 1 || integerSOR >6){
             //Hay un error, No se podido ordenar el array, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error, SOR esta fuera de rango, debe estar entre 1 y 6" +", saliendo de la aplicacion");
