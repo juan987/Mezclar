@@ -49,7 +49,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".BorrarConfiguracion"
+            android:name=".BorrarConfiguracionActivity"
             android:label="@string/title_activity_borrar_configuracion"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"

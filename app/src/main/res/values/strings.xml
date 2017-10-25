@@ -5,7 +5,14 @@
     <string name="finalizar">End program</string>
     <string name="title_activity_mezclar">CUPP Lite</string>
     <string name="combine">Cesaral Magic Photo</string>
-    <string name="title_activity_borrar_configuracion">BorrarConfiguracion</string>
+    <string name="title_activity_borrar_configuracion">CUPP Lite</string>
+
+
+    <!-- strings del alert dialod -->
+    <string name="alert_dialog_title">Titulo</string>
+    <string name="alert_dialog_ok">Proceed</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <string name="alert_dialog_description">Cuidado!</string>
 
 
 </resources>

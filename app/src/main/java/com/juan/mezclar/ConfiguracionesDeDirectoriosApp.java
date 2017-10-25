@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -59,6 +61,35 @@ public class ConfiguracionesDeDirectoriosApp {
         return true;
     }
 
+    public boolean borrarSubDirMethod(String environmentDir, String subDir){
+        //environmentDir es normalmente /CesaralMagic/ImageC/
+        //Nota 2: subDir es un string sin barras: my_nuevo_directorio
+        //subDir es el nuevo directorio que vamos a crear
+        if(isExternalStorageWritable()) {
+            File dir = Environment.getExternalStoragePublicDirectory(environmentDir);
+            String directorio = dir.getAbsolutePath() ;
+            Log.d(xxx, "borrarSubDirMethod, El directorio es: " + directorio);
+            Log.d(xxx, "borrarSubDirMethod, El sub directorio es: " + subDir);
+
+            if(borrarSubDirMethod2(directorio +"/", subDir)){
+                Log.d(xxx, "borrarSubDirMethod, Sub directorio borrado");
+            }else{
+                //Toast.makeText(context,
+                //"ERROR Imagen NO guardada", Toast.LENGTH_LONG).show();
+                Log.d(xxx, "borrarSubDirMethod, ERROR: Sub directorio no borrado" );
+                return false;
+            }
+
+
+        }else{
+            Log.d(xxx, "en borrarSubDirMethod, El external public storage no esta montado ");
+            return false;
+
+        }
+        //Si llega aqui, la imagen se ha guardado correctamente
+        return true;
+    }
+
 
 
     /* Checks if external storage is available for read and write */
@@ -85,6 +116,31 @@ public class ConfiguracionesDeDirectoriosApp {
 
         } catch (Exception e) {
             Log.e("saveToExternalStorage()", e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean borrarSubDirMethod2(String directorio, String subDir) {
+        //Ver para referencia:
+        //http://www.java2s.com/Code/Android/Core-Class/Createanewdirectoryonexternalstorage.htm
+
+        //este mejor
+        //https://stackoverflow.com/questions/14930908/how-to-delete-all-files-and-folders-in-one-folder-on-android
+        boolean directorioBorrado = true;//por defecto
+        try {
+            File dir = new File(directorio + subDir);
+            if (dir.exists()) {
+                //directorioBorrado = dir.delete();
+                FileUtils.deleteDirectory(dir);
+                if(directorioBorrado)
+                Log.d(xxx, "borrarSubDirMethod2,  directorio borrado");
+            }
+
+
+            return directorioBorrado;
+
+        } catch (Exception e) {
+            Log.d(xxx, "En el catch, directorio no borrado: " +e.getMessage());
             return false;
         }
     }

@@ -90,6 +90,14 @@ public class ConfiguracionesMultiples{
 
     }
 
+    public boolean deleteSubDirDeDirCesaralMagicImageC(String dir){
+        //crea del menu create directory un nuevo sub directorio con el nombre que el usuario ha introducido en
+        //el edit text, No uno que haya seleccionado del drop down menu
+        ConfiguracionesDeDirectoriosApp configuracionesDeDirectoriosApp = new ConfiguracionesDeDirectoriosApp(context);
+        boolean boolDirBorrado = configuracionesDeDirectoriosApp.borrarSubDirMethod(pathCesaralMagicImageC, dir);
+        return boolDirBorrado;
+    }
+
 
 
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.juan.mezclar.BorrarConfiguracion"
+    tools:context="com.juan.mezclar.BorrarConfiguracionActivity"
     tools:showIn="@layout/activity_borrar_configuracion">
 
     <TextView
@@ -16,124 +16,65 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.061"
-
+        app:layout_constraintVertical_bias="0.182"
+        app:layout_constraintHorizontal_bias="0.075"
         android:visibility="visible"
-        app:layout_constraintHorizontal_bias="0.062" />
-
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.114"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:background="@drawable/border2"
+        android:textSize="20sp"
         />
 
     <!--
-            android:background="@drawable/border"
-
-
+            app:layout_constraintHorizontal_bias="0.062"
 
     -->
 
-    <EditText
-        android:id="@+id/nuevo_dir"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/text_view_active_directory"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Enter new directory"
-        android:inputType="text"
-        android:maxLength="16"
+        android:text="Muestra el directorio actual"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="0.114"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:textSize="35sp"
-        android:imeOptions="actionDone"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:visibility="gone"/>
+        app:layout_constraintVertical_bias="0.268"
+        app:layout_constraintHorizontal_bias="0.32"
+        android:visibility="visible"
+        android:textSize="25sp"
+        />
 
-    <EditText
-        android:id="@+id/secImagenes"
-        android:layout_width="0dp"
+    <!--
+    <TextView
+        android:id="@+id/text_view_active_directory"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Numeric Mode"
-        android:inputType="number"
-        android:maxLength="16"
+        android:text="Muestra el directorio actual"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="0.318"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:textSize="35sp"
-        android:imeOptions="actionDone"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp" />
+        app:layout_constraintVertical_bias="0.271"
+        android:visibility="visible"
+        app:layout_constraintHorizontal_bias="0.075"
+        android:textSize="25sp"
+        />
+        -->
 
-    <EditText
-        android:id="@+id/secImagenesAlfanumerica"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="String Mode"
-        android:inputType="text"
-        android:maxLength="16"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="0.583"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:textSize="35sp"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp" />
 
     <Button
         android:id="@+id/button_id"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="Generate Image"
+        android:text="Delete active configuration"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintVertical_bias="0.814"
+        app:layout_constraintHorizontal_bias="0.28"
+        app:layout_constraintVertical_bias="0.577"
         android:textSize="25sp"
         android:textAllCaps="false"
         />
 
-    <Button
-        android:id="@+id/button_crear_dir"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Create new directory"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintVertical_bias="0.814"
-        android:textSize="25sp"
-        android:textAllCaps="false"
-        android:visibility="gone"
-        />
+
 
 </android.support.constraint.ConstraintLayout>

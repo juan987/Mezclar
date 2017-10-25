@@ -3,7 +3,6 @@ package com.juan.mezclar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -15,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -42,6 +40,12 @@ public class ActivityLauncherUI extends AppCompatActivity  {
     boolean boolCreandoNuevoDirectorio = false;
 
     int indiceInicial=0;
+
+    //Para el req de borrar
+    boolean booleanBorrar = false;
+
+
+    String pathCesaralMagicImageC;
 
 
 
@@ -76,7 +80,8 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         //Prueba crear nuevo subdir
         //configuracionesMultiples.createSubDirDeDirCesaralMagicImageC("nuevo_dir_2");
 
-        String pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        //String pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
         //El directorio activo de la app es:
         Log.d(xxx, "En onCreate, al inicio de la app  el directorio activo es: " +pathCesaralMagicImageC);
 
@@ -241,7 +246,7 @@ public class ActivityLauncherUI extends AppCompatActivity  {
                     nuevoDir.setVisibility(View.GONE);
                     buttonCrearDir.setVisibility(View.GONE);
 
-                    //Volver a leer los sub directorios que cuelgan de, Prueba OK
+                    //Volver a leer los sub directorios que cuelgan de predict, Prueba OK
                     List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
                     dir = null;
                     dir = new String[subDirs.size()];
@@ -303,6 +308,42 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         */
 
     }//Fin del onCreate
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(booleanBorrar){
+            Log.d(xxx, "En metodo onResume, booleanBorrar: " +booleanBorrar);
+            booleanBorrar = false;
+            //Volver a leer los sub directorios que cuelgan de predict, Prueba OK
+            List<String> subDirs = configuracionesMultiples.getSubDirDeDirCesaralMagicImageC();
+            dir = null;
+            dir = new String[subDirs.size()];
+            //dir = new String[subDirs.size() + 1];
+            //dir[0] = "";
+            for (int i = 0; i < subDirs.size(); i++) {
+                Log.d(xxx, "onResume, sub directorio es: " + subDirs.get(i));
+                //dir[i + 1] = subDirs.get(i);
+                dir[i] = subDirs.get(i);
+            }
+
+
+            //Averiguar cual es el indice del spinner ha presentar al entrar en la app
+            indiceInicial = spinnerSetSeleccion(dir, pathCesaralMagicImageC);
+            // Initializing an ArrayAdapter
+            spinnerArrayAdapter = null;
+            spinnerArrayAdapter = new ArrayAdapter<String>(
+                    ActivityLauncherUI.this, R.layout.spinner_item, dir);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+            spinner.setAdapter(spinnerArrayAdapter);
+            spinner.setSelection(indiceInicial);
+
+        }else{
+            Log.d(xxx, "En metodo onResume, booleanBorrar: " +booleanBorrar);
+        }
+
+
+    }
 
     //Find out cual es el directorio activo y muesstralo en el spinner
     public int spinnerSetSeleccion(String[] subDirs, String directorioActivo){
@@ -406,11 +447,13 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         if (id == R.id.actio_borrar_configuracion) {
             //**************************************************************
             // Lanzar actividad para borrar la configuracion activa
-            Intent intent = new Intent(ActivityLauncherUI.this, BorrarConfiguracion.class);
+            Intent intent = new Intent(ActivityLauncherUI.this, BorrarConfiguracionActivity.class);
             //intent.putExtra("KeyName", secuenciaDeImagenes.getText().toString());
 
             startActivity(intent);
 
+
+            booleanBorrar = true;
             //**************************************************************
             return true;
         }
