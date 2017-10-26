@@ -843,6 +843,14 @@ public class MezclarFinal extends AppCompatActivity {
         //Loop principal de la aplicacion
         Bitmap imagenParaSuperponerConOrigin;
 
+        //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+        CentradoCadenasNumeros centradoCadenasNumeros = new CentradoCadenasNumeros(MezclarFinal.this);
+        int offsetX_ParaCentrarN = centradoCadenasNumeros
+                .getOffsetX_ParaCentrarImagenN(pathCesaralMagicImageC, "cualquier cosa, no la uso",
+                        cadenaNumericaEmpleada, listaCoordenadas, intCenterConfig);
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, la formula de centradp da: " +offsetX_ParaCentrarN);
+        //FIN de Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+
 
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mezclando imagen: " +i);
@@ -942,20 +950,10 @@ public class MezclarFinal extends AppCompatActivity {
 
 
                 //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
-                CentradoCadenasNumeros centradoCadenasNumeros = new CentradoCadenasNumeros(MezclarFinal.this);
-                int offsetX_ParaCentrarN = centradoCadenasNumeros
-                        .getOffsetX_ParaCentrarImagenN(pathCesaralMagicImageC, "cualquier cosa, no la uso",
-                                cadenaNumericaEmpleada, listaCoordenadas, intCenterConfig);
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, la formula de centradp da: " +offsetX_ParaCentrarN);
-                //FIN de Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
-
                 //Modificamos xFloat con offsetX_ParaCentrarN:
                 Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat sin centrado: " +xFloat);
                 xFloat = xFloat + offsetX_ParaCentrarN;
                 Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat con centrado: " +xFloat);
-
-
-
 
 
                 //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
@@ -1072,6 +1070,14 @@ public class MezclarFinal extends AppCompatActivity {
         String prefijoNombreFile = "F1_";
 
         charDeLaSecuenciaRecibida = "";
+
+        //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+        CentradoCadenasNumeros centradoCadenasNumeros = new CentradoCadenasNumeros(MezclarFinal.this);
+        int offsetX_ParaCentrarN = centradoCadenasNumeros
+                .getOffsetX_ParaCentrarImagenT(pathCesaralMagicImageC, "cualquier cosa, no la uso",
+                        cadenaAlphaumericaEmpleada, arrayPojoCoordenadasAlfanumerico, intCenterConfig);
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, la formula de centradp da: " +offsetX_ParaCentrarN);
+        //FIN de Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
 
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mezclando imagen: " +i);
@@ -1202,6 +1208,15 @@ public class MezclarFinal extends AppCompatActivity {
                     //**************************************************************************************
                     //**************************************************************************************
                     //**************************************************************************************
+
+                    //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+                    //Modificamos xFloat con offsetX_ParaCentrarN:
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, xFloat sin centrado: " +xFloat);
+                    xFloat = xFloat + offsetX_ParaCentrarN;
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, xFloat con centrado: " +xFloat);
+
+
+
                     //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
                     mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
                             xFloat, yFloat);
