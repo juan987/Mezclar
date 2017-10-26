@@ -25,7 +25,6 @@ public class CentradoCadenasNumeros {
     }
 
     public int getOffsetX_ParaCentrarImagenN(String directorioActual, String nombreFicheroParaDigitos,
-                                      String nombreFicheroParaAlphanumericos,
                                       String cadenaDigitos,
                                       List<PojoCoordenadas> listaCoordenadasN,
                                       int intCenterConfig){
@@ -34,9 +33,19 @@ public class CentradoCadenasNumeros {
         int anchuraUltimaImagenTipoN = 0;
         //Calculamos la anchura
         anchuraUltimaImagenTipoN = calcularAnchuraUltimaImagenTipoN(directorioActual, cadenaDigitos );
-        //La coordenada X del primer carácter:
+        Log.d(xxx, "getOffsetX_ParaCentrarImagenN, anchuraUltimaImagenTipoN:  "  +anchuraUltimaImagenTipoN);
 
+        int coordX_DelPrimerDigito = Integer.parseInt(listaCoordenadasN.get(0).getCoordX());
+        Log.d(xxx, "getOffsetX_ParaCentrarImagenN, coordX_DelPrimerDigito:  "  +coordX_DelPrimerDigito);
 
+        int coordX_DelUltimoDigito = Integer.parseInt(listaCoordenadasN.get(cadenaDigitos.length()-1).getCoordX());
+        Log.d(xxx, "getOffsetX_ParaCentrarImagenN, coordX_DelUltimoDigito:  "  +coordX_DelUltimoDigito);
+
+        //Aplicamos la formula del mail Centrado de cadenas/numeros:
+        //Offset_X = Xa - (X2-X1+Anchura) / 2
+        offsetX_ParaCentrar = intCenterConfig -
+                Math.round((coordX_DelUltimoDigito - coordX_DelPrimerDigito + anchuraUltimaImagenTipoN) / 2);
+        Log.d(xxx, "getOffsetX_ParaCentrarImagenN, offsetX_ParaCentrar:  "  +offsetX_ParaCentrar);
 
         //*******************************************
         return offsetX_ParaCentrar;
@@ -46,13 +55,13 @@ public class CentradoCadenasNumeros {
     private int calcularAnchuraUltimaImagenTipoN(String directorioActual, String cadena){
         int anchura = 0;
         //Necesitamos saber la longitud para poner el nombre del fichero 0.bmp hasta 9.bmp
-        int ultimaCoordenada = getUltimaCoordenadaTipoN(cadena);
+        char ultimaCoordenada = getUltimaCoordenadaTipoN(cadena);
         String nombreFichero1 = ultimaCoordenada +".bmp";
         String nombreFichero2 = ultimaCoordenada +".xbmp";
         ObtenerImagen obtenerImagen = new ObtenerImagen(context);
-        File file = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, directorioActual, nombreFichero1);
+        File file = obtenerImagen.getFilePathOfPictureParaCentrar(directorioActual, nombreFichero1);
         if(file == null){
-            file = obtenerImagen.getFilePathOfPicture(Environment.DIRECTORY_DCIM, directorioActual, nombreFichero2);
+            file = obtenerImagen.getFilePathOfPictureParaCentrar(directorioActual, nombreFichero2);
             //file tiene extension .xbmp
         }else{
             //File tiene extension bmp
@@ -66,21 +75,29 @@ public class CentradoCadenasNumeros {
             return anchura;
         }else if(bytes.length == 0){
             //hay un error, devolvemos anchura como cero
-            Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, array de bytes es null o longitud cero, devolver anchura = 0:  " + bytes.length);
-            return anchura;
+            Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, array de bytes es null tiene 0 bytes:  " + bytes.length);
+            Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, anchura:  " +anchura);
 
         }
         //Tengo el array de bytes binario, seguimos
         Log.d(xxx, "array de bytes tiene datos, longitud del array:  " + bytes.length);
 
         //aplicamos la formula del mail Centrado de cadenas/numeros:  AnchuraF= Pos[18]+255  x  Pos[19]
-        anchura = (bytes[18]+255) * bytes[19];
+        Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, bytes[18]:  " +bytes[18]);
+        Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, bytes[19]:  " +bytes[19]);
+        int suma = bytes[18]+255;
+        Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, int suma = bytes[18]+255 :  " +suma);
+
+
+        anchura = (bytes[18]+(byte)255) * bytes[19];
+        Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, anchura:  " +anchura);
+
 
         return anchura;
     }//FIN calcularAnchuraUltimaImagenTipoN
 
-    private int getUltimaCoordenadaTipoN(String cadena){
-        int ultimaCoordenada = 0;
+    private char getUltimaCoordenadaTipoN(String cadena){
+        char ultimaCoordenada;
         char[] arrayImagesSequence = null;
         arrayImagesSequence = cadena.toCharArray();
         ultimaCoordenada = arrayImagesSequence[arrayImagesSequence.length - 1];

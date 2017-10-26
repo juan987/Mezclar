@@ -88,6 +88,23 @@ public class ObtenerImagen {
         }
     }
 
+    public File getFilePathOfPictureParaCentrar(String subDir, String imageName){
+        //Devuelve la ultima imagen asociada al ultimo digito de una cadena de digitos o de texto
+        if(isExternalStorageWritable()) {
+
+            File dir = new File(Environment.getExternalStorageDirectory() + subDir +imageName);
+
+            String directorio = dir.getAbsolutePath();
+
+            Log.d(xxx, "getFilePathOfPictureParaCentrar, El directorio es: " + directorio);
+            return dir;
+        }else{
+            Log.d(xxx, "El external public storage no esta montado ");
+            return null;
+
+        }
+    }
+
     public byte[] getFileBytes(File file){
         //este metodo NO lo utilizo, y tampoco lo he probado
 
