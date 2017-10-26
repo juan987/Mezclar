@@ -39,6 +39,17 @@ public class DatosConfigTxt {
     //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
     String stringIntCenterConfig="";
     int intCenterConfig = 0;
+    boolean boolUsarCenter = false;
+
+
+    public boolean getBoolUsarCenter() {
+        return boolUsarCenter;
+    }
+
+
+
+
+
 
     //Parametro offset y scale para modificar coordenadas N y T
     int intOffset_x=0;
@@ -259,6 +270,7 @@ public class DatosConfigTxt {
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con center, y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayIntCenter = arrayLineasTextoLocal.get(i).split(regexIntCenter);
+                boolUsarCenter = true;
             }
 
 
@@ -420,6 +432,7 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable intOffset_x: " +intOffset_x
                 +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
                 +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x
+                +"\n"  +"xxx Variable boolUsarCenter: " +boolUsarCenter
                 +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig);
 
         //Modificar siempre arrayPojoCoordenadas y arrayPojoCoordenadasAlfanumerico con offset y scale

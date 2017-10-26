@@ -101,6 +101,8 @@ public class IntentServiceMagic extends IntentService {
 
     //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
     int intCenterConfig = 0;
+    boolean boolUsarCenter = false;
+
 
 
     public IntentServiceMagic() {
@@ -306,6 +308,8 @@ public class IntentServiceMagic extends IntentService {
         intOffset_y = datosConfigTxt.getIntOffset_y();
         doubleScale_x = datosConfigTxt.getDoubleScale_x();
         intCenterConfig = datosConfigTxt.getIntCenterConfig();
+        boolUsarCenter = datosConfigTxt.getBoolUsarCenter();
+
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
@@ -315,6 +319,7 @@ public class IntentServiceMagic extends IntentService {
                 +"\n"  +"xxx Variable intOffset_x: " +intOffset_x
                 +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
                 +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig
+                +"\n"  +"xxx Variable boolUsarCenter: " +boolUsarCenter
                 +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x);
 
 
@@ -632,9 +637,11 @@ public class IntentServiceMagic extends IntentService {
 
                 //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
                 //Modificamos xFloat con offsetX_ParaCentrarN:
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat sin centrado: " +xFloat);
-                xFloat = xFloat + offsetX_ParaCentrarN;
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat con centrado: " +xFloat);
+                if(boolUsarCenter) {
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat sin centrado: " + xFloat);
+                    xFloat = xFloat + offsetX_ParaCentrarN;
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat con centrado: " + xFloat);
+                }
 
 
                 //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
