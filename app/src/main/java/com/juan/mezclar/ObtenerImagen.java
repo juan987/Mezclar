@@ -88,19 +88,21 @@ public class ObtenerImagen {
         }
     }
 
-    public void getFileBytes(){
+    public byte[] getFileBytes(File file){
         //este metodo NO lo utilizo, y tampoco lo he probado
-        /*
+
         try {
-            byte bytes[] = FileUtils.readFileToByteArray(photoFile);
+            byte bytes[] = FileUtils.readFileToByteArray(file);
             Log.d(xxx, "getFileBytes, file size in bytes: " +bytes.length);
+            return bytes;
 
         } catch (IOException e) {
             //e.printStackTrace();
             Log.d(xxx, "getFileBytes, error leyendo file en binario: " +e.getMessage());
+            return null;
 
         }
-        */
+
 
     }
 

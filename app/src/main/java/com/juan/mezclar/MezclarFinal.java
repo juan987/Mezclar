@@ -127,7 +127,11 @@ public class MezclarFinal extends AppCompatActivity {
     int intOffset_y=0;
     Double doubleScale_x=1.0;
 
-/*
+    //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+    int intCenterConfig = 0;
+
+
+    /*
 
     20oct17: nuevo requerimiento
     Fichero de registro de llamadas
@@ -584,6 +588,8 @@ public class MezclarFinal extends AppCompatActivity {
         intOffset_x = datosConfigTxt.getIntOffset_x();
         intOffset_y = datosConfigTxt.getIntOffset_y();
         doubleScale_x = datosConfigTxt.getDoubleScale_x();
+        intCenterConfig = datosConfigTxt.getIntCenterConfig();
+
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
@@ -592,6 +598,7 @@ public class MezclarFinal extends AppCompatActivity {
                 +"\n"  +"xxx Variable overwrite: " +stringOverwrite
                 +"\n"  +"xxx Variable intOffset_x: " +intOffset_x
                 +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
+                +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig
                 +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x);
 
 

@@ -36,6 +36,10 @@ public class DatosConfigTxt {
     String stringOffset_y="";
     String stringScale_x="";
 
+    //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+    String stringIntCenterConfig="";
+    int intCenterConfig = 0;
+
     //Parametro offset y scale para modificar coordenadas N y T
     int intOffset_x=0;
     int intOffset_y=0;
@@ -82,6 +86,10 @@ public class DatosConfigTxt {
 
     public String getStringOverwrite() {
         return stringOverwrite;
+    }
+
+    public int getIntCenterConfig() {
+        return intCenterConfig;
     }
 
     //Metodo para:
@@ -186,6 +194,7 @@ public class DatosConfigTxt {
         String[] array_intOffset_y = null;
         String[] array_doubleScale_x = null;
         String[] arrayStringOverwrite = null;
+        String[] arrayIntCenter = null;
 
         String regexUrl = "=";
         String regexUser = "=";
@@ -195,6 +204,7 @@ public class DatosConfigTxt {
         String regex_intOffset_y = "=";
         String regex_doubleScale_x = "=";
         String regexOverwrite = "=";
+        String regexIntCenter = "=";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
             //Obtener URL del Servidor para almacenar imagen generada
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("web")){
@@ -244,6 +254,11 @@ public class DatosConfigTxt {
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("scale_x")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con scale_x, y tiene: " +arrayLineasTextoLocal.get(i));
                 array_doubleScale_x = arrayLineasTextoLocal.get(i).split(regex_doubleScale_x);
+            }
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con center, y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayIntCenter = arrayLineasTextoLocal.get(i).split(regexIntCenter);
             }
 
 
@@ -378,6 +393,25 @@ public class DatosConfigTxt {
         }
 
 
+        //Imprime el center y lo asigna a la variable global como integer
+        if(arrayIntCenter != null) {
+            int i = 0;
+            for (String center : arrayIntCenter) {
+                Log.d(xxx, "xxx Dato de user en array_intOffset_x " + i + " es: " + center);
+                stringIntCenterConfig = arrayIntCenter[i];
+                i++;
+            }
+
+            try {
+                intCenterConfig = Integer.parseInt(stringIntCenterConfig);
+            } catch (NumberFormatException e) {
+                //e.printStackTrace();
+                Log.d(xxx, "Error de formato de  stringIntCenterConfig, no es un int: " + stringIntCenterConfig);
+                Log.d(xxx, "Error de formato de  stringIntCenterConfig, NumberFormatException: " + e.getMessage());
+            }
+        }
+
+
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
@@ -385,7 +419,8 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable overwrite: " +stringOverwrite
                 +"\n"  +"xxx Variable intOffset_x: " +intOffset_x
                 +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
-                +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x);
+                +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x
+                +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig);
 
         //Modificar siempre arrayPojoCoordenadas y arrayPojoCoordenadasAlfanumerico con offset y scale
 
