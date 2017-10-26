@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -833,6 +835,36 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Hemos terminado
         enviarNotificationConNumero("2");
+
+        //*****************************************************************************************
+        //*****************************************************************************************
+        //*****************************************************************************************
+        //Avisar al media scanner
+        //Como en:
+        //https://www.grokkingandroid.com/adding-files-to-androids-media-library-using-the-mediascanner/
+        File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        //File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String directorio = picturesDir.getAbsolutePath() ;
+        Log.d(xxx, "antes del media scanner El directorio es: " + directorio);
+        //Environment.DIRECTORY_DCIM, "/predict/", nombreFicheroJpg
+        File file = new File(directorio + "/predict/", nombreFicheroJpg);
+        Log.d(xxx, "antes del media scanner El directorio COMPLETO es: " + file.getAbsolutePath());
+
+
+        MediaScannerConnection.scanFile(
+                getApplicationContext(),
+                new String[]{file.getAbsolutePath()},
+                null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    @Override
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.d(xxx, "soy juan y el media scanner" +
+                                "file " + path + " was scanned seccessfully: " + uri);
+                    }
+                });
+        //*****************************************************************************************
+        //*****************************************************************************************
+        //*****************************************************************************************
         return true;
     }//Fin de metodoPrincipal_2
     //Nombre de la imagen compuesta a guardar y a enviar con ftp
