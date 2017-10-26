@@ -9,10 +9,11 @@
 
 
     <!-- strings del alert dialod -->
-    <string name="alert_dialog_title">Titulo</string>
+    <string name="alert_dialog_title">Delete active configuration</string>
     <string name="alert_dialog_ok">Proceed</string>
     <string name="alert_dialog_cancel">Cancel</string>
-    <string name="alert_dialog_description">Cuidado!</string>
+    <string name="alert_dialog_description">You are about to delete the active configuration,
+                                this action can not be undone.</string>
 
 
 </resources>

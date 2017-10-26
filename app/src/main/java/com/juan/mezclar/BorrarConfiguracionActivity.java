@@ -95,6 +95,8 @@ public class BorrarConfiguracionActivity extends AppCompatActivity
             Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Active configuration deleted", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
             configuracionesMultiples.setActiveDirectory("default directory");
+            //Volvemos a la pantalla principal
+            finish();
         }else{
             Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Error, Active configuration not deleted", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
@@ -105,6 +107,8 @@ public class BorrarConfiguracionActivity extends AppCompatActivity
     public void doNegativeClick() {
         Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Delete action canceled by user", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+        //Volvemos a la pantalla principal
+        finish();
 
     }
 }

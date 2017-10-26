@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ import java.util.List;
 public class ActivityLauncherUI extends AppCompatActivity  {
     //public class ActivityLauncherUI extends AppCompatActivity implements NoticeDialogFragment.NoticeDialogListener {
     //String para usar en log.d con el nombre de la clase
+    TextView textView = null;
     Button button = null;
     Button buttonCrearDir = null;
     String xxx = this.getClass().getSimpleName();
@@ -47,6 +49,10 @@ public class ActivityLauncherUI extends AppCompatActivity  {
 
     String pathCesaralMagicImageC;
 
+    //bolean para impedir borrar la configuracion por defecto
+    boolean boolImageC = false;
+
+
 
 
     @Override
@@ -62,6 +68,9 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         secuenciaDeImagenes   = (EditText)findViewById(R.id.secImagenes);
         secuenciaDeImagenesAlfanumerica   = (EditText)findViewById(R.id.secImagenesAlfanumerica);
         nuevoDir   = (EditText)findViewById(R.id.nuevo_dir);
+        textView   = (TextView)findViewById(R.id.textview_1);
+
+
 
 
 
@@ -151,13 +160,18 @@ public class ActivityLauncherUI extends AppCompatActivity  {
                     //configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(1));
                     configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(0));
 
+                    boolImageC = true;
+
+
 
 
                 }else{
                     Log.d(xxx, "spinner, onItemSelected cualquiera, sub directorio es: " +(String) adapterView.getItemAtPosition(pos));
                     //Guardamos el dir seleccionado en shared preferences
                     configuracionesMultiples.setActiveDirectory((String) adapterView.getItemAtPosition(pos));
-                    //Le decimos al spinner que muestre este valor:
+
+                    boolImageC = false;
+
                 }
 
             }
@@ -239,10 +253,13 @@ public class ActivityLauncherUI extends AppCompatActivity  {
                     boolCreandoNuevoDirectorio = false;
                     //Crear nuevo subdir
                     configuracionesMultiples.createSubDirDeDirCesaralMagicImageC(stringNuevoDirectorio);
+
                     button.setVisibility(View.VISIBLE);
                     secuenciaDeImagenes.setVisibility(View.VISIBLE);
                     secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
                     spinner.setVisibility(View.VISIBLE);
+                    textView.setVisibility(View.VISIBLE);
+
                     nuevoDir.setVisibility(View.GONE);
                     buttonCrearDir.setVisibility(View.GONE);
 
@@ -370,12 +387,15 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         if(actdir.equals("ImageC")){
             //indice=1;
             indice=0;
+            boolImageC = true;
         }else {
             for (int i = 0; i < subDirs.length; i++) {
                 if (actdir.equals(subDirs[i])) {
                     Log.d(xxx, "En metodo spinnerSetSeleccion, el directorio activo: "
                             + actdir + " es igual a: " + subDirs[i]);
                     indice=i;
+                    boolImageC = false;
+
                     break;
 
                 } else {
@@ -398,6 +418,7 @@ public class ActivityLauncherUI extends AppCompatActivity  {
             secuenciaDeImagenes.setVisibility(View.VISIBLE);
             secuenciaDeImagenesAlfanumerica.setVisibility(View.VISIBLE);
             spinner.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
             nuevoDir.setVisibility(View.GONE);
             buttonCrearDir.setVisibility(View.GONE);
 
@@ -434,6 +455,8 @@ public class ActivityLauncherUI extends AppCompatActivity  {
             secuenciaDeImagenes.setVisibility(View.GONE);
             secuenciaDeImagenesAlfanumerica.setVisibility(View.GONE);
             spinner.setVisibility(View.GONE);
+            textView.setVisibility(View.INVISIBLE);
+
             nuevoDir.setVisibility(View.VISIBLE);
             //Se presenta el campo vacio
             nuevoDir.setText("");
@@ -448,13 +471,18 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         if (id == R.id.actio_borrar_configuracion) {
             //**************************************************************
             // Lanzar actividad para borrar la configuracion activa
-            Intent intent = new Intent(ActivityLauncherUI.this, BorrarConfiguracionActivity.class);
-            //intent.putExtra("KeyName", secuenciaDeImagenes.getText().toString());
+            if(!boolImageC) {
+                Intent intent = new Intent(ActivityLauncherUI.this, BorrarConfiguracionActivity.class);
+                //intent.putExtra("KeyName", secuenciaDeImagenes.getText().toString());
 
-            startActivity(intent);
+                startActivity(intent);
 
-
-            booleanBorrar = true;
+                booleanBorrar = true;
+            }else{
+                //Lanzamos un snack bar con mensaje de que este dir ya existe
+                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Defaul configuration can not be deleted", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
             //**************************************************************
             return true;
         }
