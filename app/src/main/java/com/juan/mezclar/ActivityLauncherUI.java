@@ -480,7 +480,7 @@ public class ActivityLauncherUI extends AppCompatActivity  {
                 booleanBorrar = true;
             }else{
                 //Lanzamos un snack bar con mensaje de que este dir ya existe
-                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Defaul configuration can not be deleted", Snackbar.LENGTH_LONG)
+                Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Default configuration can not be deleted", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
             //**************************************************************
