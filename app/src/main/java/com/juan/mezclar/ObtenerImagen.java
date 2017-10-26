@@ -7,7 +7,10 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by Juan on 05/10/2017.
@@ -83,6 +86,22 @@ public class ObtenerImagen {
             return null;
 
         }
+    }
+
+    public void getFileBytes(){
+        //este metodo NO lo utilizo, y tampoco lo he probado
+        /*
+        try {
+            byte bytes[] = FileUtils.readFileToByteArray(photoFile);
+            Log.d(xxx, "getFileBytes, file size in bytes: " +bytes.length);
+
+        } catch (IOException e) {
+            //e.printStackTrace();
+            Log.d(xxx, "getFileBytes, error leyendo file en binario: " +e.getMessage());
+
+        }
+        */
+
     }
 
 }
