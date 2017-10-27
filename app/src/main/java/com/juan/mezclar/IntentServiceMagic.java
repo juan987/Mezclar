@@ -103,6 +103,11 @@ public class IntentServiceMagic extends IntentService {
     int intCenterConfig = 0;
     boolean boolUsarCenter = false;
 
+    //Nuevo req recibido el 27oct17, parametro m_x
+    //Se trata de un parámetro opcional para el modo numérico solamente, denominado M_X
+    int intMX = 0;
+    boolean boolMX = false;
+
 
 
     public IntentServiceMagic() {
@@ -309,6 +314,8 @@ public class IntentServiceMagic extends IntentService {
         doubleScale_x = datosConfigTxt.getDoubleScale_x();
         intCenterConfig = datosConfigTxt.getIntCenterConfig();
         boolUsarCenter = datosConfigTxt.getBoolUsarCenter();
+        intMX = datosConfigTxt.getintMX();
+        boolMX = datosConfigTxt.getboolMX();
 
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
@@ -320,7 +327,9 @@ public class IntentServiceMagic extends IntentService {
                 +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
                 +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig
                 +"\n"  +"xxx Variable boolUsarCenter: " +boolUsarCenter
-                +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x);
+                +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x
+                +"\n"  +"xxx Variable boolMX: " +boolMX
+                +"\n"  +"xxx Variable intMX: " +intMX);
 
 
         //FIN Usar clase DatosConfigTxt
@@ -541,6 +550,12 @@ public class IntentServiceMagic extends IntentService {
 
 
         for(int i = 0; i < arrayImagesSequence.length; i++) {
+            //Nuevo req recibido el 27oct17, parametro m_x
+            //Se trata de un parámetro opcional para el modo numérico solamente, denominado M_X
+            //Boolean para saber si hay que dibujar o no la imagen correspondiente
+            boolean boolDibujar = true;
+
+
             Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mezclando imagen: " +i);
             enviarNotification("mezclando imagen: " +i);
             enviarNotificationConNumero("1");
@@ -643,25 +658,67 @@ public class IntentServiceMagic extends IntentService {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat con centrado: " + xFloat);
                 }
 
+                //****************************************************************************************
+                //****************************************************************************************
+                //****************************************************************************************
+                //Nuevo req recibido el 27oct17, parametro m_x
+                //Se trata de un parámetro opcional para el modo numérico solamente, denominado M_X
+                if(boolMX){
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, boolMX es true: " + boolMX);
 
-                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
-                mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
-                        xFloat, yFloat);
-                //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
-                originJpg = mergedImages;
-                if(mergedImages != null) {
-                    //Comando de prueba. Comentar esta linea en la version final
-                    //collageImage.setImageBitmap(mergedImages);
-                }else{
-                    //Ha habido un error al mezclar las imagenes
-                    enviarNotification("Error mezclando imagen: " +i  +", saliendo de la aplicacion");
-                    enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error mixing images");
-                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mergedImages es null, no se ha generado la imagen, salimos de la app");
+                    //Chequeo de las posiciones pares para detectar si hay que modificar
+                    if ((i+1) % 2 == 0) {
+                        //Las posiciones pares, modifican su coordenada X con el
+                        //parametro M_X
+                        //Chequeamos si la posicion i del array numerico es cero
+                        if (arrayImagesSequence[i-1] == '0') {
+                            //si se cumple estas condiciones, hay que modificar la coordenada xFloat
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, posicion par: " + i);
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, hay que modificar la coordenada X de i");
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat ANTES DE USAR M_X" + xFloat);
+                            xFloat = xFloat - intMX;
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, xFloat DESPUES DE USAR M_X" + xFloat);
+                        }
+                    }
 
-                    return false;
+                    //Chequeo de las posiciones impares para detectar si hay que mezclar la imagen de esta posicion
+                    if ((i+1) % 2 != 0) {
+                        //Chequea si hay un cero en i = 0, 2, 4, 6, etc
+                        if (arrayImagesSequence[i] == '0') {
+                            //No dibujar esta imagen
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, NO dibujar");
+                            boolDibujar = false;
+                        }
+
+                    }
 
                 }
+                //****************************************************************************************
+                //****************************************************************************************
+                //****************************************************************************************
+
+                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+                if(boolDibujar) {
+                    //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+                    mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
+                            xFloat, yFloat);
+                    //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
+                    originJpg = mergedImages;
+                    if (mergedImages != null) {
+                        //Comando de prueba. Comentar esta linea en la version final
+                        //collageImage.setImageBitmap(mergedImages);
+                    } else {
+                        //Ha habido un error al mezclar las imagenes
+                        enviarNotification("Error mezclando imagen: " + i + ", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error mixing images");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mergedImages es null, no se ha generado la imagen, salimos de la app");
+
+                        return false;
+
+                    }
+                }//Fin de boolDibujar
+
                 //
             }
 

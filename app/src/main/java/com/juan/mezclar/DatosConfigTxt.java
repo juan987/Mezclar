@@ -46,6 +46,17 @@ public class DatosConfigTxt {
         return boolUsarCenter;
     }
 
+    //Nuevo req recibido el 27oct17, parametro m_x
+    //Se trata de un parámetro opcional para el modo numérico solamente, denominado M_X
+    String stringMX = "";
+    int intMX = 0;
+    boolean boolMX = false;
+    public boolean getboolMX() {
+        return boolMX;
+    }
+    public int getintMX() {
+        return intMX;
+    }
 
 
 
@@ -206,6 +217,7 @@ public class DatosConfigTxt {
         String[] array_doubleScale_x = null;
         String[] arrayStringOverwrite = null;
         String[] arrayIntCenter = null;
+        String[] arrayMX = null;
 
         String regexUrl = "=";
         String regexUser = "=";
@@ -216,6 +228,7 @@ public class DatosConfigTxt {
         String regex_doubleScale_x = "=";
         String regexOverwrite = "=";
         String regexIntCenter = "=";
+        String regexMX = "=";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
             //Obtener URL del Servidor para almacenar imagen generada
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("web")){
@@ -270,8 +283,16 @@ public class DatosConfigTxt {
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con center, y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayIntCenter = arrayLineasTextoLocal.get(i).split(regexIntCenter);
-                boolUsarCenter = true;
+                //boolUsarCenter = true;
             }
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("m_x")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con m_x, y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayMX = arrayLineasTextoLocal.get(i).split(regexMX);
+                //boolMX = true;
+            }
+
+
 
 
         }
@@ -416,12 +437,33 @@ public class DatosConfigTxt {
 
             try {
                 intCenterConfig = Integer.parseInt(stringIntCenterConfig);
+                boolUsarCenter = true;
             } catch (NumberFormatException e) {
                 //e.printStackTrace();
                 Log.d(xxx, "Error de formato de  stringIntCenterConfig, no es un int: " + stringIntCenterConfig);
                 Log.d(xxx, "Error de formato de  stringIntCenterConfig, NumberFormatException: " + e.getMessage());
             }
         }
+
+        //Parametro M_X
+        if(arrayMX != null) {
+            int i = 0;
+            for (String m_x : arrayMX) {
+                Log.d(xxx, "xxx Dato de user en array_intOffset_x " + i + " es: " + m_x);
+                stringMX = arrayMX[i];
+                i++;
+            }
+
+            try {
+                intMX = Integer.parseInt(stringMX);
+                boolMX = true;
+            } catch (NumberFormatException e) {
+                //e.printStackTrace();
+                Log.d(xxx, "Error de formato de  stringMX, no es un int: " + stringMX);
+                Log.d(xxx, "Error de formato de  stringMX, NumberFormatException: " + e.getMessage());
+            }
+        }
+
 
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
@@ -433,7 +475,9 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable intOffset_y: " +intOffset_y
                 +"\n"  +"xxx Variable doubleScale_x: " +doubleScale_x
                 +"\n"  +"xxx Variable boolUsarCenter: " +boolUsarCenter
-                +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig);
+                +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig
+                +"\n"  +"xxx Variable boolMX: " +boolMX
+                +"\n"  +"xxx Variable intMX: " +intMX);
 
         //Modificar siempre arrayPojoCoordenadas y arrayPojoCoordenadasAlfanumerico con offset y scale
 
