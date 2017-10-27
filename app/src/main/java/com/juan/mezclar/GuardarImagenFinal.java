@@ -10,8 +10,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Juan on 04/10/2017.
@@ -35,10 +37,13 @@ public class GuardarImagenFinal {
     String xxx = this.getClass().getSimpleName();
     Context context;
     Bitmap bitmap;
+    //recupero el parametro quality que viene en el CONFIG.txt
+    int intq;
 
-    public GuardarImagenFinal(Context context, Bitmap bitmap){
+    public GuardarImagenFinal(Context context, Bitmap bitmap, int intq){
         this.context = context;
         this.bitmap = bitmap;
+        this.intq = intq;
     }
 
     // los path para guardar la imagen generada son:
@@ -104,8 +109,20 @@ public class GuardarImagenFinal {
             //file.createNewFile();
             fOut = new FileOutputStream(file);
 
-// 100 means no compression, the lower you go, the stronger the compression
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+
+
+            Log.d(xxx, "En saveImageToExternalPublicStorage, quality para comprimir, intq: " +intq);
+
+
+
+
+            //de la clase bitmap, metodo compress: quality	int: Hint to the compressor, 0-100. 0 meaning compress for small size,
+            // 100 meaning compress for max quality.
+            // Some formats, like PNG which is lossless, will ignore the quality setting
+            // 100 means no compression, the lower you go, the stronger the compression
+            //bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+            //uso quality del CONFIX.txt
+            bitmap.compress(Bitmap.CompressFormat.JPEG, intq, fOut);
 
             //****************************************************************************
             //Prueba de cambio de fecha en fichero

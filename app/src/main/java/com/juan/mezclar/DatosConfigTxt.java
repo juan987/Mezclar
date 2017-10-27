@@ -59,6 +59,17 @@ public class DatosConfigTxt {
     }
 
 
+    //Nuevo req recibido el 27oct17,por telefono: parametro q para la calidad con la que se salva el
+    //bitmap.
+    //100 es la maxima calidad, si disminuye, baja la calidad.
+    //Lo usa la clase GuardarImagenFinal al almacenar el bitmap compuesto.
+    //Si no es valor entre 0 y 100, uso 100 por defecto = no compression, maxima calidad.
+    public String string_q = "";
+    private int intq = 100;
+
+
+
+
 
 
 
@@ -113,6 +124,8 @@ public class DatosConfigTxt {
     public int getIntCenterConfig() {
         return intCenterConfig;
     }
+
+
 
     //Metodo para:
     //Generar array de PojoCoordenadas con las coordenadas x e Y de posicionamiento de imagenes
@@ -218,6 +231,7 @@ public class DatosConfigTxt {
         String[] arrayStringOverwrite = null;
         String[] arrayIntCenter = null;
         String[] arrayMX = null;
+        String[] arrayQ = null;
 
         String regexUrl = "=";
         String regexUser = "=";
@@ -229,6 +243,7 @@ public class DatosConfigTxt {
         String regexOverwrite = "=";
         String regexIntCenter = "=";
         String regexMX = "=";
+        String regexQ = "=";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
             //Obtener URL del Servidor para almacenar imagen generada
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("web")){
@@ -289,6 +304,12 @@ public class DatosConfigTxt {
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("m_x")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con m_x, y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayMX = arrayLineasTextoLocal.get(i).split(regexMX);
+                //boolMX = true;
+            }
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("q=")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con q=, y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayQ = arrayLineasTextoLocal.get(i).split(regexQ);
                 //boolMX = true;
             }
 
@@ -466,6 +487,37 @@ public class DatosConfigTxt {
 
 
 
+
+        //Parametro q
+        if(arrayQ != null) {
+            int i = 0;
+            for (String q : arrayQ) {
+                Log.d(xxx, "xxx Dato de user en arrayQ " + i + " es: " + q);
+                string_q = arrayQ[i];
+                i++;
+            }
+
+            try {
+                intq = Integer.parseInt(string_q);
+                Log.d(xxx, "despues de parsin, intq es: " +intq);
+
+                //Chequeo que no este fuera de rango
+
+                if(intq < 0 || intq > 100){
+                    Log.d(xxx, "int q esta fuera de rango, intq es: "  +intq);
+
+                    //asigno 100 por defecto
+                    intq = 100;
+                }
+            } catch (NumberFormatException e) {
+                //e.printStackTrace();
+                Log.d(xxx, "Error de formato de  string_q, no es un int: " + string_q);
+                Log.d(xxx, "Error de formato de  string_q, NumberFormatException: " + e.getMessage());
+            }
+        }
+
+
+
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
@@ -477,12 +529,19 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable boolUsarCenter: " +boolUsarCenter
                 +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig
                 +"\n"  +"xxx Variable boolMX: " +boolMX
-                +"\n"  +"xxx Variable intMX: " +intMX);
+                +"\n"  +"xxx Variable intMX: " +intMX
+                +"\n"  +"xxx Variable intq: " +intq);
 
         //Modificar siempre arrayPojoCoordenadas y arrayPojoCoordenadasAlfanumerico con offset y scale
 
         return arrayPojoCoordenadas;
     }//Fin de getCoordenadasN y obtener user y password
+
+    public int getquality(){
+        Log.d(xxx, "en getquality, intq es  " + intq);
+
+        return intq;
+    }
 
 
     //Metodo para modificar las coordenadas X originales de acuerdo a offset_x, y scale_x)

@@ -458,7 +458,7 @@ public class IntentServiceMagic extends IntentService {
 
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
-        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(IntentServiceMagic.this, mergedImages);
+        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(IntentServiceMagic.this, mergedImages, datosConfigTxt.getquality());
         //Guardar imagen el directorio pictures/predict
 
         //Nuevo req el 20oct17: parametro overwrite en fichero CONFIG
@@ -1521,9 +1521,12 @@ public class IntentServiceMagic extends IntentService {
         bitmap2.setHasAlpha(true);
         for(int x=0;x<bitmap2.getWidth();x++){
             for(int y=0;y<bitmap2.getHeight();y++){
-                //if(bitmap2.getPixel(x, y)==Color.rgb(0xff, 0xff, 0xff))
+                //Solo busca pixeles blancos
+                if(bitmap2.getPixel(x, y)==Color.rgb(0xff, 0xff, 0xff))
                 //if(bitmap2.getPixel(x, y)<=Color.rgb(0xd7, 0xd7, 0xd7))
-                if(bitmap2.getPixel(x, y)>= Color.rgb(0xd7, 0xd7, 0xd7))
+
+                //tenia esta hasta el nuevo req de solo comparar con pixeles blancos el 27oct17
+                //if(bitmap2.getPixel(x, y)>= Color.rgb(0xd7, 0xd7, 0xd7))
                 {
                     int alpha = 0x00;
                     bitmap2.setPixel(x, y , Color.argb(alpha,0xff,0xff,0xff));  // changing the transparency of pixel(x,y)

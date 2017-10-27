@@ -386,7 +386,7 @@ public class Mezclar extends AppCompatActivity {
         }//Fin del loop principal
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
-        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(Mezclar.this, mergedImages);
+        GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(Mezclar.this, mergedImages, 5);
         //Guardar imagen el directorio pictures/predict
         //No hace falta, guardo directamente en DCIM/predict
         /*
