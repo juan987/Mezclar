@@ -286,6 +286,10 @@ public class ActivityLauncher extends AppCompatActivity {
             //Si la app no ha sido abierta desde otra app, Launh Mezclar en mi caso, la cierro automaticamente
             //agregue el finish el 25 oct 2017
             //this.finish();
+            Intent intent = new Intent(this, ActivityLauncherUI.class);
+
+            startActivity(intent);
+
             finish();
 
         }

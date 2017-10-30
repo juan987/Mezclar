@@ -6,9 +6,9 @@ android {
     defaultConfig {
         applicationId "com.juan.mezclar"
         minSdkVersion 16
-        targetSdkVersion 18
+        targetSdkVersion 22
         versionCode 1
-        versionName "1.0.22"
+        versionName "1.0.24"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
