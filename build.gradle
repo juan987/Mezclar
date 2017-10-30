@@ -5,6 +5,9 @@ buildscript {
         jcenter()
     }
     dependencies {
+        //30 oct 17: ERROR al actualizar a gradle 3.0.0, me da un error en el build
+        //Sigo usando la version 2.3.3
+        //classpath 'com.android.tools.build:gradle:3.0.0'
         classpath 'com.android.tools.build:gradle:2.3.3'
 
         // NOTE: Do not place your application dependencies here; they belong

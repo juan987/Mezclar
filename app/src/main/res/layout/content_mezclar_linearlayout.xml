@@ -59,6 +59,7 @@
         android:visibility="invisible"
         android:src="@drawable/ic_launcher"
         android:scaleType="matrix"
+        android:layout_marginTop="100sp"
         />
 
 
@@ -85,6 +86,7 @@
             android:layout_height="wrap_content"
             android:text=""
             android:layout_below="@+id/imageView3"
+            android:layout_marginTop="20sp"
             />
 
     <ProgressBar
