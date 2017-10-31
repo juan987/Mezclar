@@ -54,16 +54,30 @@
             >
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:id="@+id/imageView3"
         android:visibility="invisible"
-        android:src="@drawable/ic_launcher"
         android:scaleType="matrix"
         android:layout_marginTop="100sp"
         />
 
 
         <!--
+        android:src="@drawable/ic_launcher"
+
+
+                android:layout_height="250dp"
+
+
+
+
+        android:scaleType="matrix"
+
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
         Le pongo esto a imageview3 a ver si funciona el scaling
         android:scaleType="matrix"
 
