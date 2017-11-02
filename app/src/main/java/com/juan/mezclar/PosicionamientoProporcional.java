@@ -116,16 +116,45 @@ public class PosicionamientoProporcional {
         float xFloat;
         int intL_Suma = 0;//ES L1+L2..... etc
         //for(int i = 0; i < (loopSize + 1); i++){
-        for(int i = 0; i <= (loopSize); i++){
-             if(loopSize == 0){
-                 intL_Suma = 0;
-                 Log.d(xxx, "center_pGetPosicionX, intL_Suma: " +intL_Suma);
-                 break;
-             }
-             intL_Suma += arrayAnchuraImagenesPequeñas[i];
-             i++;
-
+        if(loopSize == 0){
+            intL_Suma = 0;
             Log.d(xxx, "center_pGetPosicionX, intL_Suma: " +intL_Suma);
+        }else{
+            for(int i = 0; i < (loopSize); i++){
+                intL_Suma += arrayAnchuraImagenesPequeñas[i];
+                Log.d(xxx, "center_pGetPosicionX, intL_Suma: " +intL_Suma);
+            }
+        }
+
+        xFloat = intCenter_p - Math.round(intAnchoTotal/2) + intL_Suma;
+        Log.d(xxx, "center_pGetPosicionX, nuevo xFloat: " +xFloat);
+        return xFloat;
+    }
+
+
+    public float center_pGetPosicionX2(int intCenter_p, int loopSize, int[] arrayAnchuraImagenesPequeñas, int intAnchoTotal){
+        Log.d(xxx, "center_pGetPosicionX, loopSize: " +loopSize);
+
+        //El posicionamiento del primer carácter será  en X=nnn-(L/2)
+        //El posicionamiento del segundo carácter será  en X=nnn-(L/2)+L1
+        //El posicionamiento del tercer carácter será  en X=nnn-(L/2)+L1+L2
+        //El posicionamiento del cuarto carácter será  en X=nnn-(L/2)+L1+L2+L3
+        //etc.....
+
+        //Calculo de X
+        float xFloat;
+        int intL_Suma = 0;//ES L1+L2..... etc
+        //for(int i = 0; i < (loopSize + 1); i++){
+        for(int i = 0; i <= (loopSize); i++){
+            if(loopSize == 0){
+                intL_Suma = 0;
+                Log.d(xxx, "center_pGetPosicionX, intL_Suma: " +intL_Suma);
+                break;
+            }
+            intL_Suma += arrayAnchuraImagenesPequeñas[i];
+            i++;
+
+                Log.d(xxx, "center_pGetPosicionX, intL_Suma: " +intL_Suma);
 
 
         }
@@ -133,6 +162,5 @@ public class PosicionamientoProporcional {
         Log.d(xxx, "center_pGetPosicionX, nuevo xFloat: " +xFloat);
         return xFloat;
     }
-
 
 }
