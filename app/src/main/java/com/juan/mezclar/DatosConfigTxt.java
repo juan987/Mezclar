@@ -68,7 +68,12 @@ public class DatosConfigTxt {
     private int intq = 100;
 
 
-
+    //2 nov 2017, parametro mode_t, nuevo req del mail proximos requerimientos
+    //solo afecta a la cadena de numeros
+    String stringMode_t = "0";//por defecto
+    public String getMode_t() {
+        return stringMode_t;
+    }
 
 
 
@@ -232,6 +237,7 @@ public class DatosConfigTxt {
         String[] arrayIntCenter = null;
         String[] arrayMX = null;
         String[] arrayQ = null;
+        String[] arrayMode_t = null;
 
         String regexUrl = "=";
         String regexUser = "=";
@@ -244,7 +250,16 @@ public class DatosConfigTxt {
         String regexIntCenter = "=";
         String regexMX = "=";
         String regexQ = "=";
+        String regexMode_t = "=";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
+
+            //2 nov 2017: nuevo req parametro MODE_T=1 de mail "proximos requerimientos
+            //Solo afecta a la cadena numerica
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("mode_t")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con mode_t y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayMode_t = arrayLineasTextoLocal.get(i).split(regexMode_t);
+            }
+
             //Obtener URL del Servidor para almacenar imagen generada
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("web")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con web y tiene: " +arrayLineasTextoLocal.get(i));
@@ -337,6 +352,9 @@ public class DatosConfigTxt {
                             +"\n"
                              +"Coordenada y en arraPojo " + i + " es: " + arrayPojoCoordenadas.get(i).getCoordY());
         } */
+
+
+
 
         //Imprime la url y la asigna a la variable global
         if(stringURLFinal != null) {
@@ -516,7 +534,15 @@ public class DatosConfigTxt {
             }
         }
 
-
+        //Imprime mode_t y la asigna a la variable global
+        if(arrayMode_t != null) {
+            int i = 0;
+            for (String mode_t : arrayMode_t) {
+                Log.d(xxx, "xxx Dato en arrayMode_t " + i + " es: " + mode_t);
+                stringMode_t = arrayMode_t[i];
+                i++;
+            }
+        }
 
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
@@ -530,7 +556,8 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable intCenterConfig: " +intCenterConfig
                 +"\n"  +"xxx Variable boolMX: " +boolMX
                 +"\n"  +"xxx Variable intMX: " +intMX
-                +"\n"  +"xxx Variable intq: " +intq);
+                +"\n"  +"xxx Variable intq: " +intq
+                +"\n"  +"xxx Variable stringMode_t: " +stringMode_t);
 
         //Modificar siempre arrayPojoCoordenadas y arrayPojoCoordenadasAlfanumerico con offset y scale
 

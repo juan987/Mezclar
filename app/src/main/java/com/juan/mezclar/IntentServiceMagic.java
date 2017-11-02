@@ -41,6 +41,9 @@ import java.util.List;
  */
 public class IntentServiceMagic extends IntentService {
     String xxx = this.getClass().getSimpleName();
+
+    DatosConfigTxt datosConfigTxt;
+
     //ESTE SERVICIO SOLO MANEJA COORDENADAS N
     //Variables de UI, las comento. El servicio no tiene UI
     //private ImageView collageImage;
@@ -298,7 +301,8 @@ public class IntentServiceMagic extends IntentService {
         //Usar clase DatosConfigTxt
         //Juan, 25-10-17, paso el metodo generarPojoGenerarUrl a la clase DatosConfigTxt
 
-        DatosConfigTxt datosConfigTxt = new DatosConfigTxt(IntentServiceMagic.this);
+        //DatosConfigTxt datosConfigTxt = new DatosConfigTxt(IntentServiceMagic.this);
+        datosConfigTxt = new DatosConfigTxt(IntentServiceMagic.this);
         //Leer coordenadas N y T, URL, user, password,SOR, overwrite del array de lineas obtenido del fichero CONFIG.txt
         listaCoordenadas = datosConfigTxt.getCoordenadasN(arrayLineasTexto);
 
@@ -568,6 +572,68 @@ public class IntentServiceMagic extends IntentService {
                 imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
                         +arrayImagesSequence[i]+".xbmp");
             }
+
+            //2 nov 2017 Parte 1, nuevo req param mode_t en CONFIG.txt en mail proximos requerimientos
+            //solo aplica a cadenas numericas con 4 digitos, los demas no valen
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, datosConfigTxt.getMode_t() es: " +datosConfigTxt.getMode_t());
+            if(datosConfigTxt.getMode_t().equals("1")){
+                //Chequear cuantos digitos tiene la cadena
+                if(arrayImagesSequence.length < 4){
+                    //Lanzamos error y salimos
+                    enviarNotification("Error de param mode_t: numero de digitos es menor a 4 " +", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error in mode_t: number of digits should be 4");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_t: numero de digitos es menor a 4 , salimos de la app");
+
+                    //Acabamos la ejecucion
+                    return false;
+                }
+                //Numero de digitos correcto, sequimos
+                //Estamos haciendo el bucle, pero con el param mode_t el bucle solo se ejecuta hasta el cuartos digito. Si
+                //hay mas digitos, no se usan
+
+                //Controlamos si se dibuja en este ciclo o no.
+                //para ello, hacemos el chequeo de i entre 0 y 3
+                if(i == 0){
+                    //No hay que dibujar nada en este ciclo
+                    boolDibujar = false;
+                }else if (i == 1 || i == 3){
+                    //el nombre de la imagen se forma juntando las posiciones 0 y 1 de
+                    //Obtener la imagen a superponer como un bitmap
+                    imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                            +arrayImagesSequence[i-1] +arrayImagesSequence[i]+".bmp");
+
+                    if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
+                        //Buscamos la imagen a superponer con extension .xbmp
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No existe la imagen a superponer: " +i +"con extension .bmp, buscamos con extension .xbmp");
+                        imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                                +arrayImagesSequence[i-1] +arrayImagesSequence[i]+".xbmp");
+
+                        //
+                        if(imagenParaSuperponerConOrigin == null) {
+                            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                            enviarNotification("Error con mode_t al recuperar imagen pequeña numero: "+(i-1) + i + ", saliendo de la aplicacion");
+                            enviarNotificationConNumero("E1");
+                            metodoMostrarError("E1", "Error when getting image file from external storage");
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen de dos digitos de mode_t,  jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
+
+                            //Acabamos la ejecucion
+                            return false;
+                        }
+                    }
+                }else if(i == 2){
+                    //No hay que dibujar nada en este ciclo
+                    boolDibujar = false;
+                }else if(i > 3){
+                    //No hay que dibujar nada cuando el indice es mayor que 3
+                    boolDibujar = false;
+                }
+            }//FIN de if(datosConfigTxt.getMode_t().equals("1"))
+            //FIN de 2 nov 2017 Parte 1, nuevo req param mode_t en CONFIG.txt en mail proximos requerimientos
+
+
+
+
             if(imagenParaSuperponerConOrigin == null){
                 //Hay un error, terminamos la ejecucion he informamos con una notificacion
                 enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
@@ -624,6 +690,25 @@ public class IntentServiceMagic extends IntentService {
                 } */
                 xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
                 yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+
+
+                //2 nov 2017 Parte 2, nuevo req param mode_t en CONFIG.txt en mail proximos requerimientos
+                //solo aplica a cadenas numericas con 4 digitos, los demas no valen
+                //Solo se usan las coordenadas N1 y N2
+                if(datosConfigTxt.getMode_t().equals("1")){
+                    if(i == 1){//Obtenemos N1
+                        xFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordY());
+
+                    }else if(i == 3){//Obtenemos N2
+                        xFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordY());
+
+                    }
+                }//FIN de 2 nov 2017 Parte 2, nuevo req param mode_t en CONFIG.txt en mail proximos requerimientos
+
+
+
 
                 //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
                 //Float.isNaN retorna true si no es un numero
