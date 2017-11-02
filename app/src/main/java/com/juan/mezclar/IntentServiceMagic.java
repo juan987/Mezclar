@@ -725,9 +725,9 @@ public class IntentServiceMagic extends IntentService {
                 //**************************************************************************************
                 //**************************************************************************************
                 //req de offset el 25 oct 2017, modificar coordenadas de acuerdo a offset_x, offset_y y sacale_x
-                DatosConfigTxt datosConfigTxt = new DatosConfigTxt(IntentServiceMagic.this);
-                xFloat = datosConfigTxt.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
-                yFloat = datosConfigTxt.modificarCoordenadaY(yFloat, intOffset_y);
+                DatosConfigTxt datosConfigTxtLocal = new DatosConfigTxt(IntentServiceMagic.this);
+                xFloat = datosConfigTxtLocal.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
+                yFloat = datosConfigTxtLocal.modificarCoordenadaY(yFloat, intOffset_y);
 
                 //FIN req de offset el 25 oct 2017
                 //**************************************************************************************

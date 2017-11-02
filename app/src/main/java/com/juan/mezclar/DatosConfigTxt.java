@@ -78,6 +78,7 @@ public class DatosConfigTxt {
 
     //2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn, nuevo req del mail proximos requerimientos
     //Afecta a la cadena de numeros y alfanumericos
+    String stringCenter_p = "";
     int intCenter_p = 0;//por defecto, y este es el valor a comparar.
     public int getIntCenter_p() {
         return intCenter_p;
@@ -246,6 +247,7 @@ public class DatosConfigTxt {
         String[] arrayMX = null;
         String[] arrayQ = null;
         String[] arrayMode_t = null;
+        String[] arraycenter_p = null;
 
         String regexUrl = "=";
         String regexUser = "=";
@@ -259,6 +261,10 @@ public class DatosConfigTxt {
         String regexMX = "=";
         String regexQ = "=";
         String regexMode_t = "=";
+        String regexcenter_p = "=";
+
+
+
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
 
             //2 nov 2017: nuevo req parametro MODE_T=1 de mail "proximos requerimientos
@@ -318,7 +324,10 @@ public class DatosConfigTxt {
                 array_doubleScale_x = arrayLineasTextoLocal.get(i).split(regex_doubleScale_x);
             }
 
-            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center")){
+            //2 de noviembre, cambie center por center=, por que si no, cogia center con center_p,
+            //ya que ambos cumplen la igualdad de empezar por center
+            //if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center")){
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center=")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con center, y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayIntCenter = arrayLineasTextoLocal.get(i).split(regexIntCenter);
                 //boolUsarCenter = true;
@@ -333,6 +342,14 @@ public class DatosConfigTxt {
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("q=")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con q=, y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayQ = arrayLineasTextoLocal.get(i).split(regexQ);
+                //boolMX = true;
+            }
+
+            //2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn, nuevo req del mail proximos requerimientos
+            //Afecta a la cadena de numeros y alfanumericos
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center_p")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con center_p, y tiene: " +arrayLineasTextoLocal.get(i));
+                arraycenter_p = arrayLineasTextoLocal.get(i).split(regexcenter_p);
                 //boolMX = true;
             }
 
@@ -552,6 +569,27 @@ public class DatosConfigTxt {
             }
         }
 
+
+        //Parametro intCenter_p
+        if(arraycenter_p != null) {
+            int i = 0;
+            for (String center_p : arraycenter_p) {
+                Log.d(xxx, "xxx Dato de user en arraycenter_p " + i + " es: " + center_p);
+                stringCenter_p = arraycenter_p[i];
+                i++;
+            }
+
+            try {
+                intCenter_p = Integer.parseInt(stringCenter_p);
+                Log.d(xxx, "despues de parsin, intCenter_p es: " +intCenter_p);
+
+            } catch (NumberFormatException e) {
+                //e.printStackTrace();
+                Log.d(xxx, "Error de formato de  intCenter_p, no es un int: " + intCenter_p);
+                Log.d(xxx, "Error de formato de  intCenter_p, NumberFormatException: " + e.getMessage());
+            }
+        }
+
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
@@ -565,7 +603,10 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable boolMX: " +boolMX
                 +"\n"  +"xxx Variable intMX: " +intMX
                 +"\n"  +"xxx Variable intq: " +intq
-                +"\n"  +"xxx Variable stringMode_t: " +stringMode_t);
+                +"\n"  +"xxx Variable stringMode_t: " +stringMode_t
+                +"\n"  +"xxx Variable intCenter_p: " +intCenter_p);
+
+
 
         //Modificar siempre arrayPojoCoordenadas y arrayPojoCoordenadasAlfanumerico con offset y scale
 

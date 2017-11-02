@@ -896,9 +896,12 @@ public class MezclarFinal extends AppCompatActivity {
         int anchoTotalDeLasImagenesPequenas = 0;
         PosicionamientoProporcional posicionamientoProporcional = null;
         if(datosConfigTxt.getIntCenter_p() != 0){
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, CENTER_P=nnn existe y vale: " +datosConfigTxt.getIntCenter_p() );
             posicionamientoProporcional = new PosicionamientoProporcional(MezclarFinal.this);
             arrayAnchuraImagenesPequeñas = posicionamientoProporcional.getArrayAnchurasImagenesPequenas(pathCesaralMagicImageC, arrayImagesSequence);
             if(arrayAnchuraImagenesPequeñas == null){
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, CENTER_P=nnn existe y arrayAnchuraImagenesPequeñas es nuul" );
+
                 //Hay un error con Center_P
                 //Lanzamos error y salimos
                 enviarNotification("Error de param CENTER_P=nnn: arrayAnchuraImagenesPequeñas es null,  saliendo de la aplicacion");
@@ -1099,9 +1102,9 @@ public class MezclarFinal extends AppCompatActivity {
                 //**************************************************************************************
                 //**************************************************************************************
                 //req de offset el 25 oct 2017, modificar coordenadas de acuerdo a offset_x, offset_y y sacale_x
-                DatosConfigTxt datosConfigTxt = new DatosConfigTxt(MezclarFinal.this);
-                xFloat = datosConfigTxt.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
-                yFloat = datosConfigTxt.modificarCoordenadaY(yFloat, intOffset_y);
+                DatosConfigTxt datosConfigTxtLocal = new DatosConfigTxt(MezclarFinal.this);
+                xFloat = datosConfigTxtLocal.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
+                yFloat = datosConfigTxtLocal.modificarCoordenadaY(yFloat, intOffset_y);
 
                 //FIN req de offset el 25 oct 2017
                 //**************************************************************************************
@@ -1161,8 +1164,11 @@ public class MezclarFinal extends AppCompatActivity {
                 //Afecta a la cadena de numeros y alfanumericos
                 if(datosConfigTxt.getIntCenter_p() != 0){
                     //Calculo de la coordenada xFloat
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, CENTER_P=nnn existe y xFloat original es: " +xFloat );
                     xFloat = posicionamientoProporcional.center_pGetPosicionX(datosConfigTxt.getIntCenter_p(), i,
                                         arrayAnchuraImagenesPequeñas, anchoTotalDeLasImagenesPequenas);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, CENTER_P=nnn existe y xFloat NUEVO es: " +xFloat );
+
 
                 }//FIN parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
 

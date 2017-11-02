@@ -44,38 +44,53 @@ public class PosicionamientoProporcional {
     }
 
     public int[] getArrayAnchurasImagenesPequenas(String pathCesaralMagicImageC, char[] arrayImagesSequence) {
-        int[] arrayAnchuraImagenesPequeñas = null;
+        int[] arrayAnchuraImagenesPequeñas = new int[arrayImagesSequence.length];
         ObtenerImagen obtenerImagen = new ObtenerImagen(context);
 
         for (int i = 0; i < arrayImagesSequence.length; i++) {
 
             String nombreFichero = arrayImagesSequence[i]+".bmp";
             File file = obtenerImagen.getFilePathOfPictureParaCentrar(pathCesaralMagicImageC, nombreFichero);
+            //Aunque el fichero no exista, file tiene el  path, nunca es null
+            /*
             if(file == null){//intentamos con la extension .xbmp
                 nombreFichero = arrayImagesSequence[i]+".xbmp";
                 file = obtenerImagen.getFilePathOfPictureParaCentrar(pathCesaralMagicImageC, nombreFichero);
             }
+            */
             //Obtener el array de bytes del fichero
             byte bytes[] = obtenerImagen.getFileBytes(file);
-            if(bytes == null){//ERROR
-                Log.d(xxx, "getArrayAnchurasImagenesPequenas, array de bytes es null");
+            if(bytes == null) {//ERROR
+                Log.d(xxx, "getArrayAnchurasImagenesPequenas, array de bytes es null con .bmp");
                 //return null, indica que ha habido un fallo
-                return null;
+                nombreFichero = arrayImagesSequence[i] + ".xbmp";
+                file = obtenerImagen.getFilePathOfPictureParaCentrar(pathCesaralMagicImageC, nombreFichero);
+                bytes = obtenerImagen.getFileBytes(file);
+                if (bytes == null) {
+                    Log.d(xxx, "getArrayAnchurasImagenesPequenas, array de bytes es null con .xbmp");
+                    return null;
+                }
+            }
+                /*
             }else if(bytes.length == 0){
                 Log.d(xxx, "getArrayAnchurasImagenesPequenas, array de bytes tiene longitud cero, lo devuelvo como null");
                 //return null, indica que ha habido un fallo
                 return null;
             }
+            */
 
             //seguimos
             //Calcular la anchura de la imagen
             int anchura = bytes[18]+ ((byte)255 * bytes[19]);
-            Log.d(xxx, "calcularAnchuraUltimaImagenTipoN, anchura:  " +anchura +"de imagin: " +i);
+            Log.d(xxx, "getArrayAnchurasImagenesPequenas, anchura:  " +anchura +"de imagin: " +i);
             arrayAnchuraImagenesPequeñas[i] = anchura;
         }//FIN de for (int i = 0; i < arrayImagesSequence.length; i++)
 
         return arrayAnchuraImagenesPequeñas;
-    }
+    }//Fin de getArrayAnchurasImagenesPequenas
+
+
+
 
     public int getAnchoTotalDeTodasLasImagenes(int[] arrayAnchuraImagenesPequeñas){
         //sumamos las anchuras de todas las imagenes pequeñas
@@ -89,6 +104,8 @@ public class PosicionamientoProporcional {
 
     //Devuelve la posicion x que corresponpe a la coordenada Nx
     public float center_pGetPosicionX(int intCenter_p, int loopSize, int[] arrayAnchuraImagenesPequeñas, int intAnchoTotal){
+        Log.d(xxx, "center_pGetPosicionX, loopSize: " +loopSize);
+
         //El posicionamiento del primer carácter será  en X=nnn-(L/2)
         //El posicionamiento del segundo carácter será  en X=nnn-(L/2)+L1
         //El posicionamiento del tercer carácter será  en X=nnn-(L/2)+L1+L2
@@ -98,12 +115,19 @@ public class PosicionamientoProporcional {
         //Calculo de X
         float xFloat;
         int intL_Suma = 0;//ES L1+L2..... etc
-        for(int i = 0; i < (loopSize + 1); i++){
-             if(i == 0){
+        //for(int i = 0; i < (loopSize + 1); i++){
+        for(int i = 0; i <= (loopSize); i++){
+             if(loopSize == 0){
                  intL_Suma = 0;
+                 Log.d(xxx, "center_pGetPosicionX, intL_Suma: " +intL_Suma);
                  break;
              }
              intL_Suma += arrayAnchuraImagenesPequeñas[i];
+             i++;
+
+            Log.d(xxx, "center_pGetPosicionX, intL_Suma: " +intL_Suma);
+
+
         }
         xFloat = intCenter_p - Math.round(intAnchoTotal/2) + intL_Suma;
         Log.d(xxx, "center_pGetPosicionX, nuevo xFloat: " +xFloat);
