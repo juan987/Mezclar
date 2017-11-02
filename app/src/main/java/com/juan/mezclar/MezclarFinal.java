@@ -1208,9 +1208,41 @@ public class MezclarFinal extends AppCompatActivity {
 
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence inicial tiene: " +arrayImagesSequence.toString());
 
+        //parte 1, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+        // nuevo req del mail proximos requerimientos
+        //Afecta a la cadena de numeros y alfanumericos
+        int[] arrayAnchuraImagenesPequeñas = new int[arrayImagesSequence.length];
+        int anchoTotalDeLasImagenesPequenas = 0;
+        PosicionamientoProporcional posicionamientoProporcional = null;
+        if(datosConfigTxt.getIntCenter_p() != 0){
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y vale: " +datosConfigTxt.getIntCenter_p() );
+            posicionamientoProporcional = new PosicionamientoProporcional(MezclarFinal.this);
+            arrayAnchuraImagenesPequeñas = posicionamientoProporcional.getArrayAnchurasImagenesPequenasAlfa(pathCesaralMagicImageC, arrayImagesSequence);
+            if(arrayAnchuraImagenesPequeñas == null){
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y arrayAnchuraImagenesPequeñas es nuul" );
+
+                //Hay un error con Center_P
+                //Lanzamos error y salimos
+                enviarNotification("Error de param CENTER_P=nnn: arrayAnchuraImagenesPequeñas alfanumericas es null,  saliendo de la aplicacion");
+                enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Error in CENTER_P: can not get width of alfanumeric images");
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error de param CENTER_P=nnn: " +
+                        "arrayAnchuraImagenesPequeñas alfanumericas es null, salimos de la app");
+
+                //Acabamos la ejecucion
+                return false;
+
+            }
+            anchoTotalDeLasImagenesPequenas = posicionamientoProporcional.getAnchoTotalDeTodasLasImagenes(arrayAnchuraImagenesPequeñas);
+        }//FIN parte 1, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+
+
         Character character;
         String charDeLaSecuenciaRecibida = "";
         String soloCaracteresValidos = "";
+
+
+
         //*******************************************************************************
         //Revisamos la secuencia alphanumerica para descartar caracteres prohibidos.
         //En esta version solo se aceptan letras, menos la ñ, en mayusculas y minusculas, y digitos 0-9.
@@ -1237,6 +1269,7 @@ public class MezclarFinal extends AppCompatActivity {
 
 
         //arrayImagesSequence = soloCaracteresValidos.toCharArray();
+
 
 
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence final tiene: " +arrayImagesSequence.toString());
@@ -1420,9 +1453,9 @@ public class MezclarFinal extends AppCompatActivity {
                     //**************************************************************************************
                     //**************************************************************************************
                     //req de offset el 25 oct 2017, modificar coordenadas de acuerdo a offset_x, offset_y y sacale_x
-                    DatosConfigTxt datosConfigTxt = new DatosConfigTxt(MezclarFinal.this);
-                    xFloat = datosConfigTxt.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
-                    yFloat = datosConfigTxt.modificarCoordenadaY(yFloat, intOffset_y);
+                    DatosConfigTxt datosConfigTxtLocal = new DatosConfigTxt(MezclarFinal.this);
+                    xFloat = datosConfigTxtLocal.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
+                    yFloat = datosConfigTxtLocal.modificarCoordenadaY(yFloat, intOffset_y);
 
                     //FIN req de offset el 25 oct 2017
                     //**************************************************************************************
@@ -1436,6 +1469,20 @@ public class MezclarFinal extends AppCompatActivity {
                         xFloat = xFloat + offsetX_ParaCentrarN;
                         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, xFloat con centrado: " + xFloat);
                     }
+
+
+                    //parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+                    // nuevo req del mail proximos requerimientos
+                    //Afecta a la cadena de numeros y alfanumericos
+                    if(datosConfigTxt.getIntCenter_p() != 0){
+                        //Calculo de la coordenada xFloat
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y xFloat original es: " +xFloat );
+                        xFloat = posicionamientoProporcional.center_pGetPosicionX(datosConfigTxt.getIntCenter_p(), i,
+                                arrayAnchuraImagenesPequeñas, anchoTotalDeLasImagenesPequenas);
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y xFloat NUEVO es: " +xFloat );
+
+
+                    }//FIN parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
 
 
 

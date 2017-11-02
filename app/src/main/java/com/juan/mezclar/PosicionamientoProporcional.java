@@ -43,6 +43,8 @@ public class PosicionamientoProporcional {
         Log.d(xxx, "nueva instancia de:  " + xxx);
     }
 
+
+    //Este metodo es para las secuencias numericas
     public int[] getArrayAnchurasImagenesPequenas(String pathCesaralMagicImageC, char[] arrayImagesSequence) {
         int[] arrayAnchuraImagenesPequeñas = new int[arrayImagesSequence.length];
         ObtenerImagen obtenerImagen = new ObtenerImagen(context);
@@ -103,6 +105,7 @@ public class PosicionamientoProporcional {
     }
 
     //Devuelve la posicion x que corresponpe a la coordenada Nx
+    //este metodo lo usan las secuencias numericas y alfanumericas
     public float center_pGetPosicionX(int intCenter_p, int loopSize, int[] arrayAnchuraImagenesPequeñas, int intAnchoTotal){
         Log.d(xxx, "center_pGetPosicionX, loopSize: " +loopSize);
 
@@ -132,6 +135,7 @@ public class PosicionamientoProporcional {
     }
 
 
+    //este metodo lo usan las secuencias numericas y alfanumericas
     public float center_pGetPosicionX2(int intCenter_p, int loopSize, int[] arrayAnchuraImagenesPequeñas, int intAnchoTotal){
         Log.d(xxx, "center_pGetPosicionX, loopSize: " +loopSize);
 
@@ -162,5 +166,62 @@ public class PosicionamientoProporcional {
         Log.d(xxx, "center_pGetPosicionX, nuevo xFloat: " +xFloat);
         return xFloat;
     }
+
+
+
+    //Este metodo es para las secuencias alfanumericas
+    public int[] getArrayAnchurasImagenesPequenasAlfa(String pathCesaralMagicImageC, char[] arrayImagesSequence) {
+        int[] arrayAnchuraImagenesPequeñas = new int[arrayImagesSequence.length];
+        ObtenerImagen obtenerImagen = new ObtenerImagen(context);
+
+        for (int i = 0; i < arrayImagesSequence.length; i++) {
+            String prefijoNombreFile = "F1_";
+            String nombreFichero = "";
+            //Convertir el caracter de la secuencia alfanumerica para usar el metodo matches con regex de string
+            Character character = (Character)arrayImagesSequence[i];
+            String charDeLaSecuenciaRecibida = character.toString();
+            //Generar el nombre de la imagen a utilizar para la mezcla
+            if(charDeLaSecuenciaRecibida.matches("[a-z]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase() +2;
+                nombreFichero = prefijoNombreFile;
+
+            }else if (charDeLaSecuenciaRecibida.matches("[A-Z]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase() +1;
+                nombreFichero = prefijoNombreFile;
+
+            }else if(charDeLaSecuenciaRecibida.matches("[0-9]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase();
+                nombreFichero = prefijoNombreFile;
+
+            }else{//" nov: No hago nada aqui, voy a asumir que la secuencia alfa solo tiene caracteres validos
+                //Si llega aqui, es por que hay algun character que no es valido
+                Log.d(xxx, "metodo getArrayAnchurasImagenesPequenasAlfa, OJO, hay un caracter prohibido en la secuencia numerica");
+                //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
+            }
+
+            File file = obtenerImagen.getFilePathOfPictureParaCentrar(pathCesaralMagicImageC, nombreFichero + ".bmp");
+            byte bytes[] = obtenerImagen.getFileBytes(file);
+
+            if(bytes == null) {//ERROR
+                Log.d(xxx, "getArrayAnchurasImagenesPequenasAlfa, array de bytes es null con .bmp");
+                //return null, indica que ha habido un fallo
+                nombreFichero = nombreFichero + ".xbmp";
+                file = obtenerImagen.getFilePathOfPictureParaCentrar(pathCesaralMagicImageC, nombreFichero);
+                bytes = obtenerImagen.getFileBytes(file);
+                if (bytes == null) {
+                    Log.d(xxx, "getArrayAnchurasImagenesPequenasAlfa, array de bytes es null con .xbmp");
+                    return null;
+                }
+            }
+
+            //seguimos
+            //Calcular la anchura de la imagen
+            int anchura = bytes[18]+ ((byte)255 * bytes[19]);
+            Log.d(xxx, "getArrayAnchurasImagenesPequenasAlfa, anchura:  " +anchura +"de imagin: " +i);
+            arrayAnchuraImagenesPequeñas[i] = anchura;
+        }//FIN de for (int i = 0; i < arrayImagesSequence.length; i++)
+
+        return arrayAnchuraImagenesPequeñas;
+    }//Fin de getArrayAnchurasImagenesPequenasAlfa
 
 }
