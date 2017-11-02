@@ -889,6 +889,31 @@ public class MezclarFinal extends AppCompatActivity {
 
     private boolean loopPrincipalImagenesTipoN(){
 
+        //parte 1, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+        // nuevo req del mail proximos requerimientos
+        //Afecta a la cadena de numeros y alfanumericos
+        int[] arrayAnchuraImagenesPequeñas = new int[arrayImagesSequence.length];
+        int anchoTotalDeLasImagenesPequenas = 0;
+        PosicionamientoProporcional posicionamientoProporcional = null;
+        if(datosConfigTxt.getIntCenter_p() != 0){
+            posicionamientoProporcional = new PosicionamientoProporcional(MezclarFinal.this);
+            arrayAnchuraImagenesPequeñas = posicionamientoProporcional.getArrayAnchurasImagenesPequenas(pathCesaralMagicImageC, arrayImagesSequence);
+            if(arrayAnchuraImagenesPequeñas == null){
+                //Hay un error con Center_P
+                //Lanzamos error y salimos
+                enviarNotification("Error de param CENTER_P=nnn: arrayAnchuraImagenesPequeñas es null,  saliendo de la aplicacion");
+                enviarNotificationConNumero("E1");
+               metodoMostrarError("E1", "Error in CENTER_P: can not get width of images");
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param CENTER_P=nnn: " +
+                                            "arrayAnchuraImagenesPequeñas es null, salimos de la app");
+
+                //Acabamos la ejecucion
+                return false;
+
+            }
+            anchoTotalDeLasImagenesPequenas = posicionamientoProporcional.getAnchoTotalDeTodasLasImagenes(arrayAnchuraImagenesPequeñas);
+        }//FIN parte 1, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+
 
 
         //Loop principal de la aplicacion
@@ -1131,9 +1156,19 @@ public class MezclarFinal extends AppCompatActivity {
                 //****************************************************************************************
                 //****************************************************************************************
 
+                //parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+                // nuevo req del mail proximos requerimientos
+                //Afecta a la cadena de numeros y alfanumericos
+                if(datosConfigTxt.getIntCenter_p() != 0){
+                    //Calculo de la coordenada xFloat
+                    xFloat = posicionamientoProporcional.center_pGetPosicionX(datosConfigTxt.getIntCenter_p(), i,
+                                        arrayAnchuraImagenesPequeñas, anchoTotalDeLasImagenesPequenas);
+
+                }//FIN parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
 
 
-                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+
+                //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONFIG.txt
                 if(boolDibujar) {
                     mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
                             xFloat, yFloat);

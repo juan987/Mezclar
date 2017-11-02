@@ -76,6 +76,14 @@ public class DatosConfigTxt {
     }
 
 
+    //2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn, nuevo req del mail proximos requerimientos
+    //Afecta a la cadena de numeros y alfanumericos
+    int intCenter_p = 0;//por defecto, y este es el valor a comparar.
+    public int getIntCenter_p() {
+        return intCenter_p;
+    }
+
+
 
 
     //Parametro offset y scale para modificar coordenadas N y T
