@@ -2278,7 +2278,14 @@ public class MezclarFinal extends AppCompatActivity {
                 collageImage.setVisibility(View.VISIBLE);
 
                 //Lanzamos el asynctask de enviar imagen al servidor con ftp
-                new FtpAsyncTask().execute("string1", "string2", "string3");
+                //pero solo si la variable urlServidor es distinta de ""
+                if(urlServidor.equals("")){
+                    //Do nothing else, stop here
+                    escribirDatosEnLog("2");
+                }else{//Then continue with ftp
+                    new FtpAsyncTask().execute("string1", "string2", "string3");
+
+                }
 
             }else{//Ha habido un fallo
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen jpg NO generada, saliendo de la app");

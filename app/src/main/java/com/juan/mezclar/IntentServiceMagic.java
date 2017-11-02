@@ -1814,7 +1814,16 @@ public class IntentServiceMagic extends IntentService {
                 //collageImage.setImageBitmap(mergedImages);
 
                 //Lanzamos el asynctask de enviar imagen al servidor con ftp
-                new IntentServiceMagic.FtpAsyncTask().execute("string1", "string2", "string3");
+                //new IntentServiceMagic.FtpAsyncTask().execute("string1", "string2", "string3");
+
+                //Lanzamos el asynctask de enviar imagen al servidor con ftp
+                //pero solo si la variable urlServidor es distinta de ""
+                if(urlServidor.equals("")){
+                    //Do nothing else, stop here
+                    escribirDatosEnLog("2");
+                }else{//Then continue with ftp
+                    new IntentServiceMagic.FtpAsyncTask().execute("string1", "string2", "string3");
+                }
 
             }else{
                 Log.d(xxx, "En onPostExecute: FAIL, Imagen jpg NO generada, saliendo de la app");
