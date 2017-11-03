@@ -147,6 +147,18 @@ public class CentradoCadenasNumeros {
                                              String cadenaAlfanumerica,
                                              List<PojoCoordenadas> listaCoordenadasT,
                                              int intCenterConfig){
+
+
+        //3 nov 2017, para evitar un fallo cuando no hay coordenadas T
+
+        if(listaCoordenadasT.size() == 0){
+            return 0;
+        }
+
+
+
+
+
         int offsetX_ParaCentrar = 0;
         //*******************************************
         int anchuraUltimaImagenTipoT = 0;

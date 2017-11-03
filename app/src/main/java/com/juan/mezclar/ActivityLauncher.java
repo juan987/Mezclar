@@ -29,29 +29,47 @@ public class ActivityLauncher extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //**********************************************************************
-        //De esta manera lanzo el servicio IntentServiceMagic, como tengo transparent en stile, la UI no se ve
-        //Toast.makeText(getApplicationContext(), "hola soy un toast", Toast.LENGTH_SHORT).show();
-        recuperarIntentConDatosInicialesServicio();
-        //Toast.makeText(getApplicationContext(), "hola ya me voy", Toast.LENGTH_SHORT).show();
+        //3 nov 2017, nuevo requerimiento: Licencia de la aplicacion en mail Plan viernes - corregido
+        //Antes de hacer nada, chequeamos si la licencia esta OK
+        ConfiguracionLicencia configuracionLicencia = new ConfiguracionLicencia(this);
+        String dato = configuracionLicencia.getLicencia();
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        if(dato == null){
+            Log.d(xxx, "En metodo onCreate hay un null, No hay licencia");
 
-        //
-        finish();
+            //No hay licencia
+            //Lanzar la actividad de registro de licencia
+            Intent intent = new Intent(ActivityLauncher.this, ActivityValidacion.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            ActivityLauncher.this.finish();
+            //Log.d(xxx, "En metodo onCreate, despues del finish de hay un null, No hay licencia");
 
 
-        //***********************************************************************
+        }else {
 
 
+            //**********************************************************************
+            //De esta manera lanzo el servicio IntentServiceMagic, como tengo transparent en stile, la UI no se ve
+            //Toast.makeText(getApplicationContext(), "hola soy un toast", Toast.LENGTH_SHORT).show();
+            recuperarIntentConDatosInicialesServicio();
+            //Toast.makeText(getApplicationContext(), "hola ya me voy", Toast.LENGTH_SHORT).show();
+
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+            //
+            finish();
 
 
-        setContentView(R.layout.activity_launcher);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+            //***********************************************************************
 
-        secuenciaDeImagenes   = (EditText)findViewById(R.id.secImagenes);
-        secuenciaDeImagenesAlfanumerica   = (EditText)findViewById(R.id.secImagenesAlfanumerica);
+
+            setContentView(R.layout.activity_launcher);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+
+            secuenciaDeImagenes = (EditText) findViewById(R.id.secImagenes);
+            secuenciaDeImagenesAlfanumerica = (EditText) findViewById(R.id.secImagenesAlfanumerica);
 
 
         /*
@@ -66,29 +84,31 @@ public class ActivityLauncher extends AppCompatActivity {
             }
         });  */
 
-        final Button button = (Button)findViewById(R.id.button_id);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            final Button button = (Button) findViewById(R.id.button_id);
+            button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
 
-                if(editTextNumOrAlfa()){
-                    if((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
+                    if (editTextNumOrAlfa()) {
+                        if ((secuenciaDeImagenes.length() != 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
 
-                        sendIntentToAppMezclar();
+                            sendIntentToAppMezclar();
+                        }
+                        if ((secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() != 0)) {
+
+                            sendIntentToAppMezclarAlfanumerico();
+                        }
+                    } else {
+                        //los dos edittext tienen algo o ambos estan vacios
+                        Log.d(xxx, "En metodo onCreate los dos edittext tienen algo o ambos estan vacios");
+
                     }
-                    if((secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() != 0)) {
-
-                        sendIntentToAppMezclarAlfanumerico();
-                    }
-                }else{
-                    //los dos edittext tienen algo o ambos estan vacios
-                    Log.d(xxx, "En metodo onCreate los dos edittext tienen algo o ambos estan vacios");
-
                 }
-            }
-        });
+            });
 
-        //Lo comento para la chapuza del service que quiere cesar
-        //recuperarIntentConDatosIniciales();
+            //Lo comento para la chapuza del service que quiere cesar
+            //recuperarIntentConDatosIniciales();
+
+        }//else del chequeo de la licencia
     }
 
     @Override
