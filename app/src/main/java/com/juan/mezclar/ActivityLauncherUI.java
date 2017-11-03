@@ -21,6 +21,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 //19 OCT 17: ESTA ACTIVIDAD se muestra cuando se hace click en el icono y es llamada desde
@@ -28,6 +32,8 @@ import java.util.List;
 //Esta actividad tiene una UI para introducir secuencias numericas y secuencias alfanumericas.
 
 public class ActivityLauncherUI extends AppCompatActivity  {
+
+
     //public class ActivityLauncherUI extends AppCompatActivity implements NoticeDialogFragment.NoticeDialogListener {
     //String para usar en log.d con el nombre de la clase
     TextView textView = null;
@@ -63,6 +69,42 @@ public class ActivityLauncherUI extends AppCompatActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Crear configuracion por defecto si NO existe (es la primera vez)
+        File[] files = crearDirectorioPorDefecto();
+        if(files.length == 0){//significa que /CesaralMagic/ImageC/ no existia, entonces ha creado el directorio y esta vacio, seguimos
+            //Guardar CONFIG.txt
+            copyFiletoExternalStorage(R.raw.config, "CONFIG.txt");
+            //Guardar origin.xjpg
+            copyFiletoExternalStorage(R.raw.origin, "origin.xjpg");
+            //Guardar 0.xbmp
+            copyFiletoExternalStorage(R.raw.cero, "0.xbmp");
+            //Guardar 1.xbmp
+            copyFiletoExternalStorage(R.raw.uno, "1.xbmp");
+            //Guardar 2.xbmp
+            copyFiletoExternalStorage(R.raw.dos, "2.xbmp");
+            //Guardar 3.xbmp
+            copyFiletoExternalStorage(R.raw.tres, "3.xbmp");
+            //Guardar 4.xbmp
+            copyFiletoExternalStorage(R.raw.cuatro, "4.xbmp");
+            //Guardar 5.xbmp
+            copyFiletoExternalStorage(R.raw.cinco, "5.xbmp");
+            //Guardar 6.xbmp
+            copyFiletoExternalStorage(R.raw.seis, "6.xbmp");
+            //Guardar 7.xbmp
+            copyFiletoExternalStorage(R.raw.siete, "7.xbmp");
+            //Guardar 8.xbmp
+            copyFiletoExternalStorage(R.raw.ocho, "8.xbmp");
+            //Guardar 9.xbmp
+            copyFiletoExternalStorage(R.raw.nueve, "9.xbmp");
+
+
+        }else{
+            //Ya existe la configuracion por defecto, por que hay ficheros debajo del dir por defecto
+            //que es /CesaralMagic/ImageC/
+            Log.d(xxx, "onCreate La configuracion por defecto /CesaralMagic/ImageC/ ya existe");
+
+        }
 
 
 
@@ -329,7 +371,8 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         });
         */
 
-        crearConfiguracioPorDefecto();
+
+
     }//Fin del onCreate
 
 
@@ -339,56 +382,67 @@ public class ActivityLauncherUI extends AppCompatActivity  {
     // CesaralMagic/ImageC, entonces la App lo creará y copiará en este directorio
     // los ficheros de la configuración por defecto
 
-    private void crearConfiguracioPorDefecto(){
+
+
+    //Como en:
+    //https://stackoverflow.com/questions/8664468/copying-raw-file-into-sdcard
+    //Tambien se ven muy bien estos 2:
+    //https://gist.github.com/fpersson/1435608
+    //https://stackoverflow.com/questions/19464162/how-to-copy-raw-files-into-sd-card
+    private void copyFiletoExternalStorage(int resourceId, String resourceName){
+        //String pathSDCard = Environment.getExternalStorageDirectory() + "/Prueba_1/data/" + resourceName;
+        String path = Environment.getExternalStorageDirectory() + "/CesaralMagic/ImageC/" + resourceName;
+        try{
+            InputStream in = getResources().openRawResource(resourceId);
+            FileOutputStream out = null;
+            out = new FileOutputStream(path);
+            byte[] buff = new byte[1024];
+            int read = 0;
+            try {
+                while ((read = in.read(buff)) > 0) {
+                    out.write(buff, 0, read);
+                }
+            } finally {
+                in.close();
+                out.close();
+                Log.d(xxx, "copyFiletoExternalStorage fichero copiado correctamente: " +resourceName);
+
+            }
+        } catch (FileNotFoundException e) {
+            //e.printStackTrace();
+            Log.d(xxx, "copyFiletoExternalStorage FileNotFoundException: " +e.getMessage() +"  , fichero: " +resourceName);
+
+        } catch (IOException e) {
+            //e.printStackTrace();
+            Log.d(xxx, "copyFiletoExternalStorage IOException: " +e.getMessage() +"  , fichero: " +resourceName);
+
+        }
+
+    }
+
+    private File[] crearDirectorioPorDefecto(){
         //Prueba, crear el directorio DirPrueba_1 debajo de /CesaralMagic/ImageC/
-        File directorioMain = new File(Environment.getExternalStorageDirectory() + pathCesaralMagicImageC
-                + "DirPrueba_1");
+        File directorioMain = new File(Environment.getExternalStorageDirectory()
+                                                + "/CesaralMagic/ImageC/");
+                                               // + "/Prueba_1/data/");
         String directorio = directorioMain.getAbsolutePath();
-        Log.d(xxx, "crearConfiguracioPorDefecto, El directorio es: " + directorio);
+        Log.d(xxx, "crearDirectorioPorDefecto, El directorio es: " + directorio);
         if (!directorioMain.exists()) {
             directorioMain.mkdirs();
-            Log.d(xxx, "crearConfiguracioPorDefecto Directorio DirPrueba_1 no existia y a ha sido creado ");
+            Log.d(xxx, "crearDirectorioPorDefecto Directorio DirPrueba_1 no existia y a ha sido creado ");
+            //hay que continuar con la configuracion, devuelve true
+            File[] files = directorioMain.listFiles();
+            return files;
         }else{
-            Log.d(xxx, "crearConfiguracioPorDefectoDirectorio DirPrueba_1 Ya existe ");
+            Log.d(xxx, "crearDirectorioPorDefecto DirPrueba_1 Ya existe ");
+            File[] files = directorioMain.listFiles();
+            return files;
         }
-        //directorio = directorioMain.getAbsolutePath();
-        //Log.d(xxx, "crearConfiguracioPorDefecto, El directorio es: " + directorio);
         //FIN de Prueba, crear el directorio DirPrueba_1 debajo de /CesaralMagic/ImageC/
-
-        //El directorio por defecto ya esta creado
-        //Generar el CONFIG.txt y guardarlo en el directorio creado
-        /*
-        EscribirEnFicheroTxt escribirEnFicheroTxt = new EscribirEnFicheroTxt(ActivityLauncherUI.this);
-        if(escribirEnFicheroTxt.copiarFicheroConfigTxtPorDefecto(pathCesaralMagicImageC
-                                                                        +"DirPrueba_1/CONFIG.txt")){
-
-            Log.d(xxx, "crearConfiguracioPorDefecto fichero escrito correctamente");
-
-        }else{
-            Log.d(xxx, "crearConfiguracioPorDefecto fichero NO escrito correctamente");
-        } */
-
-
-        //Recupero y guardo las imagenes por defecto en el dir por defecto
 
     }//Fin de crearConfiguracioPorDefecto
 
-    private Bitmap recuperarImagenDeDrawables(int intNombreImagen) {
-        Bitmap bitmap = null;
-        Resources res = getResources();
-        bitmap = BitmapFactory.decodeResource(res, intNombreImagen);
-        if (bitmap != null) {
-            //Toast.makeText(context,
-            //"Imagen cargada", Toast.LENGTH_SHORT).show();
-            Log.d(xxx, "Imagen cargada");
-            return bitmap;
-        } else {
-            //Toast.makeText(context,
-            //"ERROR Imagen NO cargada", Toast.LENGTH_SHORT).show();
-            Log.d(xxx, "ERROR: Imagen NO cargada");
-            return null;
-        }
-    }
+
 
 
     @Override

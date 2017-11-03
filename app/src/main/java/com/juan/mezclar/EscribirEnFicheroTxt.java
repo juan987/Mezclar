@@ -117,10 +117,11 @@ public class EscribirEnFicheroTxt {
     //Si al ejecutarse la App por primera vez no existe el folder
     // CesaralMagic/ImageC, entonces la App lo creará y copiará en este directorio
     // los ficheros de la configuración por defecto
+    //Este metodo no se usa
     public boolean copiarFicheroConfigTxtPorDefecto(String pathCesaralMagicImageC){
 
         //Leer el CONFIG.txt por defecto de la carpeta raw y reconstruirlo en string each line
-        InputStream inputStream = context.getResources().openRawResource(R.raw.default_config);
+        InputStream inputStream = context.getResources().openRawResource(R.raw.config);
         BufferedReader bufferedReader= new BufferedReader(new InputStreamReader(inputStream));
 
         String textoConfigTxt = "";
