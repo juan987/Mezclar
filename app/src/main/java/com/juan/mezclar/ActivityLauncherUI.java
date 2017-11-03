@@ -1,7 +1,11 @@
 package com.juan.mezclar;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +20,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.List;
 
 //19 OCT 17: ESTA ACTIVIDAD se muestra cuando se hace click en el icono y es llamada desde
@@ -324,7 +329,67 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         });
         */
 
+        crearConfiguracioPorDefecto();
     }//Fin del onCreate
+
+
+
+    //3 nov 2017 nuevo req recibido en mail Plan viernes - corregido
+    //Si al ejecutarse la App por primera vez no existe el folder
+    // CesaralMagic/ImageC, entonces la App lo creará y copiará en este directorio
+    // los ficheros de la configuración por defecto
+
+    private void crearConfiguracioPorDefecto(){
+        //Prueba, crear el directorio DirPrueba_1 debajo de /CesaralMagic/ImageC/
+        File directorioMain = new File(Environment.getExternalStorageDirectory() + pathCesaralMagicImageC
+                + "DirPrueba_1");
+        String directorio = directorioMain.getAbsolutePath();
+        Log.d(xxx, "crearConfiguracioPorDefecto, El directorio es: " + directorio);
+        if (!directorioMain.exists()) {
+            directorioMain.mkdirs();
+            Log.d(xxx, "crearConfiguracioPorDefecto Directorio DirPrueba_1 no existia y a ha sido creado ");
+        }else{
+            Log.d(xxx, "crearConfiguracioPorDefectoDirectorio DirPrueba_1 Ya existe ");
+        }
+        //directorio = directorioMain.getAbsolutePath();
+        //Log.d(xxx, "crearConfiguracioPorDefecto, El directorio es: " + directorio);
+        //FIN de Prueba, crear el directorio DirPrueba_1 debajo de /CesaralMagic/ImageC/
+
+        //El directorio por defecto ya esta creado
+        //Generar el CONFIG.txt y guardarlo en el directorio creado
+        /*
+        EscribirEnFicheroTxt escribirEnFicheroTxt = new EscribirEnFicheroTxt(ActivityLauncherUI.this);
+        if(escribirEnFicheroTxt.copiarFicheroConfigTxtPorDefecto(pathCesaralMagicImageC
+                                                                        +"DirPrueba_1/CONFIG.txt")){
+
+            Log.d(xxx, "crearConfiguracioPorDefecto fichero escrito correctamente");
+
+        }else{
+            Log.d(xxx, "crearConfiguracioPorDefecto fichero NO escrito correctamente");
+        } */
+
+
+        //Recupero y guardo las imagenes por defecto en el dir por defecto
+
+    }//Fin de crearConfiguracioPorDefecto
+
+    private Bitmap recuperarImagenDeDrawables(int intNombreImagen) {
+        Bitmap bitmap = null;
+        Resources res = getResources();
+        bitmap = BitmapFactory.decodeResource(res, intNombreImagen);
+        if (bitmap != null) {
+            //Toast.makeText(context,
+            //"Imagen cargada", Toast.LENGTH_SHORT).show();
+            Log.d(xxx, "Imagen cargada");
+            return bitmap;
+        } else {
+            //Toast.makeText(context,
+            //"ERROR Imagen NO cargada", Toast.LENGTH_SHORT).show();
+            Log.d(xxx, "ERROR: Imagen NO cargada");
+            return null;
+        }
+    }
+
 
     @Override
     protected void onResume() {

@@ -5,16 +5,12 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by Juan on 08/10/2017.
@@ -114,5 +110,44 @@ public class EscribirEnFicheroTxt {
             return true;
         }
         return false;
+    }
+
+
+    //3 nov 2017 nuevo req recibido en mail Plan viernes - corregido
+    //Si al ejecutarse la App por primera vez no existe el folder
+    // CesaralMagic/ImageC, entonces la App lo creará y copiará en este directorio
+    // los ficheros de la configuración por defecto
+    public boolean copiarFicheroConfigTxtPorDefecto(String pathCesaralMagicImageC){
+
+        //Leer el CONFIG.txt por defecto de la carpeta raw y reconstruirlo en string each line
+        InputStream inputStream = context.getResources().openRawResource(R.raw.default_config);
+        BufferedReader bufferedReader= new BufferedReader(new InputStreamReader(inputStream));
+
+        String textoConfigTxt = "";
+
+        try {
+            String eachline;
+            //int lineCount = 0;
+            //while ((eachline = bufferedReader.readLine()) != null) {
+            while ((eachline = bufferedReader.readLine()) != null) {
+                textoConfigTxt += eachline +"\r\n";
+            }
+            bufferedReader.close();
+            Log.d(xxx, "copiarFicheroConfigTxtPorDefecto, El CONFIG.txt por defecto tiene: " +textoConfigTxt);
+        } catch (IOException e) {
+            //e.printStackTrace();
+            Log.d(xxx, "copiarFicheroConfigTxtPorDefecto, io exception con el config por defecto: " +e.getMessage());
+            return false;
+        }
+
+        //creamos el fichero config.txt con el string
+        if(appendDateEnFichero(pathCesaralMagicImageC, textoConfigTxt)){
+            Log.d(xxx, "escribirDatosEnLog fichero escrito correctamente");
+            return true;
+        }else{
+            Log.d(xxx, "escribirDatosEnLog fichero NO escrito correctamente");
+            return true;
+        }
+
     }
 }

@@ -196,6 +196,12 @@ public class PosicionamientoProporcional {
             }else{//" nov: No hago nada aqui, voy a asumir que la secuencia alfa solo tiene caracteres validos
                 //Si llega aqui, es por que hay algun character que no es valido
                 Log.d(xxx, "metodo getArrayAnchurasImagenesPequenasAlfa, OJO, hay un caracter prohibido en la secuencia numerica");
+                Log.d(xxx, "metodo getArrayAnchurasImagenesPequenasAlfa, OJO, " +
+                        "en este caso usamos la anchura que se encuentre en el fichero  F1_A1.xbmp" +
+                         "Como esta puesto en el mail Plan viernes - corregido del 3 nov 17");
+
+                prefijoNombreFile += "A1";
+                nombreFichero = prefijoNombreFile;
                 //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
             }
 
