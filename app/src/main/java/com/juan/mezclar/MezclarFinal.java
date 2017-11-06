@@ -1321,13 +1321,13 @@ public class MezclarFinal extends AppCompatActivity {
 
                 Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c asignamos las coordenadas");
                 if(datosConfigTxt.getMode_c().equals("1")){
-                    if(i == 0){//Obtenemos N2
-                        xFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordX());
-                        yFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordY());
-
-                    }else if(i == 1){//Obtenemos N1
+                    if(i == 0){//Obtenemos N1 para mm
                         xFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordX());
                         yFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordY());
+
+                    }else if(i == 1){//Obtenemos N1
+                        xFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordY());
 
                     }
                 }
