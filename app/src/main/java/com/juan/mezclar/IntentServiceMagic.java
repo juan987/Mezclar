@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -582,7 +583,9 @@ public class IntentServiceMagic extends IntentService {
         Log.d(xxx, "metodo loopPrincipalImagenesTipoN, la formula de centradp da: " +offsetX_ParaCentrarN);
         //FIN de Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
 
-
+        //6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+        //este string es para usarlo cuando n=1
+        String nombreImagenMM= "";
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             //Nuevo req recibido el 27oct17, parametro m_x
             //Se trata de un parámetro opcional para el modo numérico solamente, denominado M_X
@@ -661,7 +664,141 @@ public class IntentServiceMagic extends IntentService {
             }//FIN de if(datosConfigTxt.getMode_t().equals("1"))
             //FIN de 2 nov 2017 Parte 1, nuevo req param mode_t en CONFIG.txt en mail proximos requerimientos
 
+            //***************************************************************************************************
+            //***************************************************************************************************
+            //Parte 1: 6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+            //Te paso los requerimientos del modo nuevo de rotación:
+            //parámetro opcional MODE_C=1
+            //Solo aplica al modo numerico
 
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, datosConfigTxt.getMode_t() es: " +datosConfigTxt.getMode_c());
+            if(datosConfigTxt.getMode_c().equals("1")){
+                //Chequear cuantos digitos tiene la cadena
+                if(arrayImagesSequence.length < 4 || arrayImagesSequence.length > 4){
+                    //Lanzamos error y salimos
+                    enviarNotification("Error de param mode_c: numero de digitos es menor o mayor a 4 " +", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error in mode_c, wrong data format: number of digits should be 4");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_c: numero de digitos es menor o mayor a 4 , salimos de la app");
+
+                    //Acabamos la ejecucion
+                    return false;
+                }else{
+                    //La longitud del array es correcta, hay que chequear los rangos
+
+                    //Imagina que el programa recibe los datos hhmm
+                    // (siempre se recibirán 4 dígitos en este modo. En caso contrario
+                    // no se hará nada y se reportará el error en el log: “Wrong data format”)
+
+                    //Valores posibles:
+                    //hh Puede tener los valores: 00, 01, 02, …,11
+                    //mm Puede tener los valores: 00, 01, 02, …,59
+                    //Si alguno de estos valores no está en este rango se reportará el error en el log: “Wrong hh:mm data format”)
+
+
+                }
+
+                //Solo vamos a dibujar en dos ciclos: i = 0 e i = 1, todos los demas ciclos no se dibujan
+                String nombreFicheroImagen = "";
+                if(i == 0){
+                    //Chequea si mm esta fuera del rango 00-59
+
+                    //Obtenemos el string mm
+                    Character character = (Character)arrayImagesSequence[2];
+                    nombreFicheroImagen = character.toString();
+                    character = (Character)arrayImagesSequence[3];
+                    nombreFicheroImagen += character.toString();
+                    nombreImagenMM = nombreFicheroImagen;
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c imagen mm es: "  +nombreFicheroImagen);
+                    //Verificamos el rango de mm
+                    if(Integer.parseInt(nombreFicheroImagen) <= 59){
+                        //mm esta dentro de rango, seguimos
+
+                    }else{
+                        //Error mm fuera de rango Lanzamos error y salimos
+                        enviarNotification("Error de param mode_c: Wrong hh:mm data format " +", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error in mode_c: Wrong hh:mm data format");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_c: Wrong hh:mm data format, error mm: " +nombreFicheroImagen);
+
+                        //Acabamos la ejecucion
+                        return false;
+                    }
+
+                }else if(i == 1){
+                    //Chequea si hh esta fuera del rango 00-11
+
+                    //Obtenemos el string mm
+                    Character character = (Character)arrayImagesSequence[0];
+                    nombreFicheroImagen = character.toString();
+                    character = (Character)arrayImagesSequence[1];
+                    nombreFicheroImagen += character.toString();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c imagen hh es: "  +nombreFicheroImagen);
+                    //Verificamos el rango de mm
+                    if(Integer.parseInt(nombreFicheroImagen) <= 11){
+                        //mm esta dentro de rango, seguimos
+
+                    }else{
+                        //Error mm fuera de rango Lanzamos error y salimos
+                        enviarNotification("Error de param mode_c: Wrong hh:mm data format " +", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error in mode_c: Wrong hh:mm data format");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_c: Wrong hh:mm data format, error hh: " +nombreFicheroImagen);
+
+                        //Acabamos la ejecucion
+                        return false;
+                    }
+
+
+                }else{
+                    //Para todos los demas indices del loop, NO se dibuja nada
+                    boolDibujar = false;
+                }
+
+                //Obtenemos la imagen, solo si i es 0 o 1, si no, no hay que dibujar nada
+                if(i == 0 || i == 1){
+                    imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                            +nombreFicheroImagen+".bmp");
+
+                    if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
+                        //Buscamos la imagen a superponer con extension .xbmp
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No existe la imagen a superponer: " +"con extension .bmp, buscamos con extension .xbmp");
+                        imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                                +nombreFicheroImagen+".xbmp");
+
+                        //
+                        if(imagenParaSuperponerConOrigin == null) {
+                            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                            enviarNotification("Error con mode_c al recuperar imagen pequeña numero: " + ", saliendo de la aplicacion");
+                            enviarNotificationConNumero("E1");
+                            metodoMostrarError("E1", "Error in mode_c when getting image file from external storage");
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen de dos digitos de mode_c, imagenParaSuperponerConOrigin == null, salimos de la app");
+
+                            //Acabamos la ejecucion
+                            return false;
+                        }
+                    }
+                }
+
+                //Rotamos, solo si i es 0 o 1, si no, no hay que dibujar nada
+                if(i == 0){
+                    //Rotamos mm
+                    //Primero cogerá la imagen m.xbmp , la rotará hacia la derecha los grados (mm x 6), teniendo en cuenta
+                    // el centro de la imagen pasada, y lo insertará en las coordenadas indicadas por N1
+                    float floatRotarMM = Integer.parseInt(nombreImagenMM) * 6;
+                    imagenParaSuperponerConOrigin = RotateBitmap(imagenParaSuperponerConOrigin, floatRotarMM);
+
+                }else if(i == 1){
+                    float floatRotarHH = (Integer.parseInt(nombreFicheroImagen) * 30)+ (Integer.parseInt(nombreImagenMM) /2);
+                    imagenParaSuperponerConOrigin = RotateBitmap(imagenParaSuperponerConOrigin, floatRotarHH);
+                }
+
+
+            }//FIN de if(datosConfigTxt.getMode_c().equals("1"))
+
+            //FIN Parte 1: de 6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+            //***************************************************************************************************
+            //***************************************************************************************************
 
 
             if(imagenParaSuperponerConOrigin == null){
@@ -825,6 +962,32 @@ public class IntentServiceMagic extends IntentService {
 
 
                 }//FIN parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+
+
+                //***********************************************************************************************
+                //***********************************************************************************************
+                //Parte dos: 6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+                //Te paso los requerimientos del modo nuevo de rotación:
+                //parámetro opcional MODE_C=1
+                //Solo aplica al modo numerico
+
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c asignamos las coordenadas");
+                if(datosConfigTxt.getMode_c().equals("1")){
+                    if(i == 0){//Obtenemos N2
+                        xFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordY());
+
+                    }else if(i == 1){//Obtenemos N1
+                        xFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordY());
+
+                    }
+                }
+                //FIN Parte dos: 6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+                //***********************************************************************************************
+                //***********************************************************************************************
+
+
 
                 //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
                 if(boolDibujar) {
@@ -1665,6 +1828,20 @@ public class IntentServiceMagic extends IntentService {
         return bitmap2;
     }
 
+
+    //6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+    //Te paso los requerimientos del modo nuevo de rotación:
+    //parámetro opcional MODE_C=1
+    //Solo aplica al modo numerico
+    //Como en:
+    //https://stackoverflow.com/questions/9015372/how-to-rotate-a-bitmap-90-degrees
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
     //Metodo anulado para que no envie las notificaciones con texto
     private void enviarNotification(String mensaje){
 
@@ -1788,7 +1965,7 @@ public class IntentServiceMagic extends IntentService {
                 }else{
                     enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
-                    metodoMostrarError("E2", "Error with fto connect or login");
+                    metodoMostrarError("E2", "Error with ftp connect or login");
                     Log.d(xxx, "En metodoSubirImagenConFtp, Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     return false;
                 }

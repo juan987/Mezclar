@@ -3,9 +3,9 @@
     <string name="action_create_configuracion">Create new configuration</string>
     <string name="action_borrar_configuracion">Delete active configuration</string>
     <string name="finalizar">End program</string>
-    <string name="title_activity_mezclar">CUPP Lite</string>
+    <string name="title_activity_mezclar">CUPP Lite v29</string>
     <string name="combine">Cesaral Magic Photo</string>
-    <string name="title_activity_borrar_configuracion">CUPP Lite</string>
+    <string name="title_activity_borrar_configuracion">CUPP Lite v29</string>
 
 
     <!-- strings del alert dialod -->
@@ -14,7 +14,7 @@
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="alert_dialog_description">You are about to delete the active configuration,
                                 this action can not be undone.</string>
-    <string name="title_activity_validacion">CUPP Lite</string>
+    <string name="title_activity_validacion">CUPP Lite v29</string>
 
 
 </resources>

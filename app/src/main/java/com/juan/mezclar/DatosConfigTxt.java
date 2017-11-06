@@ -86,6 +86,15 @@ public class DatosConfigTxt {
 
 
 
+    //6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+    //Te paso los requerimientos del modo nuevo de rotación:
+    //parámetro opcional MODE_C=1
+    //Solo aplica al modo numerico
+    String stringMode_c = "0";//por defecto
+    public String getMode_c() {
+        return stringMode_c;
+    }
+
 
     //Parametro offset y scale para modificar coordenadas N y T
     int intOffset_x=0;
@@ -138,6 +147,16 @@ public class DatosConfigTxt {
     public int getIntCenterConfig() {
         return intCenterConfig;
     }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -248,6 +267,8 @@ public class DatosConfigTxt {
         String[] arrayQ = null;
         String[] arrayMode_t = null;
         String[] arraycenter_p = null;
+        String[] arrayMode_c = null;
+
 
         String regexUrl = "=";
         String regexUser = "=";
@@ -262,7 +283,7 @@ public class DatosConfigTxt {
         String regexQ = "=";
         String regexMode_t = "=";
         String regexcenter_p = "=";
-
+        String regexMode_c = "=";
 
 
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
@@ -351,6 +372,16 @@ public class DatosConfigTxt {
                 Log.d(xxx, "xxx, Hay una linea que empieza con center_p, y tiene: " +arrayLineasTextoLocal.get(i));
                 arraycenter_p = arrayLineasTextoLocal.get(i).split(regexcenter_p);
                 //boolMX = true;
+            }
+
+
+            //6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
+            //Te paso los requerimientos del modo nuevo de rotación:
+            //parámetro opcional MODE_C=1
+            //Solo aplica al modo numerico
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("mode_c")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con mode_t y tiene: " +arrayLineasTextoLocal.get(i));
+                arrayMode_c = arrayLineasTextoLocal.get(i).split(regexMode_c);
             }
 
 
@@ -590,6 +621,24 @@ public class DatosConfigTxt {
             }
         }
 
+        //Imprime mode_c y la asigna a la variable global
+        //Solo aplica al modo numerico
+        if(arrayMode_c != null) {
+            int i = 0;
+            for (String mode_c : arrayMode_c) {
+                Log.d(xxx, "xxx Dato en arrayMode_t " + i + " es: " + mode_c);
+                stringMode_c = arrayMode_c[i];
+                i++;
+            }
+            if(stringMode_c.equals("0") || stringMode_c.equals("1")){
+                //el parametro esta bien
+            }else{
+                //si no es ni "0" ni "1" le pongo el valor "0" por defecto
+                stringMode_c = "0";
+            }
+        }
+
+
         Log.d(xxx, "xxx Variable urlServidor: " +urlServidor
                 +"\n"  +"xxx Variable user: " +user
                 +"\n"  +"xxx Variable password: " +password
@@ -604,7 +653,8 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable intMX: " +intMX
                 +"\n"  +"xxx Variable intq: " +intq
                 +"\n"  +"xxx Variable stringMode_t: " +stringMode_t
-                +"\n"  +"xxx Variable intCenter_p: " +intCenter_p);
+                +"\n"  +"xxx Variable intCenter_p: " +intCenter_p
+                +"\n"  +"xxx Variable stringMode_c: " +stringMode_c);
 
 
 
