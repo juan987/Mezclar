@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -596,14 +597,24 @@ public class IntentServiceMagic extends IntentService {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mezclando imagen: " +i);
             enviarNotification("mezclando imagen: " +i);
             enviarNotificationConNumero("1");
-            //Obtener la imagen a superponer como un bitmap
-            imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                    +arrayImagesSequence[i]+".bmp");
-            if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
-                //Buscamos la imagen a superponer con extension .xbmp
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No existe la imagen a superponer: " +i +"con extension .bmp, buscamos con extension .xbmp");
+
+
+            //OJO OJO OJO OJO
+            if(datosConfigTxt.getMode_c().equals("1") || datosConfigTxt.getMode_t().equals("1")){
+                //Sigue al if de abajo de get mode c o get mode t, por que los ficheros ya no se llaman segun n en estos modos
+                //Inicializamos a null
+                imagenParaSuperponerConOrigin = null;
+            }else {
+                //Obtener la imagen a superponer como un bitmap cuando no hay modo_c o modo_t
                 imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                        +arrayImagesSequence[i]+".xbmp");
+                        + arrayImagesSequence[i] + ".bmp");
+                if (imagenParaSuperponerConOrigin == null) {//No encuentra la imagen con extension .bmp
+                    //Buscamos la imagen a superponer con extension .xbmp
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No existe la imagen a superponer: " + i + "con extension .bmp, buscamos con extension .xbmp");
+                    imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                            + arrayImagesSequence[i] + ".xbmp");
+                }
+
             }
 
             //2 nov 2017 Parte 1, nuevo req param mode_t en CONFIG.txt en mail proximos requerimientos
@@ -755,16 +766,24 @@ public class IntentServiceMagic extends IntentService {
                     boolDibujar = false;
                 }
 
-                //Obtenemos la imagen, solo si i es 0 o 1, si no, no hay que dibujar nada
+                //Obtenemos la imagen del horrario o el minutero, solo si i es 0 o 1, si no, no hay que dibujar nada
                 if(i == 0 || i == 1){
+                    String nombreFicheroAgujaDelReloj = "";
+                    if(i == 0){
+                        nombreFicheroAgujaDelReloj = "m";
+                    }else if( i == 1){
+                        nombreFicheroAgujaDelReloj = "h";
+                    }
+
+
                     imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                            +nombreFicheroImagen+".bmp");
+                            +nombreFicheroAgujaDelReloj+".bmp");
 
                     if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
                         //Buscamos la imagen a superponer con extension .xbmp
                         Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No existe la imagen a superponer: " +"con extension .bmp, buscamos con extension .xbmp");
                         imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
-                                +nombreFicheroImagen+".xbmp");
+                                +nombreFicheroAgujaDelReloj+".xbmp");
 
                         //
                         if(imagenParaSuperponerConOrigin == null) {
@@ -785,12 +804,20 @@ public class IntentServiceMagic extends IntentService {
                     //Rotamos mm
                     //Primero cogerá la imagen m.xbmp , la rotará hacia la derecha los grados (mm x 6), teniendo en cuenta
                     // el centro de la imagen pasada, y lo insertará en las coordenadas indicadas por N1
-                    float floatRotarMM = Integer.parseInt(nombreImagenMM) * 6;
-                    imagenParaSuperponerConOrigin = RotateBitmap(imagenParaSuperponerConOrigin, floatRotarMM);
+                    float floatRotarMM = Float.parseFloat(nombreImagenMM) * 6.0f;
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero estos grados: " +floatRotarMM);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero nombre imagen MM: " +nombreImagenMM);
+
+                    imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarMM);
 
                 }else if(i == 1){
-                    float floatRotarHH = (Integer.parseInt(nombreFicheroImagen) * 30)+ (Integer.parseInt(nombreImagenMM) /2);
-                    imagenParaSuperponerConOrigin = RotateBitmap(imagenParaSuperponerConOrigin, floatRotarHH);
+                    //float floatRotarHH = (Integer.parseInt(nombreFicheroImagen) * 30)+ (Integer.parseInt(nombreImagenMM) /2);
+                    float floatRotarHH = (Float.parseFloat(nombreFicheroImagen) * 30.0f)+ (Float.parseFloat(nombreImagenMM) /2.0f);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario estos grados : " +floatRotarHH);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen MM: " +nombreImagenMM);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen HH: " +nombreFicheroImagen);
+
+                    imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarHH);
                 }
 
 
@@ -802,14 +829,18 @@ public class IntentServiceMagic extends IntentService {
 
 
             if(imagenParaSuperponerConOrigin == null){
-                //Hay un error, terminamos la ejecucion he informamos con una notificacion
-                enviarNotification("Error al recuperar imagen pequeña numero: " +i +", saliendo de la aplicacion");
-                enviarNotificationConNumero("E1");
-                metodoMostrarError("E1", "Error when getting image file from external storage");
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
+                //Pongo este if, por que si no cuando es i=0 o i=1, con mode_c, da error por que no encuentra laimagen 0.xmbp o 1.xbmp
+                if(datosConfigTxt.getMode_c().equals("0") && datosConfigTxt.getMode_t().equals("0")) {
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c y mode_t son cero");
+                    //Hay un error al recuperar la imagen, no estamos en modo t ni modo c, terminamos la ejecucion he informamos con una notificacion
+                    enviarNotification("Error al recuperar imagen pequeña numero: " + i + ", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error when getting image file from external storage");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
 
-                //Acabamos la ejecucion
-                return false;
+                    //Acabamos la ejecucion
+                    return false;
+                }
             }else{
                 //Continuamos con el procesamiento
                 //Se muestra la imagen pequeña en la UI, solo para pruebas
@@ -971,16 +1002,23 @@ public class IntentServiceMagic extends IntentService {
                 //parámetro opcional MODE_C=1
                 //Solo aplica al modo numerico
 
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c asignamos las coordenadas");
                 if(datosConfigTxt.getMode_c().equals("1")){
-                    if(i == 0){//Obtenemos N2
-                        xFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordX());
-                        yFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordY());
-
-                    }else if(i == 1){//Obtenemos N1
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c asignamos las coordenadas");
+                    if(i == 0){//Obtenemos N1 para mm
                         xFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordX());
                         yFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordY());
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, i = 0:   " +xFloat  +" , " +yFloat);
 
+
+                    }else if(i == 1){//Obtenemos N2 para hh
+                        xFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordY());
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, i = 1:   " +xFloat  +" , " +yFloat);
+
+
+                        //Movemos x a la izquierda
+                        //xFloat = xFloat - 11.0f;
+                        //yFloat = yFloat - 7.0f;
                     }
                 }
                 //FIN Parte dos: 6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
@@ -1833,13 +1871,26 @@ public class IntentServiceMagic extends IntentService {
     //Te paso los requerimientos del modo nuevo de rotación:
     //parámetro opcional MODE_C=1
     //Solo aplica al modo numerico
-    //Como en:
-    //https://stackoverflow.com/questions/9015372/how-to-rotate-a-bitmap-90-degrees
-    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    //como en
+    //https://stackoverflow.com/questions/8712652/rotating-image-on-a-canvas-in-android
+    public Bitmap Rotate(Bitmap source, float angle)
     {
+        //Bitmap bitmap = source;
+        Bitmap bitmap = Bitmap.createBitmap(source.getWidth(),source.getHeight(), source.getConfig());
+        Canvas canvas = new Canvas(bitmap);
+        Rect rect = new Rect(0,0,bitmap.getWidth(), bitmap.getHeight());
         Matrix matrix = new Matrix();
+        float px = rect.exactCenterX();
+        float py = rect.exactCenterY();
+        matrix.postTranslate(-source.getWidth()/2, -source.getHeight()/2);
         matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+        matrix.postTranslate(px, py);
+        canvas.drawBitmap(source, matrix, null);
+        matrix.reset();
+        //invalidate();
+
+        return bitmap;
+
     }
 
     //Metodo anulado para que no envie las notificaciones con texto

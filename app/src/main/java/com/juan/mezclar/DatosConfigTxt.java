@@ -380,7 +380,7 @@ public class DatosConfigTxt {
             //parámetro opcional MODE_C=1
             //Solo aplica al modo numerico
             if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("mode_c")){
-                Log.d(xxx, "xxx, Hay una linea que empieza con mode_t y tiene: " +arrayLineasTextoLocal.get(i));
+                Log.d(xxx, "xxx, Hay una linea que empieza con mode_c y tiene: " +arrayLineasTextoLocal.get(i));
                 arrayMode_c = arrayLineasTextoLocal.get(i).split(regexMode_c);
             }
 
@@ -626,7 +626,7 @@ public class DatosConfigTxt {
         if(arrayMode_c != null) {
             int i = 0;
             for (String mode_c : arrayMode_c) {
-                Log.d(xxx, "xxx Dato en arrayMode_t " + i + " es: " + mode_c);
+                Log.d(xxx, "xxx Dato en arrayMode_c " + i + " es: " + mode_c);
                 stringMode_c = arrayMode_c[i];
                 i++;
             }
