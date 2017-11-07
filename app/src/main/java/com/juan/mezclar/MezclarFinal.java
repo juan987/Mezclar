@@ -693,7 +693,7 @@ public class MezclarFinal extends AppCompatActivity {
             //Hay un error, terminamos la ejecucion he informamos con una notificacion
             enviarNotification("Error al recuperar origin.jpg, saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
-            metodoMostrarError("E1", "File origin does not exist");
+            metodoMostrarError("E1", "File origin does not exist in dir: " +pathCesaralMagicImageC);
             Log.d(xxx, "En metodoPrincipal_2, originJpg == null, salimos de la app");
             return false;
         }
@@ -844,7 +844,8 @@ public class MezclarFinal extends AppCompatActivity {
             //Ha habido un error al guardar la imagen, devolver false
             enviarNotification("Error guardando imagen predict" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E1");
-            metodoMostrarError("E1", "Error when saving image predict to external storage");
+            //metodoMostrarError("E1", "Error when saving image predict to external storage");
+            metodoMostrarError("E1", "Error saving file " +nombreFicheroJpg +" in dir " +Environment.DIRECTORY_DCIM + "/predict/");
             Log.d(xxx, "En metodoPrincipal_2, Ha habido un error al guardar la imagen compuesta, salimos de la app");
 
             return false;
@@ -1005,7 +1006,8 @@ public class MezclarFinal extends AppCompatActivity {
                             //Hay un error, terminamos la ejecucion he informamos con una notificacion
                             enviarNotification("Error con mode_t al recuperar imagen pequeña numero: "+(i-1) + i + ", saliendo de la aplicacion");
                             enviarNotificationConNumero("E1");
-                            metodoMostrarError("E1", "Error when getting image file from external storage");
+                            //metodoMostrarError("E1", "Error when getting image file from external storage");
+                            metodoMostrarError("E1", "Error in mode_t opening file: " +arrayImagesSequence[i-1] +arrayImagesSequence[i]  +" from dir " +pathCesaralMagicImageC);
                             Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen de dos digitos de mode_t,  jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
 
                             //Acabamos la ejecucion
@@ -1136,7 +1138,8 @@ public class MezclarFinal extends AppCompatActivity {
                             //Hay un error, terminamos la ejecucion he informamos con una notificacion
                             enviarNotification("Error con mode_c al recuperar imagen pequeña numero: " + ", saliendo de la aplicacion");
                             enviarNotificationConNumero("E1");
-                            metodoMostrarError("E1", "Error in mode_c when getting image file from external storage");
+                            //metodoMostrarError("E1", "Error in mode_c when getting image file from external storage");
+                            metodoMostrarError("E1", "Error in mode_c opening file " +nombreFicheroAgujaDelReloj +" in dir " +pathCesaralMagicImageC);
                             Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen de dos digitos de mode_c, imagenParaSuperponerConOrigin == null, salimos de la app");
 
                             //Acabamos la ejecucion
@@ -1186,7 +1189,8 @@ public class MezclarFinal extends AppCompatActivity {
                     //Hay un error al recuperar la imagen, no estamos en modo t ni modo c, terminamos la ejecucion he informamos con una notificacion
                     enviarNotification("Error al recuperar imagen pequeña numero: " + i + ", saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error when getting image file from external storage");
+                    //metodoMostrarError("E1", "Error when getting image file from external storage");
+                    metodoMostrarError("E1", "Error opening file " +arrayImagesSequence[i] +" in dir " +pathCesaralMagicImageC);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
 
                     //Acabamos la ejecucion
@@ -1587,7 +1591,8 @@ public class MezclarFinal extends AppCompatActivity {
                     //Hay un error, terminamos la ejecucion he informamos con una notificacion
                     enviarNotification("Error al recuperar imagen pequeña alfanumerica numero: " + i + ", saliendo de la aplicacion");
                     enviarNotificationConNumero("E1");
-                    metodoMostrarError("E1", "Error in recovering alphanumeric image from external storage");
+                    //metodoMostrarError("E1", "Error in recovering alphanumeric image from external storage");
+                    metodoMostrarError("E1", "Error opening file " +prefijoNombreFile +" in dir " +pathCesaralMagicImageC);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoT, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
 
                     //Acabamos la ejecucion
@@ -2460,7 +2465,8 @@ public class MezclarFinal extends AppCompatActivity {
         if(filePathDePredictJpg == null){
             enviarNotificationFtp("Error al obtener el file de predict.jpg para upload ftp" +", saliendo de la aplicacion");
             enviarNotificationConNumero("E2");
-            metodoMostrarError("E2", "Error recovering compoised image predict.jpg from external storage");
+            //metodoMostrarError("E2", "Error recovering image predict.jpg from " +Environment.DIRECTORY_DCIM +"/predict/");
+            metodoMostrarError("E2", "Error opening file " +nombreFicheroJpg +" in dir " +Environment.DIRECTORY_DCIM +"/predict/");
             Log.d(xxx, "En metodoSubirImagenConFtp, Error al obtener el file de predict.jpg para upload ftp");
 
             return false;
