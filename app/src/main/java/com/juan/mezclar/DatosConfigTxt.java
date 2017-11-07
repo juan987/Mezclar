@@ -153,6 +153,21 @@ public class DatosConfigTxt {
 
 
 
+    //7 nov 17, metodo para quitar todsos los espacios en blanco de las lineas de config
+    public List<String> quitarEspaciosBlancos(List<String> arrayLineasTextoLocal){
+        for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
+            String lineaSinBlancos = "";
+            for(int c = 0; c < arrayLineasTextoLocal.get(i).length(); c++){
+                if(arrayLineasTextoLocal.get(i).charAt(c) != ' '){
+                    lineaSinBlancos += arrayLineasTextoLocal.get(i).charAt(c);
+                }
+
+            }
+            arrayLineasTextoLocal.set(i, lineaSinBlancos);
+        }//Fin de for(int i = 0; i <= arrayLineasTextoLocal.size(); i++)
+        return arrayLineasTextoLocal;
+    }
+
 
 
 
@@ -166,7 +181,23 @@ public class DatosConfigTxt {
     //tambien lee user, password, SOR.
     //public List<PojoCoordenadas> generarPojoGenerarUrl(List<String> arrayLineasTextoLocal){
     public List<PojoCoordenadas> getCoordenadasN(List<String> arrayLineasTextoLocal){
+        //Imprimo las lineas del CONFIG original
         imprimirLineasConfigTxt(arrayLineasTextoLocal);
+
+        //**********************************************************************
+        //**********************************************************************
+        //7 nov 17: quito todos los especios en blanco de todas las lineas:
+        //los leading, los trailing y los que haya por medio
+        arrayLineasTextoLocal = quitarEspaciosBlancos(arrayLineasTextoLocal);
+
+        //**********************************************************************
+        //**********************************************************************
+        //Imprimo las lineas del CONFIG sin espacios en blanco
+        Log.d(xxx, "getCoordenadasN, lines de CONFIG sin blancos:  ");
+        imprimirLineasConfigTxt(arrayLineasTextoLocal);
+
+
+
         ArrayList<PojoCoordenadas> arrayPojoCoordenadas = new ArrayList<>();
         String regex = "[^\\d]+";
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
@@ -698,7 +729,7 @@ public class DatosConfigTxt {
         String[] coordenates;
         String linea;
         for (int i = 0; i < arrayLineasTexto.size(); i++) {
-            Log.d(xxx, "Linea " + (i + 1) + " contiene: " + arrayLineasTexto.get(i));
+            Log.d(xxx, "en imprimirLineasConfigTxt, CONFIG Linea " + (i + 1) + " contiene: " + arrayLineasTexto.get(i));
             linea = arrayLineasTexto.get(i);
             //Hacemos split de linea, el token es espeacio en blanco como regex: \\s+
             /*
