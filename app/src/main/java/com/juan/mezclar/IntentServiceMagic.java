@@ -1882,6 +1882,9 @@ public class IntentServiceMagic extends IntentService {
     //https://stackoverflow.com/questions/8712652/rotating-image-on-a-canvas-in-android
     public Bitmap Rotate(Bitmap source, float angle)
     {
+        source = changeSomePixelsToTransparent(source);
+        source = changeSomePixelsToTransparent(source);
+
         //Bitmap bitmap = source;
         Bitmap bitmap = Bitmap.createBitmap(source.getWidth(),source.getHeight(), source.getConfig());
         Canvas canvas = new Canvas(bitmap);
@@ -1894,11 +1897,11 @@ public class IntentServiceMagic extends IntentService {
         matrix.postTranslate(px, py);
         //8 nov 2017, usamos anti aliasing
         //canvas.drawBitmap(source, matrix, null);
-        canvas.drawBitmap(source, matrix, new Paint( Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG ));        matrix.reset();
-        //invalidate();
+        canvas.drawBitmap(source, matrix, new Paint( Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
+        matrix.reset();
 
+        //bitmap = changeSomePixelsToTransparent(bitmap);
         return bitmap;
-
     }
 
     //Metodo anulado para que no envie las notificaciones con texto

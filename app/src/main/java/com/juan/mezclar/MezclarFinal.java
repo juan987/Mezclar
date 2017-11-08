@@ -1168,6 +1168,7 @@ public class MezclarFinal extends AppCompatActivity {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen MM: " +nombreImagenMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen HH: " +nombreFicheroImagen);
 
+
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarHH);
                 }
 
@@ -2312,8 +2313,10 @@ public class MezclarFinal extends AppCompatActivity {
         Canvas canvas = new Canvas(result);
         canvas.drawBitmap(firstImage, 0f, 0f, null);
         canvas.drawBitmap(secondImage, x, y, null);
+
         return result;
     }
+
 
     private Bitmap changeSomePixelsToTransparent(Bitmap originalImage){
 
@@ -2346,6 +2349,9 @@ public class MezclarFinal extends AppCompatActivity {
     //https://stackoverflow.com/questions/8712652/rotating-image-on-a-canvas-in-android
     public Bitmap Rotate(Bitmap source, float angle)
     {
+        source = changeSomePixelsToTransparent(source);
+        source = changeSomePixelsToTransparent(source);
+
         //Bitmap bitmap = source;
         Bitmap bitmap = Bitmap.createBitmap(source.getWidth(),source.getHeight(), source.getConfig());
         Canvas canvas = new Canvas(bitmap);
@@ -2358,12 +2364,11 @@ public class MezclarFinal extends AppCompatActivity {
         matrix.postTranslate(px, py);
         //8 nov 2017, usamos anti aliasing
         //canvas.drawBitmap(source, matrix, null);
-        canvas.drawBitmap(source, matrix, new Paint( Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG ));
+        canvas.drawBitmap(source, matrix, new Paint( Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
         matrix.reset();
-        //invalidate();
 
+        //bitmap = changeSomePixelsToTransparent(bitmap);
         return bitmap;
-
     }
 
 
