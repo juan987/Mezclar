@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.media.MediaScannerConnection;
@@ -2355,7 +2356,9 @@ public class MezclarFinal extends AppCompatActivity {
         matrix.postTranslate(-source.getWidth()/2, -source.getHeight()/2);
         matrix.postRotate(angle);
         matrix.postTranslate(px, py);
-        canvas.drawBitmap(source, matrix, null);
+        //8 nov 2017, usamos anti aliasing
+        //canvas.drawBitmap(source, matrix, null);
+        canvas.drawBitmap(source, matrix, new Paint( Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG ));
         matrix.reset();
         //invalidate();
 
