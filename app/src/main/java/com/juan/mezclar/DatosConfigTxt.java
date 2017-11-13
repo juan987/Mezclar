@@ -90,6 +90,7 @@ public class DatosConfigTxt {
     //Te paso los requerimientos del modo nuevo de rotación:
     //parámetro opcional MODE_C=1
     //Solo aplica al modo numerico
+    //13 nov 17: mode_c tambien puede valer 2, ver mail detalle importante en MODE_C.
     String stringMode_c = "0";//por defecto
     public String getMode_c() {
         return stringMode_c;
@@ -661,7 +662,7 @@ public class DatosConfigTxt {
                 stringMode_c = arrayMode_c[i];
                 i++;
             }
-            if(stringMode_c.equals("0") || stringMode_c.equals("1")){
+            if(stringMode_c.equals("0") || stringMode_c.equals("1") || stringMode_c.equals("2")){
                 //el parametro esta bien
             }else{
                 //si no es ni "0" ni "1" le pongo el valor "0" por defecto

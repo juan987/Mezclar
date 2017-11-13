@@ -948,7 +948,9 @@ public class MezclarFinal extends AppCompatActivity {
 
 
             //OJO OJO OJO OJO
-            if(datosConfigTxt.getMode_c().equals("1") || datosConfigTxt.getMode_t().equals("1")){
+            //if(datosConfigTxt.getMode_c().equals("1") || datosConfigTxt.getMode_t().equals("1")){
+            //13 nov 17, agrgamos el chequeo para el valos mode_c)=2
+            if(datosConfigTxt.getMode_c().equals("1") || datosConfigTxt.getMode_c().equals("2") || datosConfigTxt.getMode_t().equals("1")){
                 //Sigue al if de abajo de get mode c o get mode t, por que los ficheros ya no se llaman segun n en estos modos
                 //Inicializamos a null
                 imagenParaSuperponerConOrigin = null;
@@ -1183,6 +1185,197 @@ public class MezclarFinal extends AppCompatActivity {
 
 
 
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+
+            if(datosConfigTxt.getMode_c().equals("2")){
+                //Chequear cuantos digitos tiene la cadena
+                if(arrayImagesSequence.length < 4 || arrayImagesSequence.length > 4){
+                    //Lanzamos error y salimos
+                    enviarNotification("Error de param mode_c: numero de digitos es menor o mayor a 4 " +", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    metodoMostrarError("E1", "Error in mode_c, wrong data format: number of digits should be 4");
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_c: numero de digitos es menor o mayor a 4 , salimos de la app");
+
+                    //Acabamos la ejecucion
+                    return false;
+                }else{
+                    //La longitud del array es correcta, hay que chequear los rangos
+
+                    //Imagina que el programa recibe los datos hhmm
+                    // (siempre se recibirán 4 dígitos en este modo. En caso contrario
+                    // no se hará nada y se reportará el error en el log: “Wrong data format”)
+
+                    //Valores posibles:
+                    //hh Puede tener los valores: 00, 01, 02, …,11
+                    //mm Puede tener los valores: 00, 01, 02, …,59
+                    //Si alguno de estos valores no está en este rango se reportará el error en el log: “Wrong hh:mm data format”)
+
+
+                }
+
+                //Solo vamos a dibujar en dos ciclos: i = 0 e i = 1, todos los demas ciclos no se dibujan
+                String nombreFicheroImagen = "";
+                if(i == 0){
+                    //Chequea si mm esta fuera del rango 00-59
+
+                    //Obtenemos el string mm
+                    Character character = (Character)arrayImagesSequence[2];
+                    nombreFicheroImagen = character.toString();
+                    character = (Character)arrayImagesSequence[3];
+                    nombreFicheroImagen += character.toString();
+                    nombreImagenMM = nombreFicheroImagen;
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c imagen mm es: "  +nombreFicheroImagen);
+                    //Verificamos el rango de mm
+                    if(Integer.parseInt(nombreFicheroImagen) <= 59){
+                        //mm esta dentro de rango, seguimos con hh
+                        //Chequea si hh esta fuera del rango 00-11
+
+                        //Obtenemos el string hh
+                        Character characterHora = (Character)arrayImagesSequence[0];
+                        nombreFicheroImagen = characterHora.toString();
+                        characterHora = (Character)arrayImagesSequence[1];
+                        nombreFicheroImagen += characterHora.toString();
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c imagen hh es: "  +nombreFicheroImagen);
+                        //Verificamos el rango de mm
+                        if(Integer.parseInt(nombreFicheroImagen) <= 11){
+                            //mm esta dentro de rango, seguimos
+
+                        }else{
+                            //Error mm fuera de rango Lanzamos error y salimos
+                            enviarNotification("Error de param mode_c: Wrong hh:mm data format " +", saliendo de la aplicacion");
+                            enviarNotificationConNumero("E1");
+                            metodoMostrarError("E1", "Error in mode_c: Wrong hh:mm data format");
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_c: Wrong hh:mm data format, error hh: " +nombreFicheroImagen);
+
+                            //Acabamos la ejecucion
+                            return false;
+                        }
+
+                    }else{
+                        //Error mm fuera de rango Lanzamos error y salimos
+                        enviarNotification("Error de param mode_c: Wrong hh:mm data format " +", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error in mode_c: Wrong hh:mm data format");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_c: Wrong hh:mm data format, error mm: " +nombreFicheroImagen);
+
+                        //Acabamos la ejecucion
+                        return false;
+                    }
+
+
+                }else if(i == 1){//Por aqui no va a entrar nunca
+                    //Chequea si hh esta fuera del rango 00-11
+
+                    //Obtenemos el string hh
+
+                    Character character = (Character)arrayImagesSequence[0];
+                    //nombreFicheroImagen = character.toString();
+                    //character = (Character)arrayImagesSequence[1];
+                    //nombreFicheroImagen += character.toString();
+                    //Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c imagen hh es: "  +nombreFicheroImagen);
+                    //Verificamos el rango de mm
+                    /*
+                    if(Integer.parseInt(nombreFicheroImagen) <= 11){
+                        //mm esta dentro de rango, seguimos
+
+                    }else{
+                        //Error mm fuera de rango Lanzamos error y salimos
+                        enviarNotification("Error de param mode_c: Wrong hh:mm data format " +", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error in mode_c: Wrong hh:mm data format");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, Error de param mode_c: Wrong hh:mm data format, error hh: " +nombreFicheroImagen);
+
+                        //Acabamos la ejecucion
+                        return false;
+                    }*/
+
+
+
+                }else{
+                    //Para todos los demas indices del loop, NO se dibuja nada
+                    boolDibujar = false;
+                }
+
+                //Obtenemos la imagen del horrario o el minutero, solo si i es 0 o 1, si no, no hay que dibujar nada
+                if(i == 0 || i == 1){
+                    String nombreFicheroAgujaDelReloj = "";
+                    if(i == 0){
+                        //nombreFicheroAgujaDelReloj = "m";
+                        nombreFicheroAgujaDelReloj = "h";
+                    }else if( i == 1){
+                        //nombreFicheroAgujaDelReloj = "h";
+                        nombreFicheroAgujaDelReloj = "m";
+                    }
+
+                    imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                            +nombreFicheroAgujaDelReloj+".bmp");
+
+                    if(imagenParaSuperponerConOrigin == null){//No encuentra la imagen con extension .bmp
+                        //Buscamos la imagen a superponer con extension .xbmp
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, No existe la imagen a superponer: " +"con extension .bmp, buscamos con extension .xbmp");
+                        imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                                +nombreFicheroAgujaDelReloj+".xbmp");
+
+                        //
+                        if(imagenParaSuperponerConOrigin == null) {
+                            //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                            enviarNotification("Error con mode_c al recuperar imagen pequeña numero: " + ", saliendo de la aplicacion");
+                            enviarNotificationConNumero("E1");
+                            //metodoMostrarError("E1", "Error in mode_c when getting image file from external storage");
+                            metodoMostrarError("E1", "Error in mode_c opening file " +nombreFicheroAgujaDelReloj +" in dir " +pathCesaralMagicImageC);
+                            Log.d(xxx, "metodo loopPrincipalImagenesTipoN, fallo con imagen de dos digitos de mode_c, imagenParaSuperponerConOrigin == null, salimos de la app");
+
+                            //Acabamos la ejecucion
+                            return false;
+                        }
+                    }
+                }
+
+
+                //Rotamos, solo si i es 0 o 1, si no, no hay que dibujar nada
+                if(i == 1){
+                    //Rotamos mm
+
+                    float floatRotarMM = Float.parseFloat(nombreImagenMM) * 6.0f;
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero estos grados: " +floatRotarMM);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero nombre imagen MM: " +nombreImagenMM);
+
+                    imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarMM);
+
+                }else if(i == 0){
+                    float floatRotarHH = (Float.parseFloat(nombreFicheroImagen) * 30.0f)+ (Float.parseFloat(nombreImagenMM) /2.0f);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario estos grados : " +floatRotarHH);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen MM: " +nombreImagenMM);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen HH: " +nombreFicheroImagen);
+
+
+                    imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarHH);
+                }
+
+
+            }//FIN de if(datosConfigTxt.getMode_c().equals("2"))
+
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+            //FIN 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+
+
 
             if(imagenParaSuperponerConOrigin == null){
                 //Pongo este if, por que si no cuando es i=0 o i=1, con mode_c, da error por que no encuentra laimagen 0.xmbp o 1.xbmp
@@ -1384,6 +1577,37 @@ public class MezclarFinal extends AppCompatActivity {
                 //FIN Parte dos: 6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
                 //***********************************************************************************************
                 //***********************************************************************************************
+
+
+                //PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+                //PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+                //PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+                //PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+                //Primero se dibuja la aguja de las horas en i=0 y la aguja de minutos en i=1
+                if(datosConfigTxt.getMode_c().equals("2")){
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, mode_c asignamos las coordenadas");
+                    if(i == 1){//Obtenemos N1 para mm
+                        xFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(0).getCoordY());
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, i = 0:   " +xFloat  +" , " +yFloat);
+
+
+                    }else if(i == 0){//Obtenemos N2 para hh
+                        xFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordX());
+                        yFloat = Float.parseFloat(listaCoordenadas.get(1).getCoordY());
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoN, i = 1:   " +xFloat  +" , " +yFloat);
+
+
+                        //Movemos x a la izquierda
+                        //xFloat = xFloat - 11.0f;
+                        //yFloat = yFloat - 7.0f;
+                    }
+                }
+                //FIN PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+                //FIN PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+                //FIN PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+                //FIN PARTE DOS: 13 Nov req Mode_c=2, en correo detalle importante en MODE_C
+
 
 
                 //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONFIG.txt
@@ -2326,10 +2550,10 @@ public class MezclarFinal extends AppCompatActivity {
             for(int y=0;y<bitmap2.getHeight();y++){
                 //Solo busca pixeles blancos
                 if(bitmap2.getPixel(x, y)==Color.rgb(0xff, 0xff, 0xff))
-                //if(bitmap2.getPixel(x, y)<=Color.rgb(0xd7, 0xd7, 0xd7))
 
                 //tenia esta hasta el nuevo req de solo comparar con pixeles blancos el 27oct17
                 //if(bitmap2.getPixel(x, y)>=Color.rgb(0xd7, 0xd7, 0xd7))
+                //if(bitmap2.getPixel(x, y)>=Color.rgb(0x80, 0x80, 0x80))
                 {
                     int alpha = 0x00;
                     bitmap2.setPixel(x, y , Color.argb(alpha,0xff,0xff,0xff));  // changing the transparency of pixel(x,y)
