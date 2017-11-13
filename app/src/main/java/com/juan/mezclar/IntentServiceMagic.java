@@ -814,6 +814,13 @@ public class IntentServiceMagic extends IntentService {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero estos grados: " +floatRotarMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero nombre imagen MM: " +nombreImagenMM);
 
+
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarMM += datosConfigTxt.getOffset_m();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero con offset_m: " +floatRotarMM);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarMM);
 
                 }else if(i == 1){
@@ -822,6 +829,12 @@ public class IntentServiceMagic extends IntentService {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario estos grados : " +floatRotarHH);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen MM: " +nombreImagenMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen HH: " +nombreFicheroImagen);
+
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarHH += datosConfigTxt.getOffset_h();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario con offset_h: " +floatRotarHH);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
 
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarHH);
                 }
@@ -1001,6 +1014,12 @@ public class IntentServiceMagic extends IntentService {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero estos grados: " +floatRotarMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero nombre imagen MM: " +nombreImagenMM);
 
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarMM += datosConfigTxt.getOffset_m();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero con offset_m: " +floatRotarMM);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarMM);
 
                 }else if(i == 0){
@@ -1008,6 +1027,12 @@ public class IntentServiceMagic extends IntentService {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario estos grados : " +floatRotarHH);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen MM: " +nombreImagenMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen HH: " +nombreFicheroImagen);
+
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarHH += datosConfigTxt.getOffset_h();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario con offset_h: " +floatRotarHH);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
 
 
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarHH);

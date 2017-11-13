@@ -1157,9 +1157,19 @@ public class MezclarFinal extends AppCompatActivity {
                     //Rotamos mm
                     //Primero cogerá la imagen m.xbmp , la rotará hacia la derecha los grados (mm x 6), teniendo en cuenta
                     // el centro de la imagen pasada, y lo insertará en las coordenadas indicadas por N1
+
+
                     float floatRotarMM = Float.parseFloat(nombreImagenMM) * 6.0f;
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero estos grados: " +floatRotarMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero nombre imagen MM: " +nombreImagenMM);
+
+
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarMM += datosConfigTxt.getOffset_m();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero con offset_m: " +floatRotarMM);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+
 
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarMM);
 
@@ -1169,6 +1179,12 @@ public class MezclarFinal extends AppCompatActivity {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario estos grados : " +floatRotarHH);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen MM: " +nombreImagenMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen HH: " +nombreFicheroImagen);
+
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarHH += datosConfigTxt.getOffset_h();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario con offset_h: " +floatRotarHH);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
 
 
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarHH);
@@ -1349,6 +1365,12 @@ public class MezclarFinal extends AppCompatActivity {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero estos grados: " +floatRotarMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero nombre imagen MM: " +nombreImagenMM);
 
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarMM += datosConfigTxt.getOffset_m();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar minutero con offset_m: " +floatRotarMM);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarMM);
 
                 }else if(i == 0){
@@ -1356,6 +1378,13 @@ public class MezclarFinal extends AppCompatActivity {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario estos grados : " +floatRotarHH);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen MM: " +nombreImagenMM);
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario nombre imagen HH: " +nombreFicheroImagen);
+
+
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+                    //Lo agrego al angulo obtenido
+                    floatRotarHH += datosConfigTxt.getOffset_h();
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoN, rotar horario con offset_h: " +floatRotarHH);
+                    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
 
 
                     imagenParaSuperponerConOrigin = Rotate(imagenParaSuperponerConOrigin, floatRotarHH);

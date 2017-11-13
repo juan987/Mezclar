@@ -97,6 +97,21 @@ public class DatosConfigTxt {
     }
 
 
+
+    //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos, son grados
+    String offset_h = "0";
+    String offset_m = "0";
+
+    public float getOffset_h() {
+        //return offset_h;
+        return Float.parseFloat(offset_h);
+    }
+
+    public float getOffset_m() {
+        //return offset_m;
+        return Float.parseFloat(offset_m);
+    }
+
     //Parametro offset y scale para modificar coordenadas N y T
     int intOffset_x=0;
     int intOffset_y=0;
@@ -316,6 +331,7 @@ public class DatosConfigTxt {
         String regexMode_t = "=";
         String regexcenter_p = "=";
         String regexMode_c = "=";
+        String regexMode_c_offset = "=";
 
 
         for(int i = 0; i < arrayLineasTextoLocal.size(); i++){
@@ -417,6 +433,19 @@ public class DatosConfigTxt {
             }
 
 
+
+            //13 nov 2017, nuevo req en mail: offet_h y offset_m, pueden ser positivos o negativos
+            //Complementa mode_c, solo aplica al modo numerico
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("offset_h")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con offset_h y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_offset = arrayLineasTextoLocal.get(i).split(regexMode_c_offset);
+                offset_h = array_offset[array_offset.length -1];
+            }
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("offset_m")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con offset_m y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_offset = arrayLineasTextoLocal.get(i).split(regexMode_c_offset);
+                offset_m = array_offset[array_offset.length -1];
+            }
 
 
         }
@@ -686,7 +715,9 @@ public class DatosConfigTxt {
                 +"\n"  +"xxx Variable intq: " +intq
                 +"\n"  +"xxx Variable stringMode_t: " +stringMode_t
                 +"\n"  +"xxx Variable intCenter_p: " +intCenter_p
-                +"\n"  +"xxx Variable stringMode_c: " +stringMode_c);
+                +"\n"  +"xxx Variable stringMode_c: " +stringMode_c
+                +"\n"  +"xxx Variable offset_h: " +offset_h
+                +"\n"  +"xxx Variable offset_m: " +offset_m);
 
 
 
