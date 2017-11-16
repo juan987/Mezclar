@@ -47,7 +47,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:ems="10"
-        android:hint="Introduce code"
+        android:hint="Enter code"
         android:inputType="text"
         android:maxLength="16"
         android:textSize="35sp"

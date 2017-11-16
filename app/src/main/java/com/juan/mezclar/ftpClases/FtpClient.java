@@ -223,8 +223,12 @@ public class FtpClient {
         Log.d(xxx, "Estoy en el metodo enviarFileFinalFinal");
 
         try {
-            ftpClient.enterLocalActiveMode();
-            //ftpClient.enterLocalPassiveMode();
+            //16 nov 2017, hasta la version 35 lo tenia con active mode.
+            //Pero cesar me ha reportado un fallo en mail dos detalles CUPP Lite del 16nov17
+            //ftpClient.enterLocalActiveMode();
+
+            //Pruebo dejando el modo pasivo
+            ftpClient.enterLocalPassiveMode();
 
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
@@ -260,10 +264,17 @@ public class FtpClient {
                 //Continuamos
                 Log.d(xxx, "Fichero almacenado en el servidor en el dir:  " +ftpClient.printWorkingDirectory());
                 buffer.close();        //Cierra el bufer
+
+                //Agregado el 16 nov 2017
+                ftpClient.disconnect();
+
                 return true;        //Se ha subido con éxito
 
             }else{
                 Log.d(xxx, "ERROR AL ALMACENAR FICHERO EN EL SERVIDOR CON ftpClient.storeFile(nombreArchivo, buffer);");
+
+                //Agregado el 16 nov 2017
+                ftpClient.disconnect();
 
                 return false;
             }
@@ -276,6 +287,8 @@ public class FtpClient {
         catch (SocketException e) {
             e.printStackTrace();
             Log.d(xxx, "Fallo 1 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
+            //Agregado el 16 nov 2017
+            ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion, Si no retorno, me sale el fallo de strict mode
 
 
@@ -283,6 +296,8 @@ public class FtpClient {
         catch (UnknownHostException e) {
             e.printStackTrace();
             Log.d(xxx, "Fallo  2 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
+            //Agregado el 16 nov 2017
+            ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion
 
 
@@ -290,6 +305,8 @@ public class FtpClient {
         catch (IOException e) {
             e.printStackTrace();
             Log.d(xxx, "Fallo 3 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
+            //Agregado el 16 nov 2017
+            ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion
 
 
@@ -298,6 +315,8 @@ public class FtpClient {
         catch (Exception e) {
             e.printStackTrace();
             Log.d(xxx, "Fallo 4 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
+            //Agregado el 16 nov 2017
+            ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion
 
 
