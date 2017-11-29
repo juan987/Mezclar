@@ -73,7 +73,13 @@ public class MezclarFinal extends AppCompatActivity {
 
     DatosConfigTxt datosConfigTxt;
 
-    private ImageView collageImage;
+
+
+    //29 nov 17, lo cambio por la clase ImageViewZoom que extiende de ImageView
+    //private ImageView collageImage;
+    private ImageViewZoom collageImage;
+
+
     private ImageView finalImage;
 
     TextView textViewErrores;
@@ -255,13 +261,18 @@ public class MezclarFinal extends AppCompatActivity {
             }
         });  */
 
+        //29 nov 17, lo cambio por la clase ImageViewZoom que extiende de ImageView
+        //collageImage = (ImageView)findViewById(R.id.imageView3);
+        collageImage = (ImageViewZoom) findViewById(R.id.imageView3);
 
-        collageImage = (ImageView)findViewById(R.id.imageView3);
+
+
         //prueba de scalar con los dedos
         //Como en:
         //https://judepereira.com/blog/multi-touch-in-android-translate-scale-and-rotate/
 
-        metodoPruebaZoom();
+        //29 nov 17, lo cambio por la clase ImageViewZoom que extiende de ImageView
+        //metodoPruebaZoom();
 
         //collageImage.setOnTouchListener(this);
 
@@ -2957,6 +2968,9 @@ public class MezclarFinal extends AppCompatActivity {
                 collageImage.setImageBitmap(mergedImages);
                 collageImage.setVisibility(View.VISIBLE);
 
+                //29 nov 17, cesar envio nuevos requerimientos en el correo arreglo en cupp lite
+                //ajustarTamañoDelBitmapResultante();
+
                 //Lanzamos el asynctask de enviar imagen al servidor con ftp
                 //pero solo si la variable urlServidor es distinta de ""
                 if(urlServidor.equals("")){
@@ -2989,6 +3003,34 @@ public class MezclarFinal extends AppCompatActivity {
         protected void onCancelled() {
         }
     }//FIN de la clase ComponerImagenAsyncTask
+
+
+
+    //************************
+    //************************
+    //
+    public void ajustarTamañoDelBitmapResultante() {
+        //Como en
+        //https://stackoverflow.com/questions/18077325/scale-image-to-fill-imageview-width-and-keep-aspect-ratio
+        Bitmap bitMapReescalado = null;
+        // creating the image that maintain aspect ratio with width of image is set to screenwidth.
+        int width = collageImage.getMeasuredWidth();
+        int diw = mergedImages.getWidth();
+        if (diw > 0) {
+            int height = 0;
+            height = width * mergedImages.getHeight() / diw;
+            Log.d(xxx, "En ajustarTamañoDelBitmapResultante: height recalculada es ");
+
+            bitMapReescalado = Bitmap.createScaledBitmap(mergedImages, width, height, false);
+        }
+        collageImage.setImageBitmap(bitMapReescalado);
+    }
+
+
+
+
+
+
 
     //Metodo de ordenacion proporcionado por cesar
     //------------------------------------------------------------------------------
@@ -3123,88 +3165,28 @@ public class MezclarFinal extends AppCompatActivity {
 //************************************************************************************************
 //************************************************************************************************
 //************************************************************************************************
-//Prueba del touch de la imagen
 
-    public boolean onTouch(View v, MotionEvent event) {
-        // handle touch events here
-        ImageView view = (ImageView) v;
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                savedMatrix.set(matrix);
-                start.set(event.getX(), event.getY());
-                mode = DRAG;
-                lastEvent = null;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                oldDist = spacing(event);
-                if (oldDist > 10f) {
-                    savedMatrix.set(matrix);
-                    midPoint(mid, event);
-                    mode = ZOOM;
-                }
-                lastEvent = new float[4];
-                lastEvent[0] = event.getX(0);
-                lastEvent[1] = event.getX(1);
-                lastEvent[2] = event.getY(0);
-                lastEvent[3] = event.getY(1);
-                d = rotation(event);
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                mode = NONE;
-                lastEvent = null;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mode == DRAG) {
-                    matrix.set(savedMatrix);
-                    float dx = event.getX() - start.x;
-                    float dy = event.getY() - start.y;
-                    matrix.postTranslate(dx, dy);
-                } else if (mode == ZOOM) {
-                    float newDist = spacing(event);
-                    if (newDist > 10f) {
-                        matrix.set(savedMatrix);
-                        float scale = (newDist / oldDist);
-                        matrix.postScale(scale, scale, mid.x, mid.y);
-                    }
-                    if (lastEvent != null && event.getPointerCount() == 3) {
-                        newRot = rotation(event);
-                        float r = newRot - d;
-                        float[] values = new float[9];
-                        matrix.getValues(values);
-                        float tx = values[2];
-                        float ty = values[5];
-                        float sx = values[0];
-                        float xc = (view.getWidth() / 2) * sx;
-                        float yc = (view.getHeight() / 2) * sx;
-                        matrix.postRotate(r, tx + xc, ty + yc);
-                    }
-                }
-                break;
-        }
-
-        view.setImageMatrix(matrix);
-        return true;
-    }// FIN de onTouch
 
     /**
      * Determine the space between the first two fingers
      */
-    private float spacing(MotionEvent event) {
+
+
+   /* private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         //return FloatMath.sqrt(x * x + y * y);
         return (float)Math.sqrt(x * x + y * y);
-    }
+    } */
 
     /**
      * Calculate the mid point of the first two fingers
      */
-    private void midPoint(PointF point, MotionEvent event) {
+    /*private void midPoint(PointF point, MotionEvent event) {
         float x = event.getX(0) + event.getX(1);
         float y = event.getY(0) + event.getY(1);
         point.set(x / 2, y / 2);
-    }
+    } */
 
     /**
      * Calculate the degree to be rotated by.
@@ -3212,15 +3194,17 @@ public class MezclarFinal extends AppCompatActivity {
      * @param event
      * @return Degrees
      */
-    private float rotation(MotionEvent event) {
+   /* private float rotation(MotionEvent event) {
         double delta_x = (event.getX(0) - event.getX(1));
         double delta_y = (event.getY(0) - event.getY(1));
         double radians = Math.atan2(delta_y, delta_x);
         return (float) Math.toDegrees(radians);
-    }
+    }*/
 
 
     // these matrices will be used to move and zoom image
+
+            /*
     private Matrix matrix = new Matrix();
     private Matrix savedMatrix = new Matrix();
     // we can be in one of these 3 states
@@ -3305,7 +3289,7 @@ public void metodoPruebaZoom(){
         }// FIN de onTouch
     });
 
-}
+}  */
 
 
 //FIN de Prueba del touch de la imagen
@@ -3313,108 +3297,7 @@ public void metodoPruebaZoom(){
 //************************************************************************************************
 //************************************************************************************************
 
-    public void metodoPruebaZoom2(){
-        collageImage.setOnTouchListener(new View.OnTouchListener() {
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // handle touch events here
-                ImageView view = (ImageView) v;
-                switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                    case MotionEvent.ACTION_DOWN:
-                        savedMatrix.set(matrix);
-                        start.set(event.getX(), event.getY());
-                        mode = DRAG;
-                        lastEvent = null;
-                        break;
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                        oldDist = spacing(event);
-                        if (oldDist > 10f) {
-                            savedMatrix.set(matrix);
-                            midPoint(mid, event);
-                            mode = ZOOM;
-                        }
-                        lastEvent = new float[4];
-                        lastEvent[0] = event.getX(0);
-                        lastEvent[1] = event.getX(1);
-                        lastEvent[2] = event.getY(0);
-                        lastEvent[3] = event.getY(1);
-                        d = rotation(event);
-                        break;
-
-                    //***************************************************************************************
-                    /*
-                    case MotionEvent.ACTION_UP:
-                        savedMatrix.set(matrix);
-                        start.set(event.getX(), event.getY());
-                        mode = DRAG;
-                        lastEvent = null;
-                        break;
-                    case MotionEvent.ACTION_POINTER_UP:
-                        oldDist = spacing(event);
-                        if (oldDist > 10f) {
-                            savedMatrix.set(matrix);
-                            midPoint(mid, event);
-                            mode = ZOOM;
-                        }
-                        lastEvent = new float[4];
-                        lastEvent[0] = event.getX(0);
-                        lastEvent[1] = event.getX(1);
-                        lastEvent[2] = event.getY(0);
-                        lastEvent[3] = event.getY(1);
-                        d = rotation(event);
-                        break;
-                        */
-
-                    //***************************************************************************************
-
-
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_POINTER_UP:
-                        mode = NONE;
-                        lastEvent = null;
-                        break;
-
-
-
-
-                    case MotionEvent.ACTION_MOVE:
-                        //if (mode == DRAG) {
-                        if (mode == DRAG && event.getPointerCount() == 1) {
-                            matrix.set(savedMatrix);
-                            float dx = event.getX() - start.x;
-                            float dy = event.getY() - start.y;
-                            matrix.postTranslate(dx, dy);
-                        //} else if (mode == ZOOM) {
-                        } else if (mode == ZOOM && event.getPointerCount() == 2) {
-                            float newDist = spacing(event);
-                            if (newDist > 10f) {
-                                matrix.set(savedMatrix);
-                                float scale = (newDist / oldDist);
-                                matrix.postScale(scale, scale, mid.x, mid.y);
-                            }
-                            if (lastEvent != null && event.getPointerCount() == 3) {
-                                newRot = rotation(event);
-                                float r = newRot - d;
-                                float[] values = new float[9];
-                                matrix.getValues(values);
-                                float tx = values[2];
-                                float ty = values[5];
-                                float sx = values[0];
-                                float xc = (view.getWidth() / 2) * sx;
-                                float yc = (view.getHeight() / 2) * sx;
-                                matrix.postRotate(r, tx + xc, ty + yc);
-                            }
-                        }
-                        break;
-                }
-
-                view.setImageMatrix(matrix);
-                return true;
-            }// FIN de onTouch
-        });
-
-    }
 
 
 }//Fin del activity
