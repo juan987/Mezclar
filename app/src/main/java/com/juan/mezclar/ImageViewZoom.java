@@ -16,6 +16,9 @@ import android.widget.ImageView;
 
 //29 nov 17, cesar envio nuevos requerimientos en el correo arreglo en cupp lite
 //esta clase extiende AppCompatImagView y ya no muestra bordes blancos, ni se sale del tamaño del image view
+
+    //Como en
+    //https://stackoverflow.com/questions/6650398/android-imageview-zoom-in-and-zoom-out
 public class ImageViewZoom extends android.support.v7.widget.AppCompatImageView{
 
     Matrix matrix = new Matrix();
