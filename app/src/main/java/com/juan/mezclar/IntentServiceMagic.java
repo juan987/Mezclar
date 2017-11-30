@@ -56,6 +56,13 @@ public class IntentServiceMagic extends IntentService {
     //Array para almacenar la secuencia de imagenes a superponer
     char[] arrayImagesSequence;
     int sizearrayImagesSequence;
+
+
+    //agregado el 30nov17 por requerimiento en mail: arreglo en cupp lite recibido el 29nov17
+    char[] arrayImagesSequenceAlphanumeric;
+
+
+
     //String de secuencia de imagenes inicializada con la imagen 0.
     //String stringImagesSecuence = "0";
     //Path a agregar al dir raiz del telefono
@@ -424,7 +431,7 @@ public class IntentServiceMagic extends IntentService {
 
         //
 
-
+        //Chequeamos si hay que hacer ordenacion con el parametro SOR
         if(stringSOR.equals("") || booleanSecuenciaRecibidaAlfanumerica){
             //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
             Log.d(xxx, "En metodoPrincipal_2, NO hay parametro SOR o se ha recibido una secuencia alfanumerica, seguimos");
@@ -444,6 +451,11 @@ public class IntentServiceMagic extends IntentService {
         }
 
 
+        //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTt
+
+
+        //30nov17, comento este if/else por requerimiento en mail: arreglo en cupp lite, recibido el 29nov17
+        /*
         if(booleanSecuenciaNumerica){
             //secuencia numerica recibida, se ejecuta loopPrincipalImagenesTipoN
             if(loopPrincipalImagenesTipoN()){
@@ -457,12 +469,38 @@ public class IntentServiceMagic extends IntentService {
             if(loopPrincipalImagenesTipoT()){
                 //Ejecucion correcta, seguimos
             }else{
+
+                //Hay un fallo en el loop principal de alfanumerico, cerramos la activity
+                return false;
+            }
+        }
+        */
+
+
+        //Ejecutamos los loops
+        //Copiado de MezclarFinal el 30nov17 por requerimiento en mail: arreglo en cupp lite, recibido el 29nov17
+        if(booleanSecuenciaNumerica){
+            //secuencia numerica recibida, se ejecuta loopPrincipalImagenesTipoN
+            if(loopPrincipalImagenesTipoN()){
+                //Ejecucion correcta, seguimos
+            }else{
+                //Hay un fallo en el loop principal de numerico, cerramos la activity
+                return false;
+            }
+        }
+        if(booleanSecuenciaRecibidaAlfanumerica){
+            //cambiamos la variable para ejecutar con arrayImagesSequence el loopPrincipalImagenesTipoT
+            arrayImagesSequence = arrayImagesSequenceAlphanumeric;
+            //secuencia alfanumerica recibida, se ejecuta loopPrincipalImagenesTipoT
+            if(loopPrincipalImagenesTipoT()){
+                //Ejecucion correcta, seguimos
+            }else{
                 //Hay un fallo en el loop principal de alfanumerico, cerramos la activity
                 return false;
             }
         }
 
-
+        //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTt
 
         //Ejecucion correcta, guardar imagen en la memoria externa del dispoositivo
         GuardarImagenFinal guardarImagenFinal = new GuardarImagenFinal(IntentServiceMagic.this, mergedImages, datosConfigTxt.getquality());
@@ -1326,7 +1364,8 @@ public class IntentServiceMagic extends IntentService {
     }//FIN de loopPrincipalImagenesTipoN
 
 
-    private boolean loopPrincipalImagenesTipoT(){
+    //30 nov 17: Deprecado por requerimiento en mail: arreglo en cupp lite, recibido el 30nov17.
+    private boolean loopPrincipalImagenesTipoT_Deprecado(){
         //Loop principal de la aplicacion
 
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence inicial tiene: " +arrayImagesSequence.toString());
@@ -1531,7 +1570,328 @@ public class IntentServiceMagic extends IntentService {
         }//Fin del loop principal
 
         return true;
+    }//FIN de loopPrincipalImagenesTipoT_Deprecado
+
+
+    //LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
+
+    //Copiado de MezclarFinal el 30nov17 por requerimiento en mail: arreglo en cupp lite, recibido el 29nov17
+    private boolean loopPrincipalImagenesTipoT(){
+        //Loop principal de la aplicacion
+
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence inicial tiene: " +arrayImagesSequence.toString());
+
+        //parte 1, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+        // nuevo req del mail proximos requerimientos
+        //Afecta a la cadena de numeros y alfanumericos
+        int[] arrayAnchuraImagenesPequeñas = new int[arrayImagesSequence.length];
+        int anchoTotalDeLasImagenesPequenas = 0;
+        PosicionamientoProporcional posicionamientoProporcional = null;
+        if(datosConfigTxt.getIntCenter_p() != 0){
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y vale: " +datosConfigTxt.getIntCenter_p() );
+            posicionamientoProporcional = new PosicionamientoProporcional(IntentServiceMagic.this);
+            arrayAnchuraImagenesPequeñas = posicionamientoProporcional.getArrayAnchurasImagenesPequenasAlfa(pathCesaralMagicImageC, arrayImagesSequence);
+            if(arrayAnchuraImagenesPequeñas == null){
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y arrayAnchuraImagenesPequeñas es nuul" );
+
+                //Hay un error con Center_P
+                //Lanzamos error y salimos
+                enviarNotification("Error de param CENTER_P=nnn: arrayAnchuraImagenesPequeñas alfanumericas es null,  saliendo de la aplicacion");
+                enviarNotificationConNumero("E1");
+                metodoMostrarError("E1", "Error in CENTER_P: can not get width of alfanumeric images");
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error de param CENTER_P=nnn: " +
+                        "arrayAnchuraImagenesPequeñas alfanumericas es null, salimos de la app");
+
+                //Acabamos la ejecucion
+                return false;
+
+            }
+            anchoTotalDeLasImagenesPequenas = posicionamientoProporcional.getAnchoTotalDeTodasLasImagenes(arrayAnchuraImagenesPequeñas);
+        }//FIN parte 1, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+
+
+        Character character;
+        String charDeLaSecuenciaRecibida = "";
+        String soloCaracteresValidos = "";
+
+
+
+        //*******************************************************************************
+        //Revisamos la secuencia alphanumerica para descartar caracteres prohibidos.
+        //En esta version solo se aceptan letras, menos la ñ, en mayusculas y minusculas, y digitos 0-9.
+        /*
+        for(int i = 0; i < arrayImagesSequence.length; i++) {
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, revisando el array de secuencia alfanumerica");
+
+            //Convertir el caracter de la secuencia alfanumerica para usar el metodo matches con regex de string
+            character = (Character) arrayImagesSequence[i];
+            charDeLaSecuenciaRecibida = character.toString();
+            //Generar el nombre de la imagen a utilizar para la mezcla
+            if (charDeLaSecuenciaRecibida.matches("[a-z]")) {
+                soloCaracteresValidos += charDeLaSecuenciaRecibida;
+            } else if (charDeLaSecuenciaRecibida.matches("[A-Z]")) {
+                soloCaracteresValidos += charDeLaSecuenciaRecibida;
+
+            } else if (charDeLaSecuenciaRecibida.matches("[0-9]")) {
+                soloCaracteresValidos += charDeLaSecuenciaRecibida;
+
+            }
+        }
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, soloCaracteresValidos tiene: " +soloCaracteresValidos);
+        */
+
+
+        //arrayImagesSequence = soloCaracteresValidos.toCharArray();
+
+
+
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence final tiene: " +arrayImagesSequence.toString());
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayImagesSequence final tiene una longitud de: " +arrayImagesSequence.length);
+        if(arrayImagesSequence.length == 0){
+            enviarNotification("Error en la secuencia de imagenes alfanumerica: caracteres NO validos");
+            enviarNotificationConNumero("E1");
+            metodoMostrarError("E1", "Not valid characters in alphanumeric array");
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en la secuencia de imagenes alfanumerica: caracteres NO validos");
+
+            //Acabamos la ejecucion
+            return false;
+        }
+
+
+
+
+        //*******************************************************************************
+
+
+
+
+
+        Bitmap imagenParaSuperponerConOrigin;
+        //Los nombres de los ficheros para mezclar seran F1_ +letra o numero del array de secuencia +indice +.bmp o x.bmp
+        //Ejemplos:
+        /*
+        a)    Si la letra es mayúscula, los ficheros gráficos que se utilizarán para la superposición son:
+
+        F1_A1.bmp             o con extensión “xbmp”
+        F1_B1.bmp             o con extensión “xbmp”
+        …
+        F1_Z1.bmp             o con extensión “xbmp”
+
+        b)   Si la letra es minúscula, los ficheros gráficos que se utilizarán para la superposición son:
+
+        F1_A2.bmp            o con extensión “xbmp”
+        F1_B2.bmp             o con extensión “xbmp”
+        …
+        F1_Z2.bmp             o con extensión “xbmp”
+
+        c)    Si el carácter es un número, los ficheros gráficos que se utilizarán para la superposición es el:
+
+        F1_0.bmp              o con extensión “xbmp”
+        F1_1.bmp              o con extensión “xbmp”
+        …
+        F1_9.bmp              o con extensión “xbmp”
+
+
+         */
+        String prefijoNombreFile = "F1_";
+
+        charDeLaSecuenciaRecibida = "";
+
+        //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+        CentradoCadenasNumeros centradoCadenasNumeros = new CentradoCadenasNumeros(IntentServiceMagic.this);
+        int offsetX_ParaCentrarN = centradoCadenasNumeros
+                .getOffsetX_ParaCentrarImagenT(pathCesaralMagicImageC, "cualquier cosa, no la uso",
+                        cadenaAlphaumericaEmpleada, arrayPojoCoordenadasAlfanumerico, intCenterConfig);
+        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, la formula de centradp da: " +offsetX_ParaCentrarN);
+        //FIN de Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+
+        for(int i = 0; i < arrayImagesSequence.length; i++) {
+            Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mezclando imagen: " +i);
+            prefijoNombreFile = "F1_";
+            boolean boolSeguirEjecutando = true;
+
+            //Convertir el caracter de la secuencia alfanumerica para usar el metodo matches con regex de string
+            character = (Character)arrayImagesSequence[i];
+            charDeLaSecuenciaRecibida = character.toString();
+            //Generar el nombre de la imagen a utilizar para la mezcla
+            if(charDeLaSecuenciaRecibida.matches("[a-z]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase() +2;
+            }else if (charDeLaSecuenciaRecibida.matches("[A-Z]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase() +1;
+
+            }else if(charDeLaSecuenciaRecibida.matches("[0-9]")){
+                prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase();
+            }else{
+                //Si llega aqui, es por que hay algun character que no es valido
+                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia numerica");
+                //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
+                boolSeguirEjecutando = false;
+            }
+
+            //************************************************************************************************
+            //Si el caracter no es valido, por que llega al else anterior,
+            //No ejecutar nada de lo que sigue
+            if(boolSeguirEjecutando) {
+
+                enviarNotification("mezclando imagen: " + i);
+                enviarNotificationConNumero("1");
+                //Obtener la imagen a superponer como un bitmap
+                imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                        + prefijoNombreFile + ".bmp");
+                if (imagenParaSuperponerConOrigin == null) {//No encuentra la imagen con extension .bmp
+                    //Buscamos la imagen a superponer con extension .xbmp
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, No existe la imagen a superponer: " + i + "con extension .bmp, buscamos con extension .xbmp");
+                    imagenParaSuperponerConOrigin = obtenerImagen.getImagenMethod(pathCesaralMagicImageC
+                            + prefijoNombreFile + ".xbmp");
+                }
+                if (imagenParaSuperponerConOrigin == null) {
+                    //Hay un error, terminamos la ejecucion he informamos con una notificacion
+                    enviarNotification("Error al recuperar imagen pequeña alfanumerica numero: " + i + ", saliendo de la aplicacion");
+                    enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error in recovering alphanumeric image from external storage");
+                    metodoMostrarError("E1", "Error opening file " +prefijoNombreFile +" in dir " +pathCesaralMagicImageC);
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, fallo con imagen 0-9 jpg, imagenParaSuperponerConOrigin == null, salimos de la app");
+
+                    //Acabamos la ejecucion
+                    return false;
+                } else {
+
+                    //Como todos los parametro son opcionales, seguimos aunque No haya coordenadas tipo T
+                    //Lo hice el 19 oct 17, para cumplimentar el req: todos los parametros de
+                    // CONFIG.txt son opcionales
+                    //Chequeo si arrayPojoCoordenadasAlfanumerico tiene coordenadas o no
+                    if (arrayPojoCoordenadasAlfanumerico != null) {
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico tiene: "
+                                + arrayPojoCoordenadasAlfanumerico.size() + " coordenadas");
+
+                    } else {
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, arrayPojoCoordenadasAlfanumerico es null");
+
+                    }
+
+                    //Modificar la imagen a superponer: pixels blancos son convertidos a transparentes con channel alpha
+                    imagenParaSuperponerConOrigin = changeSomePixelsToTransparent(imagenParaSuperponerConOrigin);
+
+                    //Leere las coordenadas reales obtenidas del fichero CONFIG.txt
+                    //Siempre chequeo que i no sea mayor o igual que la lista de coordenadas T, por si acaso
+                    //el fichero CONFIG.txt no tiene las 16 coordenadas T sino un numero menor.
+                    if (i >= arrayPojoCoordenadasAlfanumerico.size()) {
+                        //Modificacion el 20 oct 2017:
+                        //Nuevo requerimiento: ahora se admite que el indice del array de alphanumeric sea mayor
+                        //que el de coordenadas T.
+                        //No se lanza error, se hace el loop hasta esta condicion, si existe,
+                        //y solo se superponen las imagenes hasta que no se cumpla esta condicion,
+                        //cuando indice del array de numeros sea mayor que el de coordenadas T
+                        //Nuevo req 28oct17: fichero de log
+                        //informar cuando esto ocurre al log
+                        escribirDatosEnLog("index of alphanumeric string > index of T coordenates");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, No hay fallo, fin del loop tipo T debido a");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, ........./index of alphanumeric string > index of T coordenates....,");
+                        break;//termina el loop
+
+
+                        //Dejo el codigo original comentado
+                        //enviarNotification("Error en indice de coordenadas alfanumericas, saliendo de la aplicacion");
+                        //enviarNotificationConNumero("E1");
+                        //metodoMostrarError("E1", "Error in index of T coordenates");
+                        //Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en indice de coordenadas, salimos de la app");
+                        //return false;//Cerrar aplicacion y evitar un null pointer
+                    }
+
+
+                    //Para corregir fallos de null, OJO OJO OJO
+                /*
+                if(listaCoordenadas.get(i).getCoordX() == null || listaCoordenadas.get(i).getCoordY() == null){
+                    //No lee los valores null
+                }else{
+                    xFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordX());
+                    yFloat = Float.parseFloat(listaCoordenadas.get(i).getCoordY());
+                } */
+
+
+                    xFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordX());
+                    yFloat = Float.parseFloat(arrayPojoCoordenadasAlfanumerico.get(i).getCoordY());
+
+                    //Chequear que xFloat y yFloat son validos, si no, cerrar el programa
+                    //Float.isNaN retorna true si no es un numero
+                    if (Float.isNaN(xFloat) || Float.isNaN(yFloat)) {
+                        enviarNotification("Error, coordenadas alfanumericas no son un numero valido, saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error: some coordenate T is not a number");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, Error en coordenadas x o y no son un numero, revisar CONFIG.txt, salimos de la app");
+
+                        return false;//Cerrar aplicacion y evitar fallo en el procesamiento
+                    }
+
+                    //**************************************************************************************
+                    //**************************************************************************************
+                    //**************************************************************************************
+                    //req de offset el 25 oct 2017, modificar coordenadas de acuerdo a offset_x, offset_y y sacale_x
+                    DatosConfigTxt datosConfigTxtLocal = new DatosConfigTxt(IntentServiceMagic.this);
+                    xFloat = datosConfigTxtLocal.modificarCoordenadaX(xFloat, doubleScale_x, intOffset_x);
+                    yFloat = datosConfigTxtLocal.modificarCoordenadaY(yFloat, intOffset_y);
+
+                    //FIN req de offset el 25 oct 2017
+                    //**************************************************************************************
+                    //**************************************************************************************
+                    //**************************************************************************************
+
+                    //Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
+                    //Modificamos xFloat con offsetX_ParaCentrarN:
+                    if(boolUsarCenter) {
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, xFloat sin centrado: " + xFloat);
+                        xFloat = xFloat + offsetX_ParaCentrarN;
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, xFloat con centrado: " + xFloat);
+                    }
+
+
+                    //parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+                    // nuevo req del mail proximos requerimientos
+                    //Afecta a la cadena de numeros y alfanumericos
+                    if(datosConfigTxt.getIntCenter_p() != 0){
+                        //Calculo de la coordenada xFloat
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y xFloat original es: " +xFloat );
+                        xFloat = posicionamientoProporcional.center_pGetPosicionX(datosConfigTxt.getIntCenter_p(), i,
+                                arrayAnchuraImagenesPequeñas, anchoTotalDeLasImagenesPequenas);
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, CENTER_P=nnn existe y xFloat NUEVO es: " +xFloat );
+
+
+                    }//FIN parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
+
+
+
+                    //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
+                    mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
+                            xFloat, yFloat);
+                    //En cada pasada, originJpg se tiene que refrescar con las imagenes mezcladas.
+                    originJpg = mergedImages;
+                    if (mergedImages != null) {
+                        //Comando de prueba. Comentar esta linea en la version final
+                        //collageImage.setImageBitmap(mergedImages);
+                    } else {
+                        //Ha habido un error al mezclar las imagenes
+                        enviarNotification("Error mezclando imagen alfanumerica: " + i + ", saliendo de la aplicacion");
+                        enviarNotificationConNumero("E1");
+                        metodoMostrarError("E1", "Error when mixing alphanumeric images");
+                        Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mergedImages es null, no se ha generado la imagen, salimos de la app");
+
+                        return false;
+
+                    }
+                    //
+                }
+            }
+            //************************************************************************************************
+            //FIN  Si el caracter no es valido, por que llega al else anterior,
+            //No ejecutar nada de lo que sigue
+
+        }//Fin del loop principal
+
+        return true;
     }//loopPrincipalImagenesTipoT
+
+
+    //LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
 
 
     private boolean ejecutarConParametroSor(){
