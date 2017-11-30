@@ -334,6 +334,7 @@ public class MezclarFinal extends AppCompatActivity {
                 sizearrayImagesSequence = arrayImagesSequence.length;
                 cadenaNumericaEmpleada = stringNumeric;
             }
+
             if(arrayImagesSequenceAlphanumeric.length !=0){
                 booleanSecuenciaRecibidaAlfanumerica = true;
                 cadenaAlphaumericaEmpleada = stringAlphanumeric;

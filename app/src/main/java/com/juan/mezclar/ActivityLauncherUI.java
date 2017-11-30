@@ -761,4 +761,20 @@ public class ActivityLauncherUI extends AppCompatActivity  {
     }//Fin de recuperarIntentConDatosIniciales
     */
 
+
+
+    @Override
+    protected void onStop() {
+        // call the superclass method first
+        super.onStop();
+        //30 nov 17, nuevo requerimiento en mail: arreglo en cupp lite, recivido el 29 nov 17
+
+        //Guardamos lo que hay en edittext alfanumerico
+        ConfiguracionAlfanumerica configuracionAlfanumerica = new ConfiguracionAlfanumerica(this);
+        configuracionAlfanumerica.setStringAlfanumerico(secuenciaDeImagenesAlfanumerica.getText().toString());
+
+        Log.d(xxx, "onStop La secuencia alfanumerica es: "  +secuenciaDeImagenesAlfanumerica.getText().toString());
+
+    }
+
 }//Fin de la clase

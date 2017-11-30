@@ -205,10 +205,12 @@ public class IntentServiceMagic extends IntentService {
         if(dato == null){
             //No se ejecuta el metodo loopPrincipalImagenesTipoT()
             Log.d(xxx, "En metodo recuperarSecuenciaAlphanumerica hay un null, No hay secuencia alphanumerica");
+            cadenaAlphaumericaEmpleada = "No data";
 
         }else{
             Log.d(xxx, "En metodo recuperarSecuenciaAlphanumerica hay secuencia alphanumerica: " +dato);
             //Convertir el string alfanumerico en un array alfanumerico, character a character
+            cadenaAlphaumericaEmpleada = dato;
             arrayImagesSequenceAlphanumeric = dato.toCharArray();
             //Hay secuencia alfanumerica, pasamos a true para que se ejecute el metodo: loopPrincipalImagenesTipoT()
             booleanSecuenciaRecibidaAlfanumerica = true;
@@ -520,6 +522,7 @@ public class IntentServiceMagic extends IntentService {
         if(booleanSecuenciaRecibidaAlfanumerica){
             //cambiamos la variable para ejecutar con arrayImagesSequence el loopPrincipalImagenesTipoT
             arrayImagesSequence = arrayImagesSequenceAlphanumeric;
+
             //secuencia alfanumerica recibida, se ejecuta loopPrincipalImagenesTipoT
             if(loopPrincipalImagenesTipoT()){
                 //Ejecucion correcta, seguimos
@@ -3007,8 +3010,12 @@ public class IntentServiceMagic extends IntentService {
         SimpleDateFormat sdf3 = new SimpleDateFormat("HH:mm");
         horaLog = sdf3.format(date);
         String mensajeLog = "//" +fechaLog +separador +horaLog +separador
-                +cadenaNumericaEmpleada +separador +"No data" +separador +mensajeError +"\r\n";
+                //+cadenaNumericaEmpleada +separador +"No data" +separador +mensajeError +"\r\n";
+                +cadenaNumericaEmpleada +separador +cadenaAlphaumericaEmpleada +separador +mensajeError +"\r\n";
         Log.d(xxx, "escribirDatosEnLog el mensaje del log es: " +mensajeLog);
+
+
+
 
         mensajeLog2 = mensajeLog;
 

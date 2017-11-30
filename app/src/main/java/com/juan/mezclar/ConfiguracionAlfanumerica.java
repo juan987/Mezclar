@@ -40,7 +40,7 @@ public class ConfiguracionAlfanumerica {
 
         }else{
             //Guardamos el campo alfanumerico
-            editor.putString(prefName, string+"/"); // Storing string
+            editor.putString(prefName, string); // Storing string
             Log.d(xxx, "getStringAlfanumerico, la secuencia alfanumerica guardad es: " + string);
 
 
