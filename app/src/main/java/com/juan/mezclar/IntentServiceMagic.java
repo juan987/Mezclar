@@ -195,10 +195,39 @@ public class IntentServiceMagic extends IntentService {
     //Esta variable tiene el resultado final de componer la imagen
     Bitmap mergedImages = null;
 
+
+    //30nov17, nuevo requerimiento recibido en mail: arreglo en cupp lite el 29nov17
+    private void recuperarSecuenciaAlphanumerica(){
+
+        ConfiguracionAlfanumerica configuracionAlfanumerica = new ConfiguracionAlfanumerica(this);
+        String dato = configuracionAlfanumerica.getStringAlfanumerico();
+
+        if(dato == null){
+            //No se ejecuta el metodo loopPrincipalImagenesTipoT()
+            Log.d(xxx, "En metodo recuperarSecuenciaAlphanumerica hay un null, No hay secuencia alphanumerica");
+
+        }else{
+            Log.d(xxx, "En metodo recuperarSecuenciaAlphanumerica hay secuencia alphanumerica: " +dato);
+            //Convertir el string alfanumerico en un array alfanumerico, character a character
+            arrayImagesSequenceAlphanumeric = dato.toCharArray();
+            //Hay secuencia alfanumerica, pasamos a true para que se ejecute el metodo: loopPrincipalImagenesTipoT()
+            booleanSecuenciaRecibidaAlfanumerica = true;
+
+        }
+
+    }
+
+
+
+
     //Metodo final y OK
     ObtenerImagen obtenerImagen;
+
     private boolean metodoPrincipal_2(){
         Log.d(xxx, "En metodoPrincipal_2");
+
+        //30nov17, nuevo requerimiento recibido en mail: arreglo en cupp lite el 29nov17
+        recuperarSecuenciaAlphanumerica();
 
 
         //progressBar.setVisibility(View.VISIBLE); //To Hide ProgressBar
