@@ -34,6 +34,11 @@ public class ActivityValidacion extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         String macAddress = getMacAddr();
+
+        //1 dic 17, voy a buscar el fallo reportado en mail problema con codigo de activacion
+        //fallo encontrado: cuando el digito era un 4, se devolvia el resultado del algoritmo + 1 espacio
+        //macAddress = "84:34:38:D7:92:8F";
+
         Log.d(xxx, "En metodo onCreate la Mac address es: "  +macAddress);
 
         TextView textview_2 = (TextView) findViewById(R.id.textview_2);
@@ -130,7 +135,7 @@ public class ActivityValidacion extends AppCompatActivity {
             return "4";
         }
         if(numero.equals("4")){
-            return "5 ";
+            return "5";
         }
         if(numero.equals("5")){
             return "6";
@@ -184,7 +189,7 @@ public class ActivityValidacion extends AppCompatActivity {
             return "2";
         }
         if(numero.equals("4")){
-            return "3 ";
+            return "3";
         }
         if(numero.equals("5")){
             return "4";
