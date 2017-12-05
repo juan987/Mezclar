@@ -29,6 +29,9 @@ public class ActivityLauncher extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d(xxx, "En metodo onCreate, entrando");
+
+
         //3 nov 2017, nuevo requerimiento: Licencia de la aplicacion en mail Plan viernes - corregido
         //Antes de hacer nada, chequeamos si la licencia esta OK
         ConfiguracionLicencia configuracionLicencia = new ConfiguracionLicencia(this);
@@ -287,7 +290,7 @@ public class ActivityLauncher extends AppCompatActivity {
                 mServiceIntent.putExtra("KeyName", stringImagesSecuence);
                 startService(mServiceIntent);
                 //agregue el finish el 25 oct 2017
-                finish();
+                //finish();
 
 
             } else {//Salta aqui si no hay datos en el intent
@@ -298,7 +301,7 @@ public class ActivityLauncher extends AppCompatActivity {
                 //launchMezclarApplication.putExtra("KeyName","Hola, te estoy llamando");
 
                 startActivity(intent);
-                finish();
+                //finish();
             }
 
         } else {//Salta aqui si recibe nulo en el intent
@@ -310,8 +313,35 @@ public class ActivityLauncher extends AppCompatActivity {
 
             startActivity(intent);
 
-            finish();
+            //finish();
 
         }
     }//Fin de recuperarIntentConDatosInicialesServicio
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(xxx, "En metodo onStop");
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(xxx, "En metodo onDestroy");
+
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+        if(isFinishing()){
+            Log.d(xxx, "En metodo onPause, the activity is finishing");
+
+        }else{
+            Log.d(xxx, "En metodo onPause, the activity is only pausing");
+
+        }
+    }
 }//Fin de la clase

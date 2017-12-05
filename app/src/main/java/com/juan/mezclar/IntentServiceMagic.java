@@ -462,6 +462,9 @@ public class IntentServiceMagic extends IntentService {
 
         //
 
+        //?????????????????????????????????????????????????????????????????????????????????????????????????????????
+        //5 dic 17, esto esta mal, ver fallo en correo problema importante (No ordena con SOR)
+        /*
         //Chequeamos si hay que hacer ordenacion con el parametro SOR
         if(stringSOR.equals("") || booleanSecuenciaRecibidaAlfanumerica){
             //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
@@ -480,6 +483,33 @@ public class IntentServiceMagic extends IntentService {
             }
 
         }
+        */
+
+        //5 dic 17, este es el codigo correcto que ordena, como en MezclarFinal
+        //Chequeamos si hay que hacer ordenacion con el parametro SOR
+        if(stringSOR.equals("")){
+            //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
+            Log.d(xxx, "En metodoPrincipal_2, NO hay parametro SOR o se ha recibido una secuencia alfanumerica, seguimos");
+
+        }else{
+            Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR, se ejecuta metodo ejecutarConParametroSor");
+            if(booleanSecuenciaNumerica) {
+                Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR y booleanSecuenciaNumerica=true, " +
+                        "se ejecuta metodo ejecutarConParametroSor");
+                if (!ejecutarConParametroSor()) {
+                    //Ha habido un problema con la ordenacion, salir del programa
+                    //enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
+                    Log.d(xxx, "En metodoPrincipal_2, Error en metodo ejecutarConParametroSor, salimos de la app");
+                    //Me faltaba esta linea
+                    return false;
+                }
+            }
+
+        }
+
+        //FIN de 5 dic 17, esto esta mal, ver fallo en correo problema importante.
+        //???????????????????????????????????????????????????????????????????????????????????????????????????????????????
 
 
         //TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTt
