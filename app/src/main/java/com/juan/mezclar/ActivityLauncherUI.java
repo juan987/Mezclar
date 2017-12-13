@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -117,7 +118,63 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         nuevoDir   = (EditText)findViewById(R.id.nuevo_dir);
         textView   = (TextView)findViewById(R.id.textview_1);
 
+        //13 dic 17, nuevo requerimiento, uso de teclado bluetooth
+        //Cuando se entra en la app con el teclado, el foco lo coje el selector de los directorios.
+        //fuerzo que el foco lo tenga el campo numerico:
+        secuenciaDeImagenes.requestFocus();
+        //secuenciaDeImagenes.setFocusableInTouchMode(true);
 
+        // Set a key listener callback so that users can do something by pressing "Enter"
+        //Como en https://www.programcreek.com/java-api-examples/android.view.View.OnKeyListener
+        secuenciaDeImagenes.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if( keyCode == KeyEvent.KEYCODE_ENTER ) {
+                    if( event.getAction() == KeyEvent.ACTION_UP ) {
+                        Log.d(xxx, "En onCreate, KEYCODE_ENTER: para secuenciaDeImagenes" );
+                        metodoTeclaEnterBluetoothKeyboard();
+                    }
+
+                    return true;
+                }
+
+                if( keyCode == KeyEvent.KEYCODE_DPAD_UP ) {
+                    if( event.getAction() == KeyEvent.ACTION_UP ) {
+                        Log.d(xxx, "En onCreate, KEYCODE_DPAD_UP: para secuenciaDeImagenes" );
+                        Log.d(xxx, "En onCreate, No dejo que vaya al spinner: para secuenciaDeImagenes" );
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        secuenciaDeImagenesAlfanumerica.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if( keyCode == KeyEvent.KEYCODE_ENTER ) {
+                    if( event.getAction() == KeyEvent.ACTION_UP ) {
+                        Log.d(xxx, "En onCreate, KEYCODE_ENTER: para secuenciaDeImagenesAlfanumerica" );
+                        metodoTeclaEnterBluetoothKeyboard();
+                    }
+                    return true;
+                }
+
+                if( keyCode == KeyEvent.KEYCODE_DPAD_DOWN ) {
+                    if( event.getAction() == KeyEvent.ACTION_UP ) {
+                        Log.d(xxx, "En onCreate, KEYCODE_DPAD_DOWN: para secuenciaDeImagenes" );
+                        Log.d(xxx, "En onCreate, No dejo que vaya al boton: para secuenciaDeImagenes" );
+                    }
+
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        //FIN de 13 dic 17, nuevo requerimiento, uso de teclado bluetooth
 
 
 
@@ -374,6 +431,36 @@ public class ActivityLauncherUI extends AppCompatActivity  {
 
 
     }//Fin del onCreate
+
+    //13 dic 17, nuevo requerimiento, uso de teclado bluetooth
+    private void metodoTeclaEnterBluetoothKeyboard(){
+        if((secuenciaDeImagenes.length() == 0 && secuenciaDeImagenesAlfanumerica.length() == 0)) {
+            Snackbar.make(findViewById(R.id.coordinatorlayout_1), "Enter data in one of the boxes or both", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }else {
+            if(secuenciaDeImagenes.hasFocus()){
+                Log.d(xxx, "En metodoTeclaEnterBluetoothKeyboard,despues del boton enter,  secuenciaDeImagenes tiene el foco: " );
+
+            }
+            if(secuenciaDeImagenesAlfanumerica.hasFocus()){
+                Log.d(xxx, "En metodoTeclaEnterBluetoothKeyboard,despues del boton enter,  secuenciaDeImagenesAlfanumerica tiene el foco: " );
+
+            }
+            //Antes del intent, mostrar el directorio activo
+            //Leer el directorio activo del share preferences, tb en IntentServiceMagic
+            String pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+            //El directorio activo de la app es:
+            Log.d(xxx, "En metodoTeclaEnterBluetoothKeyboard,despues del enter del teclado,  el directorio activo es: " +pathCesaralMagicImageC);
+            //Uno o ambos campos tienen datos, enviamos el intent a MezclarFinal
+            Intent intent = new Intent(ActivityLauncherUI.this, MezclarFinal.class);
+            intent.putExtra("KeyName", secuenciaDeImagenes.getText().toString());
+            intent.putExtra("KeyAlfanumerico", secuenciaDeImagenesAlfanumerica.getText().toString());
+            startActivity(intent);
+        }
+    }
+
+
+    //FIN de 13 dic 17, nuevo requerimiento, uso de teclado bluetooth
 
 
 
