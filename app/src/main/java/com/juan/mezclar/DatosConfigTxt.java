@@ -166,8 +166,26 @@ public class DatosConfigTxt {
 
 
 
+    //23 ene 2018: Nuevo req de email "CUPP Lite - nuevo requerimiento de Cesar", recibido el 14 ene 18
+    public String F_R = "0";
+    public String F_G = "0";
+    public String F_B = "0";
 
+    public int int_F_R = -1;
+    public int int_F_G = -1;
+    public int int_F_B = -1;
 
+    public int getInt_F_R() {
+        return int_F_R;
+    }
+
+    public int getInt_F_G() {
+        return int_F_G;
+    }
+
+    public int getInt_F_B() {
+        return int_F_B;
+    }
 
     //7 nov 17, metodo para quitar todsos los espacios en blanco de las lineas de config
     public List<String> quitarEspaciosBlancos(List<String> arrayLineasTextoLocal){
@@ -448,6 +466,56 @@ public class DatosConfigTxt {
             }
 
 
+            //*********************************
+            //23 Enero 2018
+            //*********************************
+            //23 ene 2018: Nuevo req de email "CUPP Lite - nuevo requerimiento de Cesar", recibido el 14 ene 18
+            //Para el color rojo
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("f_r")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con f_r y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_f_r = arrayLineasTextoLocal.get(i).split("=");
+                F_R = array_f_r[array_f_r.length -1];
+                //Verifico que es un integer valido
+                try {
+                    int_F_R = Integer.parseInt(F_R);
+                    Log.d(xxx, "El valor F_R es valido " + int_F_R);
+                } catch (NumberFormatException e) {
+                    //e.printStackTrace();
+                    Log.d(xxx, "El valor F_R NO es valido " + F_R);
+                }
+            }
+
+            //Para el color verde
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("f_g")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con f_g y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_f_g = arrayLineasTextoLocal.get(i).split("=");
+                F_G = array_f_g[array_f_g.length -1];
+                try {
+                    int_F_G = Integer.parseInt(F_G);
+                    Log.d(xxx, "El valor F_G es valido " + int_F_G);
+                } catch (NumberFormatException e) {
+                    //e.printStackTrace();
+                    Log.d(xxx, "El valor F_G NO es valido " + F_G);
+                }
+            }
+
+            //Para el color azul
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("f_b")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con f_g y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_f_b = arrayLineasTextoLocal.get(i).split("=");
+                F_B = array_f_b[array_f_b.length -1];
+                try {
+                    int_F_B = Integer.parseInt(F_B);
+                    Log.d(xxx, "El valor F_B es valido " + int_F_B);
+                } catch (NumberFormatException e) {
+                    //e.printStackTrace();
+                    Log.d(xxx, "El valor F_B NO es valido " + F_B);
+                }
+            }
+
+            //*********************************
+            //23 Enero 2018
+            //*********************************
         }
 
 
@@ -545,7 +613,8 @@ public class DatosConfigTxt {
                 intOffset_x = Integer.parseInt(stringOffset_x);
             } catch (NumberFormatException e) {
                 //e.printStackTrace();
-                Log.d(xxx, "Error de formato de  stringOffset_x, no puede ser tipo int " + stringOffset_x);            }
+                Log.d(xxx, "Error de formato de  stringOffset_x, no puede ser tipo int " + stringOffset_x);
+            }
         }
 
         //Imprime el offset_y y lo asigna a la variable global como integer
@@ -561,7 +630,8 @@ public class DatosConfigTxt {
                 intOffset_y = Integer.parseInt(stringOffset_y);
             } catch (NumberFormatException e) {
                 //e.printStackTrace();
-                Log.d(xxx, "Error de formato de  stringOffset_y, no puede ser tipo int " + stringOffset_y);            }
+                Log.d(xxx, "Error de formato de  stringOffset_y, no puede ser tipo int " + stringOffset_y);
+            }
         }
 
         //Imprime el scale_x y lo asigna a la variable global como double

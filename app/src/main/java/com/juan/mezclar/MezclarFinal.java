@@ -2583,6 +2583,108 @@ public class MezclarFinal extends AppCompatActivity {
 
 
     private Bitmap changeSomePixelsToTransparent(Bitmap originalImage){
+        Log.d(xxx, "en metodo: changeSomePixelsToTransparent" );
+
+
+        Bitmap bitmap2 = originalImage.copy(Bitmap.Config.ARGB_8888,true);
+        bitmap2.setHasAlpha(true);
+        for(int x=0;x<bitmap2.getWidth();x++){
+            for(int y=0;y<bitmap2.getHeight();y++){
+                //Solo busca pixeles blancos
+                if(bitmap2.getPixel(x, y)==Color.rgb(0xff, 0xff, 0xff))
+
+                //tenia esta hasta el nuevo req de solo comparar con pixeles blancos el 27oct17
+                //if(bitmap2.getPixel(x, y)>=Color.rgb(0xd7, 0xd7, 0xd7))
+                //if(bitmap2.getPixel(x, y)>=Color.rgb(0x80, 0x80, 0x80))
+                {
+                    int alpha = 0x00;
+                    bitmap2.setPixel(x, y , Color.argb(alpha,0xff,0xff,0xff));  // changing the transparency of pixel(x,y)
+                }else{//Si el pixel no es blanco, chequeo si existen F_R, F_G, F_B en CONGIG.txt
+                    //23 ene 2018: Nuevo req de email CUPP Lite - nuevo requerimiento de Cesar, LUMINANCIA
+
+                    //Pregunto si algun parametro de luminancia F_R, F_G, F_B es distinto de cero
+                    if(datosConfigTxt.getInt_F_R() > -1
+                            || datosConfigTxt.getInt_F_G() > -1
+                            || datosConfigTxt.getInt_F_B() > -1){
+                        Log.d(xxx, "changeSomePixelsToTransparent, HAY QUE CHEQUEAR LA LUMINANCIA " );
+                        Log.d(xxx, "changeSomePixelsToTransparent, luminancia red: " +datosConfigTxt.getInt_F_R());
+                        Log.d(xxx, "changeSomePixelsToTransparent, luminancia green: " +datosConfigTxt.getInt_F_G());
+                        Log.d(xxx, "changeSomePixelsToTransparent, luminancia blue: " +datosConfigTxt.getInt_F_B());
+                        //Hay algun parametro mayor que cero, hago los chequeos
+                        //Primero extraigo los valores RGB del pixel
+                        //Como en:
+                        //https://stackoverflow.com/questions/5669501/how-do-you-get-the-rgb-values-from-a-bitmap-on-an-android-device
+                        int colour = bitmap2.getPixel(x, y);
+
+                        int red = Color.red(colour);
+                        int blue = Color.blue(colour);
+                        int green = Color.green(colour);
+                        int alpha = Color.alpha(colour);
+
+                        boolean boolDibujaEstePixel = false;
+                        boolean boolContinuaChequeo = true;
+                        //Chequeamos el rojo
+                        if(datosConfigTxt.getInt_F_R() > -1){
+                            if(red > datosConfigTxt.getInt_F_R()){
+                                Log.d(xxx, "changeSomePixelsToTransparent, el rojo es mayor: " +red +" que F_R" +datosConfigTxt.getInt_F_R());
+                                boolDibujaEstePixel = true;
+                            }else{
+                                Log.d(xxx, "changeSomePixelsToTransparent, el rojo es menor: " +red +" que F_R" +datosConfigTxt.getInt_F_R());
+                                boolDibujaEstePixel = false;
+                                boolContinuaChequeo = false;
+                            }
+                        }
+
+                        //Chequeamos el verde
+                        if(datosConfigTxt.getInt_F_G() > -1 && boolContinuaChequeo){
+                            if(green > datosConfigTxt.getInt_F_G()){
+                                boolDibujaEstePixel = true;
+                            }else{
+                                boolDibujaEstePixel = false;
+                                boolContinuaChequeo = false;
+
+                            }
+                        }
+
+                        //Chequeamos el azul
+                        if(datosConfigTxt.getInt_F_B() > -1 && boolContinuaChequeo){
+                            if(blue > datosConfigTxt.getInt_F_B()){
+                                boolDibujaEstePixel = true;
+                            }else{
+                                boolDibujaEstePixel = false;
+                            }
+                        }
+
+
+                        //Chequeo si hay que dibujar el pixel o no
+                        if(boolDibujaEstePixel){
+                            Log.d(xxx, "changeSomePixelsToTransparent, boolDibujaEstePixel es true");
+
+                            //No hago nada
+                        }else{
+                            Log.d(xxx, "changeSomePixelsToTransparent, boolDibujaEstePixel es false, lo pongo transparente");
+                            int alpha2 = 0x00;
+                            bitmap2.setPixel(x, y , Color.argb(alpha2,0xff,0xff,0xff));  // changing the transparency of pixel(x,y)
+                        }
+
+                    }else {//Si no existen, no hago nada, no chequeo la luminancia
+                        Log.d(xxx, "changeSomePixelsToTransparent, NO HAY QUE CHEQUEAR LA LUMINANCIA " );
+
+                    }
+
+
+
+                }//Fin de else de chequeo de la luminancia
+            }
+        }
+        return bitmap2;
+    }
+
+
+    //23 ene 2018: Nuevo req de email "CUPP Lite - nuevo requerimiento de Cesar", recibido el 14 ene 18
+    //23 ene 2018: Nuevo req de email "CUPP Lite - nuevo requerimiento de Cesar", recibido el 14 ene 18
+    //Mantengo el metodo original que solo pone a transparentes los pixeles que son blancos.
+    private Bitmap changeSomePixelsToTransparent_ORIGINAL(Bitmap originalImage){
 
         Bitmap bitmap2 = originalImage.copy(Bitmap.Config.ARGB_8888,true);
         bitmap2.setHasAlpha(true);
@@ -2602,8 +2704,6 @@ public class MezclarFinal extends AppCompatActivity {
         }
         return bitmap2;
     }
-
-
 
     //6 nov 2017, nuevo req en mail Plan lunes - Modo rotacional
     //Te paso los requerimientos del modo nuevo de rotación:
