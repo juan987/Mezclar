@@ -2625,7 +2625,7 @@ public class MezclarFinal extends AppCompatActivity {
                         boolean boolContinuaChequeo = true;
                         //Chequeamos el rojo
                         if(datosConfigTxt.getInt_F_R() > -1){
-                            if(red > datosConfigTxt.getInt_F_R()){
+                            if(red < datosConfigTxt.getInt_F_R()){
                                 Log.d(xxx, "changeSomePixelsToTransparent, el rojo es mayor: " +red +" que F_R" +datosConfigTxt.getInt_F_R());
                                 boolDibujaEstePixel = true;
                             }else{
@@ -2637,7 +2637,7 @@ public class MezclarFinal extends AppCompatActivity {
 
                         //Chequeamos el verde
                         if(datosConfigTxt.getInt_F_G() > -1 && boolContinuaChequeo){
-                            if(green > datosConfigTxt.getInt_F_G()){
+                            if(green < datosConfigTxt.getInt_F_G()){
                                 boolDibujaEstePixel = true;
                             }else{
                                 boolDibujaEstePixel = false;
@@ -2648,7 +2648,7 @@ public class MezclarFinal extends AppCompatActivity {
 
                         //Chequeamos el azul
                         if(datosConfigTxt.getInt_F_B() > -1 && boolContinuaChequeo){
-                            if(blue > datosConfigTxt.getInt_F_B()){
+                            if(blue < datosConfigTxt.getInt_F_B()){
                                 boolDibujaEstePixel = true;
                             }else{
                                 boolDibujaEstePixel = false;
