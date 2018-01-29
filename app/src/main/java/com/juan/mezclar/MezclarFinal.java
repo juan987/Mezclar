@@ -796,6 +796,13 @@ public class MezclarFinal extends AppCompatActivity {
 
         //Ejecutamos los loops
         if(booleanSecuenciaNumerica){
+            //29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+            //Center_PN, solo para centrar en X el modo numerico, y
+            //Center_PT, solopara centrar en X en el modo alfanumerico
+            //En email: nuevo requerimiento CUPP Lite del 26 ene 2018
+            datosConfigTxt.setModo(1);
+
+
             //secuencia numerica recibida, se ejecuta loopPrincipalImagenesTipoN
             if(loopPrincipalImagenesTipoN()){
                 //Ejecucion correcta, seguimos
@@ -805,6 +812,12 @@ public class MezclarFinal extends AppCompatActivity {
             }
         }
         if(booleanSecuenciaRecibidaAlfanumerica){
+            //29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+            //Center_PN, solo para centrar en X el modo numerico, y
+            //Center_PT, solopara centrar en X en el modo alfanumerico
+            //En email: nuevo requerimiento CUPP Lite del 26 ene 2018
+            datosConfigTxt.setModo(2);
+
             //cambiamos la variable para ejecutar con arrayImagesSequence el loopPrincipalImagenesTipoT
             arrayImagesSequence = arrayImagesSequenceAlphanumeric;
             //secuencia alfanumerica recibida, se ejecuta loopPrincipalImagenesTipoT

@@ -80,9 +80,69 @@ public class DatosConfigTxt {
     //Afecta a la cadena de numeros y alfanumericos
     String stringCenter_p = "";
     int intCenter_p = 0;//por defecto, y este es el valor a comparar.
+
+    //El antiguo
+    //public int getIntCenter_p() {
+        //return intCenter_p;
+    //}
+
+    //29 enero 2018, modifico el metodo getIntCenter_p por los reqs de Center_PN y Center_PT
+    //Ahora recibe un 1 si es llamado desde loopPrincipalImagenesTipoN
+    //o recibe un 2 si es llamado desde loopPrincipalImagenesTipoT
     public int getIntCenter_p() {
-        return intCenter_p;
+        //Chequeamos si la peticion viene es para coordenada N o coordenadas T
+        if(modo == 1){
+            //Peticion viene de loopPrincipalImagenesTipoN
+            if(Center_PN != 0){
+                return Center_PN;
+            }else{
+                return intCenter_p;
+            }
+        }else{
+            //Peticion viene de loopPrincipalImagenesTipoT
+            if(Center_PT != 0){
+                return Center_PT;
+            }else{
+                return intCenter_p;
+            }
+        }//Fin de if de modo
+    }//Fin de getIntCenter_p
+    //FIN de 29 enero 2018, modifico el metodo getIntCenter_p por los reqs de Center_PN y Center_PT
+
+
+
+    //29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+    //Center_PN, solo para centrar en X el modo numerico, y
+    //Center_PT, solopara centrar en X en el modo alfanumerico
+    //En email: nuevo requerimiento CUPP Lite del 26 ene 2018
+
+    //Inicialmente, estan igualados a cero
+    String string_Center_PN = "0";
+    String string_Center_PT = "0";
+
+    int Center_PN =0;
+    int Center_PT =0;
+
+    public int getCenter_PN() {
+        return Center_PN;
     }
+
+    public int getCenter_PT() {
+        return Center_PT;
+    }
+
+
+    //En las clases MezclarFinal y IntentServiceMagic pongo el modo para llamar al metodo getIntCenter_p
+    public int modo;
+    public void setModo(int modo) {
+        this.modo = modo;
+    }
+
+
+
+
+    //FIN de 29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+
 
 
 
@@ -515,6 +575,54 @@ public class DatosConfigTxt {
 
             //*********************************
             //23 Enero 2018
+            //*********************************
+
+
+
+
+            //*********************************
+            //29 Enero 2018
+            //*********************************
+            //29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+            //Center_PN, solo para centrar en X el modo numerico, y
+            //Center_PT, solopara centrar en X en el modo alfanumerico
+            //En email: nuevo requerimiento CUPP Lite del 26 ene 2018
+
+            //Parametro Center_PN
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center_pn")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con center_pn y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_center_pn = arrayLineasTextoLocal.get(i).split("=");
+                string_Center_PN = array_center_pn[array_center_pn.length -1];
+                try {
+                    Center_PN = Integer.parseInt(string_Center_PN);
+                    Log.d(xxx, "El valor Center_PN es valido " + Center_PN);
+                } catch (NumberFormatException e) {
+                    //e.printStackTrace();
+                    Log.d(xxx, "El valor Center_PN NO es valido " + string_Center_PN);
+                }
+                Log.d(xxx, "El valor FINAL Center_PN es: " + Center_PN);
+
+            }
+
+            //Parametro Center_PT
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center_pt")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con center_pt y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_center_pt = arrayLineasTextoLocal.get(i).split("=");
+                string_Center_PT = array_center_pt[array_center_pt.length -1];
+                try {
+                    Center_PT = Integer.parseInt(string_Center_PT);
+                    Log.d(xxx, "El valor Center_PT es valido " + Center_PT);
+                } catch (NumberFormatException e) {
+                    //e.printStackTrace();
+                    Log.d(xxx, "El valor Center_PT NO es valido " + string_Center_PT);
+                }
+                Log.d(xxx, "El valor FINAL Center_PT es: " + Center_PT);
+
+            }
+
+            //FIN de 29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+            //*********************************
+            //29 Enero 2018
             //*********************************
         }
 

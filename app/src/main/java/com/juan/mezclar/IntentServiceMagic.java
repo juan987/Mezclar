@@ -541,6 +541,12 @@ public class IntentServiceMagic extends IntentService {
         //Ejecutamos los loops
         //Copiado de MezclarFinal el 30nov17 por requerimiento en mail: arreglo en cupp lite, recibido el 29nov17
         if(booleanSecuenciaNumerica){
+            //29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+            //Center_PN, solo para centrar en X el modo numerico, y
+            //Center_PT, solopara centrar en X en el modo alfanumerico
+            //En email: nuevo requerimiento CUPP Lite del 26 ene 2018
+            datosConfigTxt.setModo(1);
+
             //secuencia numerica recibida, se ejecuta loopPrincipalImagenesTipoN
             if(loopPrincipalImagenesTipoN()){
                 //Ejecucion correcta, seguimos
@@ -550,6 +556,12 @@ public class IntentServiceMagic extends IntentService {
             }
         }
         if(booleanSecuenciaRecibidaAlfanumerica){
+            //29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
+            //Center_PN, solo para centrar en X el modo numerico, y
+            //Center_PT, solopara centrar en X en el modo alfanumerico
+            //En email: nuevo requerimiento CUPP Lite del 26 ene 2018
+            datosConfigTxt.setModo(2);
+
             //cambiamos la variable para ejecutar con arrayImagesSequence el loopPrincipalImagenesTipoT
             arrayImagesSequence = arrayImagesSequenceAlphanumeric;
 
