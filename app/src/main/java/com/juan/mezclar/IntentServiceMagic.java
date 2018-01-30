@@ -1779,6 +1779,12 @@ public class IntentServiceMagic extends IntentService {
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, la formula de centradp da: " +offsetX_ParaCentrarN);
         //FIN de Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
 
+
+
+        //Nuevo req el 29 ene 2018 en el correo: "caracteres especiales"
+        CaracteresEspeciales caracteresEspeciales = new CaracteresEspeciales(this);
+
+
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mezclando imagen: " +i);
             prefijoNombreFile = "F1_";
@@ -1797,9 +1803,22 @@ public class IntentServiceMagic extends IntentService {
                 prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase();
             }else{
                 //Si llega aqui, es por que hay algun character que no es valido
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia numerica");
+                //Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia numerica");
                 //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
-                boolSeguirEjecutando = false;
+                //boolSeguirEjecutando = false;
+
+                //Nuevo req el 29 ene 2018 en el correo: "caracteres especiales"
+                prefijoNombreFile = caracteresEspeciales.getNombreFicheroEspecial(charDeLaSecuenciaRecibida);
+                if(prefijoNombreFile == null){
+                    //Si llega aqui, es por que hay algun character que no es valido
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia alphanumerica");
+                    //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
+                    boolSeguirEjecutando = false;
+                }else{
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter ESPECIAL en " +
+                            "la secuencia alphanumerica: " +prefijoNombreFile);
+                }
+                //FIN Nuevo req el 29 ene 2018 en el correo: "caracteres especiales"
             }
 
             //************************************************************************************************
@@ -2578,10 +2597,10 @@ public class IntentServiceMagic extends IntentService {
                     if(datosConfigTxt.getInt_F_R() > -1
                             || datosConfigTxt.getInt_F_G() > -1
                             || datosConfigTxt.getInt_F_B() > -1){
-                        Log.d(xxx, "changeSomePixelsToTransparent, HAY QUE CHEQUEAR LA LUMINANCIA " );
-                        Log.d(xxx, "changeSomePixelsToTransparent, luminancia red: " +datosConfigTxt.getInt_F_R());
-                        Log.d(xxx, "changeSomePixelsToTransparent, luminancia green: " +datosConfigTxt.getInt_F_G());
-                        Log.d(xxx, "changeSomePixelsToTransparent, luminancia blue: " +datosConfigTxt.getInt_F_B());
+                        //Log.d(xxx, "changeSomePixelsToTransparent, HAY QUE CHEQUEAR LA LUMINANCIA " );
+                        //Log.d(xxx, "changeSomePixelsToTransparent, luminancia red: " +datosConfigTxt.getInt_F_R());
+                        //Log.d(xxx, "changeSomePixelsToTransparent, luminancia green: " +datosConfigTxt.getInt_F_G());
+                        //Log.d(xxx, "changeSomePixelsToTransparent, luminancia blue: " +datosConfigTxt.getInt_F_B());
                         //Hay algun parametro mayor que cero, hago los chequeos
                         //Primero extraigo los valores RGB del pixel
                         //Como en:
@@ -2598,10 +2617,10 @@ public class IntentServiceMagic extends IntentService {
                         //Chequeamos el rojo
                         if(datosConfigTxt.getInt_F_R() > -1){
                             if(red < datosConfigTxt.getInt_F_R()){
-                                Log.d(xxx, "changeSomePixelsToTransparent, el rojo es mayor: " +red +" que F_R" +datosConfigTxt.getInt_F_R());
+                                //Log.d(xxx, "changeSomePixelsToTransparent, el rojo es mayor: " +red +" que F_R" +datosConfigTxt.getInt_F_R());
                                 boolDibujaEstePixel = true;
                             }else{
-                                Log.d(xxx, "changeSomePixelsToTransparent, el rojo es menor: " +red +" que F_R" +datosConfigTxt.getInt_F_R());
+                                //Log.d(xxx, "changeSomePixelsToTransparent, el rojo es menor: " +red +" que F_R" +datosConfigTxt.getInt_F_R());
                                 boolDibujaEstePixel = false;
                                 boolContinuaChequeo = false;
                             }
@@ -2630,17 +2649,17 @@ public class IntentServiceMagic extends IntentService {
 
                         //Chequeo si hay que dibujar el pixel o no
                         if(boolDibujaEstePixel){
-                            Log.d(xxx, "changeSomePixelsToTransparent, boolDibujaEstePixel es true");
+                            //Log.d(xxx, "changeSomePixelsToTransparent, boolDibujaEstePixel es true");
 
                             //No hago nada
                         }else{
-                            Log.d(xxx, "changeSomePixelsToTransparent, boolDibujaEstePixel es false, lo pongo transparente");
+                            //Log.d(xxx, "changeSomePixelsToTransparent, boolDibujaEstePixel es false, lo pongo transparente");
                             int alpha2 = 0x00;
                             bitmap2.setPixel(x, y , Color.argb(alpha2,0xff,0xff,0xff));  // changing the transparency of pixel(x,y)
                         }
 
                     }else {//Si no existen, no hago nada, no chequeo la luminancia
-                        Log.d(xxx, "changeSomePixelsToTransparent, NO HAY QUE CHEQUEAR LA LUMINANCIA " );
+                        //Log.d(xxx, "changeSomePixelsToTransparent, NO HAY QUE CHEQUEAR LA LUMINANCIA " );
 
                     }
 

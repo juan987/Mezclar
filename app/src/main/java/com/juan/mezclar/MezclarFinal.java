@@ -1827,6 +1827,12 @@ public class MezclarFinal extends AppCompatActivity {
         Log.d(xxx, "metodo loopPrincipalImagenesTipoT, la formula de centradp da: " +offsetX_ParaCentrarN);
         //FIN de Nuevo requerimiento, centrado de cadenas/numeros recibido el 26 oct 2017
 
+
+
+
+        //Nuevo req el 29 ene 2018 en el correo: "caracteres especiales"
+        CaracteresEspeciales caracteresEspeciales = new CaracteresEspeciales(this);
+
         for(int i = 0; i < arrayImagesSequence.length; i++) {
             Log.d(xxx, "metodo loopPrincipalImagenesTipoT, mezclando imagen: " +i);
             prefijoNombreFile = "F1_";
@@ -1845,9 +1851,22 @@ public class MezclarFinal extends AppCompatActivity {
                 prefijoNombreFile += charDeLaSecuenciaRecibida.toUpperCase();
             }else{
                 //Si llega aqui, es por que hay algun character que no es valido
-                Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia numerica");
+                //Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia numerica");
                 //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
-                boolSeguirEjecutando = false;
+
+                //Nuevo req el 29 ene 2018 en el correo: "caracteres especiales"
+                prefijoNombreFile = caracteresEspeciales.getNombreFicheroEspecial(charDeLaSecuenciaRecibida);
+                if(prefijoNombreFile == null){
+                    //Si llega aqui, es por que hay algun character que no es valido
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter prohibido en la secuencia alphanumerica");
+                    //Como no es un caracter valido, no ejecutamos lo que viene, volvemos al loop a chequear el siguiente caracter
+                    boolSeguirEjecutando = false;
+                }else{
+                    Log.d(xxx, "metodo loopPrincipalImagenesTipoT, OJO, hay un caracter ESPECIAL en " +
+                            "la secuencia alphanumerica: " +prefijoNombreFile);
+                }
+                //FIN Nuevo req el 29 ene 2018 en el correo: "caracteres especiales"
+
             }
 
             //************************************************************************************************
