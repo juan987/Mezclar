@@ -494,7 +494,12 @@ public class DatosConfigTxt {
 
             //2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn, nuevo req del mail proximos requerimientos
             //Afecta a la cadena de numeros y alfanumericos
-            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center_p")){
+
+            //30 ene 2018:
+            //Debido al req de center_pn y center_pt del 29 ene 2018,
+            //tengo que cambiar center_p por center_p=
+            //if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center_p")){
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("center_p=")){
                 Log.d(xxx, "xxx, Hay una linea que empieza con center_p, y tiene: " +arrayLineasTextoLocal.get(i));
                 arraycenter_p = arrayLineasTextoLocal.get(i).split(regexcenter_p);
                 //boolMX = true;
