@@ -21,6 +21,15 @@ public class DatosConfigTxt {
     //Almacena la contraseña a partir de version 1.0.1
     String password = "";
 
+
+
+    //3 feb 2018: nuevo req: usar ftp_dir= para cambiar el directorio en el servidor ftp
+    //No hay un mail,  esto fue via telefonica
+    String stringFtpDir = null;
+    public String getStringFtpDir() {
+        return stringFtpDir;
+    }
+
     //Almacena el SOR a partir de version 1.0.2
     String stringSOR = "";
 
@@ -628,6 +637,24 @@ public class DatosConfigTxt {
             //FIN de 29 enero 2018, Posicionamiento en x en modo proporcional, parametros:
             //*********************************
             //29 Enero 2018
+            //*********************************
+
+            //*********************************
+            //3 feb 2018
+            //*********************************
+            //3 feb 2018: nuevo req: usar ftp_dir= para cambiar el directorio en el servidor ftp
+            //No hay un mail,  esto fue via telefonica
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("ftp_dir")) {
+                Log.d(xxx, "xxx, Hay una linea que empieza con ftp_dir y tiene: " + arrayLineasTextoLocal.get(i));
+                String[] array_ftp_dir = arrayLineasTextoLocal.get(i).split("=");
+                stringFtpDir = array_ftp_dir[array_ftp_dir.length - 1];
+                Log.d(xxx, "xxx, ftp_dir es valido: " + stringFtpDir);
+            }
+
+            //FIN 3 feb 2018: nuevo req: usar ftp_dir= para cambiar el directorio en el servidor ftp
+            //*********************************
+            //FIN 3 feb 2018
             //*********************************
         }
 

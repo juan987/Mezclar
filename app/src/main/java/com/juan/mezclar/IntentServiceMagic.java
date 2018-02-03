@@ -2851,10 +2851,38 @@ public class IntentServiceMagic extends IntentService {
             try {
                 if(ftp.login(user, password)){
                     //Login correcto, enviamos el fichero con el try catch de abajo
+
+                    //****************************************************************
+                    //Seguimos: verificar si hay que cambiar de directorio
+                    //3 feb 2018: nuevo req: usar ftp_dir= para cambiar el directorio en el servidor ftp
+                    //No hay un mail,  esto fue via telefonica
+                    if(datosConfigTxt.getStringFtpDir() == null){
+                        Log.d(xxx, "metodoSubirImagenConFtp: No hay que cambiar de directorio");
+
+                    }else{
+                        Log.d(xxx, "metodoSubirImagenConFtp: SI HAY que cambiar de directorio");
+                        //Cambiar directorio en el servidor FTP
+                        if(ftp.cambiarDirEnFtpServer(datosConfigTxt.getStringFtpDir())){
+                            Log.d(xxx, "metodoSubirImagenConFtp: OK en cambiarDirEnFtpServer");
+
+                        }else{
+                            Log.d(xxx, "metodoSubirImagenConFtp: FALLO en cambiarDirEnFtpServer");
+                            enviarNotificationFtp("Error: metodoSubirImagenConFtp: FALLO en cambiarDirEnFtpServer" +", saliendo de la aplicacion");
+                            enviarNotificationConNumero("E2");
+                            metodoMostrarError("E2", "Error with directory in server: " +ftp.getStrinnMensajesDeErrorDelServidorFtp());
+                            return false;
+
+                        }
+
+
+                    }
+                    //FIN 3 feb 2018: nuevo req: usar ftp_dir= para cambiar el directorio en el servidor ftp
+                    //****************************************************************
                 }else{
                     enviarNotificationFtp("Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
-                    metodoMostrarError("E2", "Error with ftp connect or login");
+                    //metodoMostrarError("E2", "Error with ftp connect or login");
+                    metodoMostrarError("E2", "Error with ftp connect or login: " +ftp.getStrinnMensajesDeErrorDelServidorFtp());
                     Log.d(xxx, "En metodoSubirImagenConFtp, Error: El login o la conexion al servidor ftp ha fallado" +", saliendo de la aplicacion");
                     return false;
                 }
@@ -2891,7 +2919,9 @@ public class IntentServiceMagic extends IntentService {
                 }else{
                     enviarNotificationFtp("Error: Fallo al enviar el fichero predict.jpg al servidor" +", saliendo de la aplicacion");
                     enviarNotificationConNumero("E2");
-                    metodoMostrarError("E2", "Error upload file to ftp server ");
+                    //metodoMostrarError("E2", "Error upload file to ftp server ");
+                    metodoMostrarError("E2", "Error upload file to ftp server: " +ftp.getStrinnMensajesDeErrorDelServidorFtp());
+
                     Log.d(xxx, "En metodoSubirImagenConFtp, Error: Fallo al enviar el fichero predict.jpg al servidor");
                     return false;
                 }

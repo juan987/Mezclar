@@ -138,6 +138,8 @@ public class FtpClient {
 
     //------------------------------------------------------------------
 
+
+
     /**
      * Realiza el login en el servidor
      * @param usuario	El nombre de usuario
@@ -146,6 +148,12 @@ public class FtpClient {
      * @throws SocketException
      * @throws IOException
      */
+
+    String strinnMensajesDeErrorDelServidorFtp = "";
+    public String getStrinnMensajesDeErrorDelServidorFtp() {
+        return strinnMensajesDeErrorDelServidorFtp;
+    }
+
     public boolean login (String usuario, String contrasena) throws SocketException, IOException {
         Log.d(xxx, "Estoy en el metodo login");
 
@@ -181,6 +189,8 @@ public class FtpClient {
 
                 Log.d(xxx, "Fallo en el login al servidor ftp ftpClient.login(usuario, contrasena))");
                 Log.d(xxx, "Codigo de respuesta del login:   " +ftpClient.getReplyCode());
+
+                strinnMensajesDeErrorDelServidorFtp = ftpClient.getReplyCode() + " , " +ftpClient.getReplyString();
 
                 return false;	//En caso de login incorrecto
             }
@@ -266,6 +276,7 @@ public class FtpClient {
                 buffer.close();        //Cierra el bufer
 
                 //Agregado el 16 nov 2017
+                ftpClient.logout();
                 ftpClient.disconnect();
 
                 return true;        //Se ha subido con éxito
@@ -274,7 +285,11 @@ public class FtpClient {
                 Log.d(xxx, "ERROR AL ALMACENAR FICHERO EN EL SERVIDOR CON ftpClient.storeFile(nombreArchivo, buffer);");
 
                 //Agregado el 16 nov 2017
+                ftpClient.logout();
                 ftpClient.disconnect();
+
+                strinnMensajesDeErrorDelServidorFtp = ftpClient.getReplyCode() + " , " +ftpClient.getReplyString();
+
 
                 return false;
             }
@@ -288,6 +303,7 @@ public class FtpClient {
             e.printStackTrace();
             Log.d(xxx, "Fallo 1 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
             //Agregado el 16 nov 2017
+            ftpClient.logout();
             ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion, Si no retorno, me sale el fallo de strict mode
 
@@ -297,6 +313,7 @@ public class FtpClient {
             e.printStackTrace();
             Log.d(xxx, "Fallo  2 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
             //Agregado el 16 nov 2017
+            ftpClient.logout();
             ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion
 
@@ -306,6 +323,7 @@ public class FtpClient {
             e.printStackTrace();
             Log.d(xxx, "Fallo 3 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
             //Agregado el 16 nov 2017
+            ftpClient.logout();
             ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion
 
@@ -316,6 +334,7 @@ public class FtpClient {
             e.printStackTrace();
             Log.d(xxx, "Fallo 4 en la conexion al server ftpClient.connect(ip): " + e.getMessage());
             //Agregado el 16 nov 2017
+            ftpClient.logout();
             ftpClient.disconnect();
             return false;	//En caso de que no sea posible la conexion
 
@@ -324,6 +343,47 @@ public class FtpClient {
 
 
     }//Fin de enviarFileFinalFinal
+
+    //*********************************
+    //3 feb 2018
+    //*********************************
+    //3 feb 2018: nuevo req: usar ftp_dir= para cambiar el directorio en el servidor ftp
+    //No hay un mail,  esto fue via telefonica
+
+    //Como en:
+    //http://www.codejava.net/java-se/networking/ftp/java-ftp-example-change-working-directory
+
+     boolean success = true;
+     public boolean cambiarDirEnFtpServer(String dir){
+         try {
+
+             // cambiar directorio
+             success = ftpClient.changeWorkingDirectory(dir);
+
+             if (success) {
+                 Log.d(xxx, "cambiarDirEnFtpServer, OK en cambiarDirEnFtpServer");
+             } else {//Ha habido un fallo
+                 Log.d(xxx, "cambiarDirEnFtpServer, Fallo en cambiarDirEnFtpServer");
+                 Log.d(xxx, "Codigo de respuesta del cambiarDirEnFtpServer, el fallo es:   " +ftpClient.getReplyCode());
+
+                 strinnMensajesDeErrorDelServidorFtp = ftpClient.getReplyCode() + " , " +ftpClient.getReplyString();
+
+             }
+
+             return success;
+
+
+         } catch (IOException e) {
+             Log.d(xxx, "cambiarDirEnFtpServer, ha habido una exception: " + e.getMessage());
+             return success;
+         }
+
+     }
+
+    //FIN 3 feb 2018: nuevo req: usar ftp_dir= para cambiar el directorio en el servidor ftp
+    //*********************************
+    //FIN 3 feb 2018
+    //*********************************
 
 
 }//Fin de la clase
