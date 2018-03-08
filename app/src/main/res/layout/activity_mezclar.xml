@@ -11,7 +11,10 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:visibility="invisible">
+        <!-- 8 marzo 2018: Req en mail cosilla del 3 de marzo 2018 -->
+
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
