@@ -24,7 +24,12 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile files('libs/commons-net-3.6.jar')
+
+    //Como no tengo incluido el jar de commons-net,
+    //ya aprovecho y lo pongo como compile para que lo baje gradle
+    //compile files('libs/commons-net-3.6.jar')
+    compile 'commons-net:commons-net:3.6'
+
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:26.+'
@@ -33,6 +38,7 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.0.1'
     compile 'org.apache.commons:commons-io:1.3.2'
     testCompile 'junit:junit:4.12'
+    compile 'commons-net:commons-net:3.6'
 }
 
 

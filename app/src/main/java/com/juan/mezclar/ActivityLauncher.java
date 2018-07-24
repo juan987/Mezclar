@@ -18,6 +18,7 @@ import android.widget.Toast;
 //lANZAR UN INTENT SERVICE EN SEGUNDO PLANO CUANDO EL INTENT VIENE DEL LANZADOR,
 //lANZAR LA UI ActivityLauncher cuando se hace click en el icono.
 
+
 public class ActivityLauncher extends AppCompatActivity {
     //String para usar en log.d con el nombre de la clase
     String xxx = this.getClass().getSimpleName();
