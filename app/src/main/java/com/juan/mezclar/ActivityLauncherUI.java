@@ -281,7 +281,7 @@ public class ActivityLauncherUI extends AppCompatActivity  {
                 }
 
                 //Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
-                //Actualizamos la variable pathCesaralMagicImageC
+                //Actualizamos la variable pathCesaralMagicImageC cuando se selecciona un dir del spinner
                 pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
                 //Averiguamos el valor de SOR, si es 9, mostramos el teclado numerico en el campo alfanumerico
                 if(booleanEsSor9()){
