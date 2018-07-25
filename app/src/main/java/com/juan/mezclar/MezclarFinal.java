@@ -777,7 +777,15 @@ public class MezclarFinal extends AppCompatActivity {
             //NO hay string SOR, NO HAY que ordenar la secuencia de imagenes recibida, seguimos
             Log.d(xxx, "En metodoPrincipal_2, NO hay parametro SOR o se ha recibido una secuencia alfanumerica, seguimos");
 
-        }else{
+
+        //}else{   // else original, antes del 25julio18, cuando NO habia paremetro SOR igial a 9, SOR=9
+
+
+        //***********************************
+        //**********req SOR******************
+        //***********************************
+        //Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
+        }else if(!stringSOR.equals("9")){ //Chequea que SOR sea distinto de 9, y hace lo que hacia antes
             Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR, se ejecuta metodo ejecutarConParametroSor");
             if(booleanSecuenciaNumerica) {
                 Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR y booleanSecuenciaNumerica=true, " +
@@ -793,6 +801,70 @@ public class MezclarFinal extends AppCompatActivity {
             }
 
         }
+
+        //Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
+        else{//Entra aqui cuando SOR = 9, y se ejecuta la ordenacion 2 veces
+            Log.d(xxx, "En metodoPrincipal_2, SOR=9, se ejecuta metodo ejecutarConParametroSor 2 veces");
+            if(booleanSecuenciaNumerica) {
+                Log.d(xxx, "En metodoPrincipal_2, Hay parametro SOR y booleanSecuenciaNumerica=true, " +
+                        "se ejecuta metodo ejecutarConParametroSor");
+
+                booleanSecuenciaRecibidaAlfanumerica = false;//Lo pongo a false, el campo alfanumerico lo uso solo para
+                //Cambio stringSOR a 6, para ordenar 12 digitos en cada llamada al algoritmo
+                stringSOR = "6";
+
+                //Ejecutar la ordenacion de los digitos 1 a 12
+                if (!ejecutarConParametroSor()) {
+                    //Ha habido un problema con la ordenacion, salir del programa
+                    //enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
+                    Log.d(xxx, "En metodoPrincipal_2, con SOR=9 Error en metodo ejecutarConParametroSor, salimos de la app");
+                    //Me faltaba esta linea
+                    return false;
+                }
+                //Se ha ejecutado correctamente ejecutarConParametroSor la primera vez
+                //Guardamos arrayImagesSequence con la secuencia ordenada de digitos 1 a 12 en una variable temporal
+                char[] arrayImagesSequence_1 = arrayImagesSequence.clone();
+                //Ejecutar ejecutarConParametroSor la segunda vez
+
+                //Ponemos los digitos de 13 a 24 en arrayImagesSequence, para ser ordenado
+                arrayImagesSequence = arrayImagesSequenceAlphanumeric.clone();
+
+                //Longitud del componente alphanumerico
+                sizearrayImagesSequence = arrayImagesSequenceAlphanumeric.length;
+
+                Log.d(xxx, "En metodoPrincipal_2, con SOR=9 LONGITUD DE arrayImagesSequence" +
+                        "Alphanumeric: " +arrayImagesSequenceAlphanumeric.length);
+
+                //Antes de ejecutar la ordenacion de los digitos 13 a 24
+                if (!ejecutarConParametroSor()) {
+                    //Ha habido un problema con la ordenacion, salir del programa
+                    //enviarNotificationConNumero("E1");
+                    //metodoMostrarError("E1", "Error in ordering algorithm for SOR parameter");
+                    Log.d(xxx, "En metodoPrincipal_2, con SOR=9 Error en metodo ejecutarConParametroSor, salimos de la app");
+                    //Me faltaba esta linea
+                    return false;
+                }
+                //Despues de ejecutar la ordenacion de los digitos 13 a 24
+
+                //Concatenamos los dos char arrays, cada uno con 12 digitos ordenados ascendente (1 a 12 y 13 a 24)
+                StringBuilder sb = new StringBuilder(64);
+                sb.append(arrayImagesSequence_1);
+                sb.append(arrayImagesSequence);
+
+                //char result[] = sb.toString().toCharArray();
+                arrayImagesSequence = sb.toString().toCharArray();
+                Log.d(xxx, "En metodoPrincipal_2, con SOR=9 el array final ordenado de 24 digitos es: " +arrayImagesSequence.toString());
+
+
+            }
+        }
+        //***********************************
+        //*********FIN req SOR***************
+        //***********************************
+        //FIN Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
+
+
 
         //Ejecutamos los loops
         if(booleanSecuenciaNumerica){

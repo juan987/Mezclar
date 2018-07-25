@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -115,6 +116,7 @@ public class ActivityLauncherUI extends AppCompatActivity  {
 
         secuenciaDeImagenes   = (EditText)findViewById(R.id.secImagenes);
         secuenciaDeImagenesAlfanumerica   = (EditText)findViewById(R.id.secImagenesAlfanumerica);
+
         nuevoDir   = (EditText)findViewById(R.id.nuevo_dir);
         textView   = (TextView)findViewById(R.id.textview_1);
 
@@ -278,6 +280,19 @@ public class ActivityLauncherUI extends AppCompatActivity  {
 
                 }
 
+                //Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
+                //Actualizamos la variable pathCesaralMagicImageC
+                pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+                //Averiguamos el valor de SOR, si es 9, mostramos el teclado numerico en el campo alfanumerico
+                if(booleanEsSor9()){
+                    secuenciaDeImagenesAlfanumerica.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    secuenciaDeImagenesAlfanumerica.setHint("Numeric Mode");
+                }else{//En este caso, manejo el caso false por que no se si la
+                    //asignacion inicial es la por defecto (text y String Mode),
+                    // o ya habia los settings de SOR9 al final del create
+                    secuenciaDeImagenesAlfanumerica.setInputType(InputType.TYPE_CLASS_TEXT);
+                    secuenciaDeImagenesAlfanumerica.setHint("String Mode");
+                }
             }
 
             @Override
@@ -428,7 +443,13 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         });
         */
 
-
+        //Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
+        //Averiguamos el valor de SOR, si es 9, mostramos el teclado numerico en el campo alfanumerico
+        //Tambien tengo que hacer esta llamada en el metodo del spinner: onItemSelected
+        if(booleanEsSor9()){
+            secuenciaDeImagenesAlfanumerica.setInputType(InputType.TYPE_CLASS_NUMBER);
+            secuenciaDeImagenesAlfanumerica.setHint("Numeric Mode");
+        }
 
     }//Fin del onCreate
 
@@ -863,5 +884,64 @@ public class ActivityLauncherUI extends AppCompatActivity  {
         Log.d(xxx, "onStop La secuencia alfanumerica es: "  +secuenciaDeImagenesAlfanumerica.getText().toString());
 
     }
+
+
+
+
+    //***********************************
+    //**********req SOR******************
+    //***********************************
+    //Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
+
+    //Este metodo lee de config.txt el parametro SOR.
+    private boolean booleanEsSor9(){
+        boolean boolEsSor9= false;
+
+        //REQ: Gestion de configuraciones multiples recibido el 23-10-17
+        //ConfiguracionesMultiples configuracionesMultiples = new ConfiguracionesMultiples(ActivityLauncherUI.this);
+
+        //Leer el directorio activo del share preferences, tb en IntentServiceMagic
+        //pathCesaralMagicImageC = configuracionesMultiples.getActiveDirectory();
+        //El directorio activo de la app es:
+        Log.d(xxx, "En booleanEsSor9, el directorio activo es: " +pathCesaralMagicImageC);
+
+        String ficheroConfigTxt = "CONFIG.txt";
+        //Obtener todas las lineas del fichero CONFIG.txt en el dir del dispositivo: pathCesaralMagicImageC
+        LeerFicheroTxt leerFicheroTxt = new LeerFicheroTxt(ActivityLauncherUI.this);
+        //arrayLineasTexto contiene todas las lineas de CONFIG.txt
+        List<String> arrayLineasTexto = leerFicheroTxt.getFileContentsLineByLineMethod(pathCesaralMagicImageC + ficheroConfigTxt);
+
+
+        if(arrayLineasTexto == null){
+            //Por alguna razon, el fichero config.txt no esta bien, devuelvo false y manejo el error en MezclarFinal
+            return false;
+        }
+
+        if(arrayLineasTexto.isEmpty()){
+            //Por alguna razon, el fichero config.txt no esta bien, devuelvo false y manejo el error en MezclarFinal
+            return false;
+        }
+
+
+        //DatosConfigTxt datosConfigTxt = new DatosConfigTxt(MezclarFinal.this);
+        DatosConfigTxt datosConfigTxt = new DatosConfigTxt(ActivityLauncherUI.this);
+        //Leer coordenadas N y T, URL, user, password,SOR, overwrite del array de lineas obtenido del fichero CONFIG.txt
+        //El metodo datosConfigTxt.getCoordenadasN lo coje todo, no solo las coordenadas
+        List<PojoCoordenadas> listaCoordenadas = datosConfigTxt.getCoordenadasN(arrayLineasTexto);
+        String stringSOR = datosConfigTxt.getStringSOR();
+
+        //reiniciar estas variables:
+        pathCesaralMagicImageC = "";
+
+        if(stringSOR.equals("9"))
+        {
+            boolEsSor9 = true;
+        }
+        return boolEsSor9;
+    }
+    //***********************************
+    //*********FIN req SOR***************
+    //***********************************
+    //FIN Juan 25-7-18, nuevo requerimiento SOR=9, recibido en dos correos de Cesar el 20 y 22 de julio18
 
 }//Fin de la clase
