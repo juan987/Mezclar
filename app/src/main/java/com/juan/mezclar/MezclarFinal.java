@@ -1739,6 +1739,31 @@ public class MezclarFinal extends AppCompatActivity {
                 if(boolDibujar) {
                     Log.d(xxx, "metodo loopPrincipalImagenesTipoN, en booldibujar: " +i +" , "   +xFloat  +" , " +yFloat);
 
+
+                    //***********************************************
+                    //**************NEW REQ***************************
+                    //***********************************************
+                    //Juan, 26julio18, req de mail "nivel de Transparencia" recibido el 26julio18
+                    /*
+                        El pixel a dibujar tiene las componentes RGB:  R1,G1,B1
+                        Supongamos que el pixel del fondo que se va a sobreescribir
+                        tiene de componentes RGB Rf,Gf,Bf
+                        El pixel que se escribiría tendría de componentes RGB:
+                        R1 x t1 + Rf x t2,  G1 x t1 + Gf x t2,  B1 x t1 + Bf x t2
+                     */
+                    double doubleT1 = 1d;
+                    if(doubleT1 != -1.0d){
+                        imagenParaSuperponerConOrigin = setTransparencyWithT1AndT2(originJpg, imagenParaSuperponerConOrigin,
+                                xFloat, yFloat);
+                    }
+
+                    //***********************************************
+                    //**************FIN NEW REQ**********************
+                    //***********************************************
+                    //FIN Juan, 26julio18, req de mail "nivel de Transparencia" recibido el 26julio18
+
+
+
                     mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
                             xFloat, yFloat);
 
@@ -2685,7 +2710,46 @@ public class MezclarFinal extends AppCompatActivity {
         return result;
     }
 
+    private Bitmap setTransparencyWithT1AndT2(Bitmap firstImage, Bitmap secondImage, float xCoord, float yCoord ){
+        /*
+            El pixel a dibujar tiene las componentes RGB:  R1,G1,B1
+            Supongamos que el pixel del fondo que se va a sobreescribir
+            tiene de componentes RGB Rf,Gf,Bf
+            El pixel que se escribiría tendría de componentes RGB:
+            R1 x t1 + Rf x t2,  G1 x t1 + Gf x t2,  B1 x t1 + Bf x t2
+        */
+        Log.d(xxx, "en metodo: changeSomePixelsToTransparent" );
 
+        Bitmap imagenOrigin = secondImage.copy(Bitmap.Config.ARGB_8888,true);
+        imagenOrigin.setHasAlpha(true);//DUDA si tengo que dejar el setHasAlpha
+
+        Bitmap imagenPequeña = secondImage.copy(Bitmap.Config.ARGB_8888,true);
+        imagenPequeña.setHasAlpha(true);//DUDA si tengo que dejar el setHasAlpha
+
+        for(int x=0;x<imagenPequeña.getWidth();x++){
+            for(int y=0;y<imagenPequeña.getHeight();y++){
+
+                int colour = imagenPequeña.getPixel(x, y);
+                double red = (double)Color.red(colour);
+                double blue = (double)Color.blue(colour);
+                double green = (double)Color.green(colour);
+                int alpha = Color.alpha(colour);
+
+                if(alpha == 0x00) break;//Si este pixel no se dibuja, termina el loop, y sigo con el siguiente indice
+
+                double doubleAlpha = (double)Color.alpha(colour);
+
+                //Sigo con la imagen imagenOrigin
+
+            }
+        }
+        return imagenPequeña;
+    }
+
+
+    //23 ene 2018: Nuevo req de email "CUPP Lite - nuevo requerimiento de Cesar", recibido el 14 ene 18
+    //23 ene 2018: Nuevo req de email "CUPP Lite - nuevo requerimiento de Cesar", recibido el 14 ene 18
+    //Mantengo el metodo original que solo pone a transparentes los pixeles que son blancos, EL DE ABAJO
     private Bitmap changeSomePixelsToTransparent(Bitmap originalImage){
         Log.d(xxx, "en metodo: changeSomePixelsToTransparent" );
 
