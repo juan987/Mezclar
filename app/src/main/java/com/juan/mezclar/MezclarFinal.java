@@ -1744,6 +1744,7 @@ public class MezclarFinal extends AppCompatActivity {
                     //**************NEW REQ***************************
                     //***********************************************
                     //Juan, 26julio18, req de mail "nivel de Transparencia" recibido el 26julio18
+                    //Aplica a numericos y alphanumericos
                     /*
                         El pixel a dibujar tiene las componentes RGB:  R1,G1,B1
                         Supongamos que el pixel del fondo que se va a sobreescribir
@@ -1751,8 +1752,7 @@ public class MezclarFinal extends AppCompatActivity {
                         El pixel que se escribiría tendría de componentes RGB:
                         R1 x t1 + Rf x t2,  G1 x t1 + Gf x t2,  B1 x t1 + Bf x t2
                      */
-                    double doubleT1 = 1d;
-                    if(doubleT1 != -1.0d){
+                    if(datosConfigTxt.getTransparencyT1() != -1.0f){
                         imagenParaSuperponerConOrigin = setTransparencyWithT1AndT2(originJpg, imagenParaSuperponerConOrigin,
                                 xFloat, yFloat);
                     }
@@ -2096,7 +2096,27 @@ public class MezclarFinal extends AppCompatActivity {
 
                     }//FIN parte 2, 2 nov 2017, Posicionamiento de ficheros en modo proporcional, parametro CENTER_P=nnn,
 
+                    //***********************************************
+                    //**************NEW REQ***************************
+                    //***********************************************
+                    //Juan, 26julio18, req de mail "nivel de Transparencia" recibido el 26julio18
+                    //Aplica a numericos y alphanumericos
+                    /*
+                        El pixel a dibujar tiene las componentes RGB:  R1,G1,B1
+                        Supongamos que el pixel del fondo que se va a sobreescribir
+                        tiene de componentes RGB Rf,Gf,Bf
+                        El pixel que se escribiría tendría de componentes RGB:
+                        R1 x t1 + Rf x t2,  G1 x t1 + Gf x t2,  B1 x t1 + Bf x t2
+                     */
+                    if(datosConfigTxt.getTransparencyT1() != -1.0f){
+                        imagenParaSuperponerConOrigin = setTransparencyWithT1AndT2(originJpg, imagenParaSuperponerConOrigin,
+                                xFloat, yFloat);
+                    }
 
+                    //***********************************************
+                    //**************FIN NEW REQ**********************
+                    //***********************************************
+                    //FIN Juan, 26julio18, req de mail "nivel de Transparencia" recibido el 26julio18
 
                     //Mezclar la imagen pequeña con origin.jpg en las coordenada que corresponden en CONGIG.txt
                     mergedImages = createSingleImageFromMultipleImagesWithCoord(originJpg, imagenParaSuperponerConOrigin,
@@ -2718,32 +2738,64 @@ public class MezclarFinal extends AppCompatActivity {
             El pixel que se escribiría tendría de componentes RGB:
             R1 x t1 + Rf x t2,  G1 x t1 + Gf x t2,  B1 x t1 + Bf x t2
         */
-        Log.d(xxx, "en metodo: changeSomePixelsToTransparent" );
+        Log.d(xxx, "en metodo: setTransparencyWithT1AndT2" );
 
-        Bitmap imagenOrigin = secondImage.copy(Bitmap.Config.ARGB_8888,true);
+        Bitmap imagenOrigin = firstImage.copy(Bitmap.Config.ARGB_8888,true);
         imagenOrigin.setHasAlpha(true);//DUDA si tengo que dejar el setHasAlpha
 
-        Bitmap imagenPequeña = secondImage.copy(Bitmap.Config.ARGB_8888,true);
-        imagenPequeña.setHasAlpha(true);//DUDA si tengo que dejar el setHasAlpha
+        Bitmap imagenPequena = secondImage.copy(Bitmap.Config.ARGB_8888,true);
+        imagenPequena.setHasAlpha(true);//DUDA si tengo que dejar el setHasAlpha
 
-        for(int x=0;x<imagenPequeña.getWidth();x++){
-            for(int y=0;y<imagenPequeña.getHeight();y++){
+        //Valores T1 y T2
 
-                int colour = imagenPequeña.getPixel(x, y);
-                double red = (double)Color.red(colour);
-                double blue = (double)Color.blue(colour);
-                double green = (double)Color.green(colour);
-                int alpha = Color.alpha(colour);
+        //Ha medida que T1 es mas pequeño que T2, las imagenes a superponer se mas clarita
+        //float floatT1 = 0.8f;
+        //float floatT2 = 0.2f;
 
-                if(alpha == 0x00) break;//Si este pixel no se dibuja, termina el loop, y sigo con el siguiente indice
+        //con estos valores, casi desaparecen las imagenes a superponer
+        //float floatT1 = 0.2f;
+        //float floatT2 = 0.8f;
+        float floatT1 = datosConfigTxt.getTransparencyT1();
+        float floatT2 = datosConfigTxt.getTransparencyT2();
 
-                double doubleAlpha = (double)Color.alpha(colour);
+        for(int x=0;x<imagenPequena.getWidth();x++){
+            for(int y=0;y<imagenPequena.getHeight();y++){
+                //obtener los colores RGB de la imagen pequeña como floats
+                int colourImgPequena = imagenPequena.getPixel(x, y);
+                int alphaImgPequena = Color.alpha(colourImgPequena);
 
-                //Sigo con la imagen imagenOrigin
+                if(alphaImgPequena == 0x00) continue;//Si este pixel no se dibuja, no sigue ejecutando y sigo con el siguiente indice
 
+                float redImgPequena = (float)Color.red(colourImgPequena);
+                float blueImgPequena = (float)Color.blue(colourImgPequena);
+                float greenImgPequena = (float)Color.green(colourImgPequena);
+
+                //Convierto las coordenadas de imagen origin a integer para extraer los pixeles
+                //de origin que seran sobreescritos con los pixeles de la imagen pequeña
+                int XcoordInteger = changeFloatToInteger(xCoord);
+                int YcoordInteger = changeFloatToInteger(yCoord);
+                //obtener los colores RGB de la imagen origin como floats
+                int colourImgGrande = imagenOrigin.getPixel(XcoordInteger + x, YcoordInteger + y);
+                float redImgGrande = (float)Color.red(colourImgGrande);
+                float blueImgGrande = (float)Color.blue(colourImgGrande);
+                float greenImgGrande = (float)Color.green(colourImgGrande);
+
+                //Aplico la formula:  R1 x t1 + Rf x t2,  G1 x t1 + Gf x t2,  B1 x t1 + Bf x t2
+                int intredImgPequena = changeFloatToInteger((redImgPequena * floatT1) + (redImgGrande * floatT2));
+                int intblueImgPequena = changeFloatToInteger((blueImgPequena * floatT1) + (blueImgGrande * floatT2));
+                int intgreenImgPequena = changeFloatToInteger((greenImgPequena * floatT1) + (greenImgGrande * floatT2));
+
+                //Reasigno los colores del pixel modificado de la imagen pequeña
+                imagenPequena.setPixel(x, y , Color.argb(alphaImgPequena,intredImgPequena,intgreenImgPequena,intblueImgPequena));
             }
         }
-        return imagenPequeña;
+        return imagenPequena;
+    }//Fin de setTransparencyWithT1AndT2
+
+    private int changeFloatToInteger(float floatNumber){
+        int intNumber = Math.round(floatNumber);
+
+        return intNumber;
     }
 
 

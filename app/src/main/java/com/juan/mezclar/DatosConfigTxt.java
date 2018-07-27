@@ -272,7 +272,26 @@ public class DatosConfigTxt {
     }
 
 
+    //Juan, 26julio18, req de mail "nivel de Transparencia" recibido el 26julio18
+    //Aplica a numericos y alphanumericos
+    //String stringTransparencyT1 = "-1.0";
+    //String stringTransparencyT2 = "-1.0";
 
+    //prueba
+    //con estos valores, casi desaparecen las imagenes a superponer
+    //String stringTransparencyT1 = "0.2";
+    //String stringTransparencyT2 = "0.8";
+
+    //Valores por defecto: no se aplica transparencia
+    String stringTransparencyT1 = "-1.0";
+    String stringTransparencyT2 = "-1.0";
+    public float getTransparencyT1() {
+        return Float.parseFloat(stringTransparencyT1);
+    }
+
+    public float getTransparencyT2() {
+        return Float.parseFloat(stringTransparencyT2);
+    }
 
 
 
@@ -538,6 +557,22 @@ public class DatosConfigTxt {
                 String[] array_offset = arrayLineasTextoLocal.get(i).split(regexMode_c_offset);
                 offset_m = array_offset[array_offset.length -1];
             }
+
+
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("tp1")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con tp1 y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_offset = arrayLineasTextoLocal.get(i).split(regexMode_c_offset);
+                stringTransparencyT1 = array_offset[array_offset.length -1];
+            }
+
+            if(arrayLineasTextoLocal.get(i).toLowerCase().startsWith("tp2")){
+                Log.d(xxx, "xxx, Hay una linea que empieza con tp2 y tiene: " +arrayLineasTextoLocal.get(i));
+                String[] array_offset = arrayLineasTextoLocal.get(i).split(regexMode_c_offset);
+                stringTransparencyT2 = array_offset[array_offset.length -1];
+            }
+
+
 
 
             //*********************************
